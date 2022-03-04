@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
 
+
 import com.turkcell.rentACar.business.dtos.ColorGetDto;
 import com.turkcell.rentACar.business.dtos.ColorListDto;
 import com.turkcell.rentACar.business.request.CreateColorRequest;
@@ -13,7 +14,6 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
-import com.turkcell.rentACar.dataAccess.abstracts.CarDao;
 import com.turkcell.rentACar.dataAccess.abstracts.ColorDao;
 import com.turkcell.rentACar.entities.concretes.Color;
 
@@ -28,13 +28,11 @@ public class ColorManager implements ColorService {
 
 	private ColorDao colorDao;
 	private ModelMapperService modelMapperService;
-	private CarDao carDao;
 
 	@Autowired
-	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService, CarDao carDao) {
+	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService) {
 		this.colorDao = colorDao;
 		this.modelMapperService = modelMapperService;
-		this.carDao = carDao;
 	}
 
 	@Override
@@ -127,19 +125,12 @@ public class ColorManager implements ColorService {
 
 	}
 
-	private void checkIfUseOnCar(int colorId) throws BusinessException {
-		if (this.carDao.getByColor_ColorId(colorId) != null) {
-			throw new BusinessException("This color is used in the car class..");
-		}
-	}
-
 	@Override
 	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
 
 		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 
 		checkIfIsData(color.getColorId());
-		checkIfUseOnCar(deleteColorRequest.getColorId());
 
 		this.colorDao.deleteById(color.getColorId());
 		return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");

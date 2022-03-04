@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.BrandDao;
-import com.turkcell.rentACar.dataAccess.abstracts.CarDao;
 import com.turkcell.rentACar.entities.concretes.Brand;
 
 @Service
@@ -28,19 +28,11 @@ public class BrandManager implements BrandService {
 
 	private BrandDao brandDao;
 	private ModelMapperService modelMapperService;
-	private CarDao carDao;
 
 	@Autowired
-	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService, CarDao carDao) {
+	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService) {
 		this.brandDao = brandDao;
 		this.modelMapperService = modelMapperService;
-		this.carDao = carDao;
-	}
-
-	private void checkIfUseOnCar(int brandId) throws BusinessException {
-		if (this.carDao.getByBrand_BrandId(brandId) != null) {
-			throw new BusinessException("This brand is used in the car class..");
-		}
 	}
 
 	@Override
@@ -133,8 +125,6 @@ public class BrandManager implements BrandService {
 
 	@Override
 	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException {
-
-		checkIfUseOnCar(deleteBrandRequest.getBrandId());
 
 		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 

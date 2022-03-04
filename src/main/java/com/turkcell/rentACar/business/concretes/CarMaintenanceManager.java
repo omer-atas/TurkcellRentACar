@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
-import com.turkcell.rentACar.dataAccess.abstracts.CarDao;
 import com.turkcell.rentACar.dataAccess.abstracts.CarMaintenanceDao;
 import com.turkcell.rentACar.entities.concretes.CarMaintenance;
 
@@ -32,20 +32,15 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	private CarMaintenanceDao carMaintenanceDao;
 	private ModelMapperService modelMapperService;
-	private CarDao carDao;
 
 	@Autowired
-	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService,
-			CarDao carDao) {
+	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService) {
 		this.carMaintenanceDao = carMaintenanceDao;
 		this.modelMapperService = modelMapperService;
-		this.carDao = carDao;
 	}
 
 	@Override
 	public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
-
-		checkIfIsCar(createCarMaintenanceRequest.getCarId());
 
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
@@ -54,15 +49,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		this.carMaintenanceDao.save(carMaintenance);
 		return new SuccessResult("Added : " + carMaintenance.getCarMaintanenceId());
-	}
-
-	private boolean checkIfIsCar(int carId) throws BusinessException {
-
-		if (this.carDao.getByCarId(carId) == null) {
-			throw new BusinessException("The car with this ID is not available..");
-		}
-
-		return true;
 	}
 
 	private CarMaintenance checkIfEmpty(CarMaintenance result) throws BusinessException {
@@ -113,7 +99,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
 
 		checkIfCarMaintenance(updateCarMaintenanceRequest.getCarMaintanenceId());
-		checkIfCarMaintenanceHasCar(updateCarMaintenanceRequest.getCarId());
 
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
 				CarMaintenance.class);
@@ -133,15 +118,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		this.carMaintenanceDao.deleteById(carMaintenance.getCarMaintanenceId());
 		return new SuccessResult(carMaintenance.getCarMaintanenceId() + " deleted..");
 
-	}
-
-	private boolean checkIfCarMaintenanceHasCar(int carId) throws BusinessException {
-
-		if (this.carDao.getByCarId(carId) == null) {
-			throw new BusinessException("There is no car in the id sent");
-		}
-
-		return true;
 	}
 
 	@Override
@@ -205,19 +181,19 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	@Override
 	public DataResult<List<CarMaintenanceListDto>> getByCarMaintenanceCarId(int carId) throws BusinessException {
-		
+
 		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
-		
-		if(result.isEmpty()) {
+
+		if (result.isEmpty()) {
 			throw new BusinessException("No data");
 		}
 
 		List<CarMaintenanceListDto> response = result.stream()
 				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
-		
+
 		updateCarCarMaintenance(result, response);
-		
+
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Success");
 	}
 

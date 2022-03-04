@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,35 +23,23 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
-import com.turkcell.rentACar.dataAccess.abstracts.BrandDao;
 import com.turkcell.rentACar.dataAccess.abstracts.CarDao;
-import com.turkcell.rentACar.dataAccess.abstracts.CarMaintenanceDao;
-import com.turkcell.rentACar.dataAccess.abstracts.ColorDao;
 import com.turkcell.rentACar.entities.concretes.Car;
 
 @Service
 public class CarManager implements CarService {
 
 	private CarDao carDao;
-	private BrandDao brandDao;
-	private ColorDao colorDao;
 	private ModelMapperService modelMapperService;
-	private CarMaintenanceDao carMaintenanceDao;
 
 	@Autowired
-	public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandDao brandDao, ColorDao colorDao,
-			CarMaintenanceDao carMaintenanceDao) {
+	public CarManager(CarDao carDao, ModelMapperService modelMapperService) {
 		this.carDao = carDao;
 		this.modelMapperService = modelMapperService;
-		this.brandDao = brandDao;
-		this.colorDao = colorDao;
-		this.carMaintenanceDao = carMaintenanceDao;
 	}
 
 	@Override
 	public Result add(CreateCarRequest createCarRequest) throws BusinessException {
-
-		checkIfColorAndBrandİsAvailable(createCarRequest.getBrandId(), createCarRequest.getColorId());
 
 		Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
@@ -59,7 +48,7 @@ public class CarManager implements CarService {
 		this.carDao.save(car);
 		return new SuccessResult("Car added : " + car.getDescription());
 	}
-	
+
 	private Car checkIfEmpty(Car result) throws BusinessException {
 
 		if (result == null) {
@@ -76,30 +65,6 @@ public class CarManager implements CarService {
 		}
 
 		return result;
-	}
-
-	public void checkIfBrand(int brandId) throws BusinessException {
-
-		if (this.brandDao.getByBrandId(brandId) == null) {
-			throw new BusinessException("Brand cannot found");
-		}
-	}
-
-	public void checkIfColor(int colorId) throws BusinessException {
-
-		if (this.colorDao.getByColorId(colorId) == null) {
-			throw new BusinessException("Brand cannot found");
-		}
-	}
-
-	private void checkIfColorAndBrandİsAvailable(int brandId, int colorId) throws BusinessException {
-
-		if (this.brandDao.getByBrandId(brandId) == null) {
-			throw new BusinessException("Brand does not exist.");
-		} else if (this.colorDao.getByColorId(colorId) == null) {
-			throw new BusinessException("Color does not exist.");
-		}
-
 	}
 
 	@Override
@@ -159,8 +124,6 @@ public class CarManager implements CarService {
 
 		updateCarRequest = checkIfUpdateCarRequest(updateCarRequest.getCarId(), updateCarRequest);
 
-		checkIfColorAndBrandİsAvailable(updateCarRequest.getBrandId(), updateCarRequest.getColorId());
-
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
 
 		checkIfIsData(updateCarRequest.getCarId());
@@ -178,7 +141,7 @@ public class CarManager implements CarService {
 		checkIfIsData(deleteCarRequest.getCarId());
 
 		this.carDao.deleteById(car.getCarId());
-		this.carMaintenanceDao.deleteByCar_CarId(car.getCarId());
+		
 		return new SuccessResult(deleteCarRequest.getCarId() + " deleted..");
 
 	}
