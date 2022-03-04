@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
+import com.turkcell.rentACar.business.dtos.CarMaintenanceGetDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.request.CreateCarMaintenanceRequest;
 import com.turkcell.rentACar.business.request.DeleteCarMaintenanceRequest;
@@ -62,6 +63,11 @@ public class CarMaintenancesController {
 	DataResult<List<CarMaintenanceListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction)
 			throws BusinessException {
 		return this.carMaintenanceService.getAllSorted(direction);
+	}
+	
+	@GetMapping("/getByCarMaintenanceId/{carMaintanenceId}")
+	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(@RequestParam("carMaintanenceId") int carMaintanenceId) throws BusinessException {
+		return this.carMaintenanceService.getByCarMaintenanceId(carMaintanenceId);
 	}
 
 	@PutMapping("/update")

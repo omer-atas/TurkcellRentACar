@@ -48,11 +48,10 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 
-		if (checkIfName(createBrandRequest.getBrandName())) {
-			this.brandDao.save(brand);
-			return new SuccessResult("Brand added : " + brand.getBrandName());
-		}
-		return null;
+		checkIfName(createBrandRequest.getBrandName());
+		this.brandDao.save(brand);
+		return new SuccessResult("Brand added : " + brand.getBrandName());
+
 	}
 
 	private boolean checkIfName(String brandName) throws BusinessException {
@@ -70,9 +69,7 @@ public class BrandManager implements BrandService {
 
 		List<Brand> result = this.brandDao.findAll();
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
@@ -81,14 +78,30 @@ public class BrandManager implements BrandService {
 		return new SuccessDataResult<List<BrandListDto>>(response, "Success");
 	}
 
+	private Brand checkIfEmpty(Brand result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
+		}
+
+		return result;
+	}
+
+	private List<Brand> checkIfListEmpty(List<Brand> result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
+		}
+
+		return result;
+	}
+
 	@Override
 	public DataResult<BrandGetDto> getByBrandId(int brandId) throws BusinessException {
 
 		Brand result = this.brandDao.getByBrandId(brandId);
 
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
+		checkIfEmpty(result);
 
 		BrandGetDto response = this.modelMapperService.forDto().map(result, BrandGetDto.class);
 		return new SuccessDataResult<BrandGetDto>(response, "Success");
@@ -110,10 +123,9 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 
-		if (!checkIfIsData(brand.getBrandId()) || !checkIfName(updateBrandRequest.getBrandName())) {
-			return null;
-		}
-		
+		checkIfIsData(brand.getBrandId());
+		checkIfName(updateBrandRequest.getBrandName());
+
 		this.brandDao.save(brand);
 		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
 
@@ -126,11 +138,9 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 
-		if (!checkIfIsData(brand.getBrandId())) {
-			return null;
-		} else {
-			this.brandDao.deleteById(brand.getBrandId());
-			return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");
-		}
+		checkIfIsData(brand.getBrandId());
+		this.brandDao.deleteById(brand.getBrandId());
+		return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");
+
 	}
 }

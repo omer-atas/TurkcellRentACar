@@ -42,11 +42,30 @@ public class ColorManager implements ColorService {
 
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
 
-		if (checkIfNameNotDuplicated(createColorRequest.getColorName())) {
-			this.colorDao.save(color);
-			return new SuccessResult("Color added : " + color.getColorName());
+		checkIfEmpty(color);
+		checkIfNameNotDuplicated(createColorRequest.getColorName());
+
+		this.colorDao.save(color);
+		return new SuccessResult("Color added : " + color.getColorName());
+
+	}
+
+	private Color checkIfEmpty(Color result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
 		}
-		return null;
+
+		return result;
+	}
+
+	private List<Color> checkIfListEmpty(List<Color> result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
+		}
+
+		return result;
 	}
 
 	private boolean checkIfNameNotDuplicated(String colorName) throws BusinessException {
@@ -66,9 +85,7 @@ public class ColorManager implements ColorService {
 
 		List<Color> result = this.colorDao.findAll();
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<ColorListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
@@ -81,9 +98,7 @@ public class ColorManager implements ColorService {
 
 		Color result = this.colorDao.getByColorId(colorId);
 
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
+		checkIfEmpty(result);
 
 		ColorGetDto response = this.modelMapperService.forDto().map(result, ColorGetDto.class);
 		return new SuccessDataResult<ColorGetDto>(response, "Success");
@@ -94,9 +109,9 @@ public class ColorManager implements ColorService {
 
 		Color color = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
 
-		if (!checkIfIsData(color.getColorId()) || !checkIfNameNotDuplicated(updateColorRequest.getColorName())) {
-			return null;
-		}
+		checkIfIsData(color.getColorId());
+		checkIfNameNotDuplicated(updateColorRequest.getColorName());
+
 		this.colorDao.save(color);
 		return new SuccessResult(updateColorRequest.getColorName() + " updated..");
 
@@ -121,15 +136,13 @@ public class ColorManager implements ColorService {
 	@Override
 	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
 
-		checkIfUseOnCar(deleteColorRequest.getColorId());
 		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 
-		if (!checkIfIsData(color.getColorId())) {
-			return null;
-		} else {
-			this.colorDao.deleteById(color.getColorId());
-			return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");
-		}
+		checkIfIsData(color.getColorId());
+		checkIfUseOnCar(deleteColorRequest.getColorId());
+
+		this.colorDao.deleteById(color.getColorId());
+		return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");
 
 	}
 }

@@ -2,7 +2,6 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
-
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,23 +54,39 @@ public class CarManager implements CarService {
 
 		Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
-		if (car == null) {
-			throw new BusinessException("No data..");
-		}
+		checkIfEmpty(car);
 
 		this.carDao.save(car);
 		return new SuccessResult("Car added : " + car.getDescription());
 	}
+	
+	private Car checkIfEmpty(Car result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
+		}
+
+		return result;
+	}
+
+	private List<Car> checkIfListEmpty(List<Car> result) throws BusinessException {
+
+		if (result == null) {
+			throw new BusinessException("No data");
+		}
+
+		return result;
+	}
 
 	public void checkIfBrand(int brandId) throws BusinessException {
-		
+
 		if (this.brandDao.getByBrandId(brandId) == null) {
 			throw new BusinessException("Brand cannot found");
 		}
 	}
 
 	public void checkIfColor(int colorId) throws BusinessException {
-		
+
 		if (this.colorDao.getByColorId(colorId) == null) {
 			throw new BusinessException("Brand cannot found");
 		}
@@ -92,9 +107,7 @@ public class CarManager implements CarService {
 
 		Car result = this.carDao.getByCarId(carId);
 
-		if (result == null) {
-			throw new BusinessException("No data..");
-		}
+		checkIfEmpty(result);
 
 		CarGetDto response = this.modelMapperService.forDto().map(result, CarGetDto.class);
 		return new SuccessDataResult<CarGetDto>(response, "Success");
@@ -106,9 +119,7 @@ public class CarManager implements CarService {
 
 		List<Car> result = this.carDao.findAll();
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<CarListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, CarListDto.class))
@@ -152,9 +163,7 @@ public class CarManager implements CarService {
 
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
 
-		if (!checkIfIsData(updateCarRequest.getCarId())) {
-			return null;
-		}
+		checkIfIsData(updateCarRequest.getCarId());
 
 		this.carDao.save(car);
 		return new SuccessResult(updateCarRequest.getCarId() + " updated..");
@@ -166,13 +175,11 @@ public class CarManager implements CarService {
 
 		Car car = this.modelMapperService.forRequest().map(deleteCarRequest, Car.class);
 
-		if (!checkIfIsData(deleteCarRequest.getCarId())) {
-			return null;
-		} else {
-			this.carDao.deleteById(car.getCarId());
-			this.carMaintenanceDao.deleteByCar_CarId(car.getCarId());
-			return new SuccessResult(deleteCarRequest.getCarId() + " deleted..");
-		}
+		checkIfIsData(deleteCarRequest.getCarId());
+
+		this.carDao.deleteById(car.getCarId());
+		this.carMaintenanceDao.deleteByCar_CarId(car.getCarId());
+		return new SuccessResult(deleteCarRequest.getCarId() + " deleted..");
 
 	}
 
@@ -181,9 +188,7 @@ public class CarManager implements CarService {
 
 		List<Car> result = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<CarListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, CarListDto.class))
@@ -194,14 +199,12 @@ public class CarManager implements CarService {
 
 	@Override
 	public DataResult<List<CarListDto>> getAllPaged(int pageNo, int pageSize) throws BusinessException {
-		
+
 		Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
 		List<Car> result = this.carDao.findAll(pageable).getContent();
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<CarListDto> response = result.stream()
 				.map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
@@ -215,9 +218,7 @@ public class CarManager implements CarService {
 
 		List<Car> result = this.carDao.findAll(s);
 
-		if (result.isEmpty()) {
-			throw new BusinessException("No data");
-		}
+		checkIfListEmpty(result);
 
 		List<CarListDto> response = result.stream()
 				.map(product -> this.modelMapperService.forDto().map(product, CarListDto.class))
