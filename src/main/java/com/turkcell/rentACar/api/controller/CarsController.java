@@ -42,31 +42,29 @@ public class CarsController {
 	}
 
 	@GetMapping("/getall")
-	public DataResult<List<CarListDto>> getAll() throws BusinessException {
+	public DataResult<List<CarListDto>> getAll() {
 		return this.carService.getAll();
 	}
 
-	@GetMapping("/getByCarId/{carId}")
-	public DataResult<CarGetDto> getByCarId(@RequestParam("carId") int carId) throws BusinessException {
-		return this.carService.getByCarId(carId);
-	}
-
-	@GetMapping("/findByDailyPriceLessThanEqual")
-	public DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(@RequestParam("dailyPrice") double dailyPrice)
-			throws BusinessException {
-		return this.carService.findByDailyPriceLessThanEqual(dailyPrice);
-	}
-
 	@GetMapping("/getAllSorted")
-	public DataResult<List<CarListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction)
-			throws BusinessException {
+	public DataResult<List<CarListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction) {
 		return this.carService.getAllSorted(direction);
 	}
 
 	@GetMapping("/getAllPaged")
 	public DataResult<List<CarListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
-			@RequestParam("pageSize") int pageSize) throws BusinessException {
+			@RequestParam("pageSize") int pageSize) {
 		return this.carService.getAllPaged(pageNo, pageSize);
+	}
+
+	@GetMapping("/getByCarId/{carId}")
+	public DataResult<CarGetDto> getByCarId(@RequestParam("carId") int carId) {
+		return this.carService.getByCarId(carId);
+	}
+
+	@GetMapping("/findByDailyPriceLessThanEqual")
+	public DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(@RequestParam("dailyPrice") double dailyPrice) {
+		return this.carService.findByDailyPriceLessThanEqual(dailyPrice);
 	}
 
 	@PutMapping("/update")

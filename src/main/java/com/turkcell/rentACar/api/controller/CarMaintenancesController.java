@@ -43,30 +43,29 @@ public class CarMaintenancesController {
 	}
 
 	@GetMapping("/getByCarMaintenanceCarId/{carId}")
-	public DataResult<List<CarMaintenanceListDto>> getByCarMaintenanceCarId(@RequestParam("carId") int carId)
-			throws BusinessException {
+	public DataResult<List<CarMaintenanceListDto>> getByCarMaintenanceCarId(@RequestParam("carId") int carId) {
 		return this.carMaintenanceService.getByCarMaintenanceCarId(carId);
 	}
 
 	@GetMapping("/getAll")
-	public DataResult<List<CarMaintenanceListDto>> getAll() throws BusinessException {
+	public DataResult<List<CarMaintenanceListDto>> getAll() {
 		return this.carMaintenanceService.getAll();
 	}
 
 	@GetMapping("/getAllPaged")
 	public DataResult<List<CarMaintenanceListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
-			@RequestParam("pageSize") int pageSize) throws BusinessException {
+			@RequestParam("pageSize") int pageSize) {
 		return this.carMaintenanceService.getAllPaged(pageNo, pageSize);
 	}
 
 	@GetMapping("/getAllSorted")
-	DataResult<List<CarMaintenanceListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction)
-			throws BusinessException {
+	DataResult<List<CarMaintenanceListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction) {
 		return this.carMaintenanceService.getAllSorted(direction);
 	}
-	
+
 	@GetMapping("/getByCarMaintenanceId/{carMaintanenceId}")
-	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(@RequestParam("carMaintanenceId") int carMaintanenceId) throws BusinessException {
+	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(
+			@RequestParam("carMaintanenceId") int carMaintanenceId) {
 		return this.carMaintenanceService.getByCarMaintenanceId(carMaintanenceId);
 	}
 

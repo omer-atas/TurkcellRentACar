@@ -2,10 +2,13 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
-
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.BrandService;
@@ -17,6 +20,7 @@ import com.turkcell.rentACar.business.request.UpdateBrandRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -40,13 +44,14 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 
-		checkIfName(createBrandRequest.getBrandName());
+		checkIfSameName(createBrandRequest.getBrandName());
+
 		this.brandDao.save(brand);
 		return new SuccessResult("Brand added : " + brand.getBrandName());
 
 	}
 
-	private boolean checkIfName(String brandName) throws BusinessException {
+	private boolean checkIfSameName(String brandName) throws BusinessException {
 
 		if (this.brandDao.existsByBrandName(brandName)) {
 			throw new BusinessException("Names can't be the same");
@@ -57,11 +62,13 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public DataResult<List<BrandListDto>> getAll() throws BusinessException {
+	public DataResult<List<BrandListDto>> getAll() {
 
 		List<Brand> result = this.brandDao.findAll();
 
-		checkIfListEmpty(result);
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<BrandListDto>>("Brands not listed");
+		}
 
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
@@ -70,37 +77,57 @@ public class BrandManager implements BrandService {
 		return new SuccessDataResult<List<BrandListDto>>(response, "Success");
 	}
 
-	private Brand checkIfEmpty(Brand result) throws BusinessException {
+	@Override
+	public DataResult<List<BrandListDto>> getAllPaged(int pageNo, int pageSize) {
 
-		if (result == null) {
-			throw new BusinessException("No data");
+		Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+
+		List<Brand> result = this.brandDao.findAll(pageable).getContent();
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<BrandListDto>>("Brands not list - getAllPaged - ");
 		}
 
-		return result;
-	}
+		List<BrandListDto> response = result.stream()
+				.map(car -> this.modelMapperService.forDto().map(car, BrandListDto.class)).collect(Collectors.toList());
 
-	private List<Brand> checkIfListEmpty(List<Brand> result) throws BusinessException {
-
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
-
-		return result;
+		return new SuccessDataResult<List<BrandListDto>>(response, "Brands Listed Successfully");
 	}
 
 	@Override
-	public DataResult<BrandGetDto> getByBrandId(int brandId) throws BusinessException {
+	public DataResult<List<BrandListDto>> getAllSorted(Direction direction) {
+
+		Sort s = Sort.by(direction, "brandName");
+
+		List<Brand> result = this.brandDao.findAll(s);
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<BrandListDto>>("Cars not list - getAllSorted -");
+		}
+
+		List<BrandListDto> response = result.stream()
+				.map(product -> this.modelMapperService.forDto().map(product, BrandListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<BrandListDto>>(response);
+	}
+
+	@Override
+	public DataResult<BrandGetDto> getByBrandId(int brandId) {
 
 		Brand result = this.brandDao.getByBrandId(brandId);
 
-		checkIfEmpty(result);
+		if (result == null) {
+			return new ErrorDataResult<BrandGetDto>("Brand not found");
+		}
 
 		BrandGetDto response = this.modelMapperService.forDto().map(result, BrandGetDto.class);
 		return new SuccessDataResult<BrandGetDto>(response, "Success");
 
 	}
 
-	private boolean checkIfIsData(int brandId) throws BusinessException {
+	@Override
+	public boolean checkIfIsThereBrand(int brandId) throws BusinessException {
 
 		if (this.brandDao.getByBrandId(brandId) == null) {
 			throw new BusinessException("There is no data in the id sent");
@@ -115,8 +142,8 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 
-		checkIfIsData(brand.getBrandId());
-		checkIfName(updateBrandRequest.getBrandName());
+		checkIfIsThereBrand(brand.getBrandId());
+		checkIfSameName(updateBrandRequest.getBrandName());
 
 		this.brandDao.save(brand);
 		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
@@ -128,9 +155,11 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 
-		checkIfIsData(brand.getBrandId());
+		checkIfIsThereBrand(brand.getBrandId());
+
 		this.brandDao.deleteById(brand.getBrandId());
 		return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");
 
 	}
+
 }

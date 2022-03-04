@@ -21,6 +21,7 @@ import com.turkcell.rentACar.business.request.UpdateCarMaintenanceRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -45,50 +46,67 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
 
-		checkIfEmpty(carMaintenance);
-
 		this.carMaintenanceDao.save(carMaintenance);
-		return new SuccessResult("Added : " + carMaintenance.getCarMaintanenceId());
-	}
-
-	private CarMaintenance checkIfEmpty(CarMaintenance result) throws BusinessException {
-
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
-
-		return result;
-	}
-
-	private List<CarMaintenance> checkIfListEmpty(List<CarMaintenance> result) throws BusinessException {
-
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
-
-		return result;
+		return new SuccessResult("Added : " + carMaintenance.getMaintanenceId());
 	}
 
 	@Override
-	public DataResult<List<CarMaintenanceListDto>> getAll() throws BusinessException {
+	public DataResult<List<CarMaintenanceListDto>> getAll() {
 
 		List<CarMaintenance> result = this.carMaintenanceDao.findAll();
 
-		checkIfListEmpty(result);
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
+		}
 
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
-		updateCarCarMaintenance(result, response);
-
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
 
 	}
+	
+	@Override
+	public DataResult<List<CarMaintenanceListDto>> getAllPaged(int pageNo, int pageSize) {
 
-	private boolean checkIfCarMaintenance(int carMaintenanceId) throws BusinessException {
+		Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
-		if (this.carMaintenanceDao.getByCarMaintanenceId(carMaintenanceId) == null) {
+		List<CarMaintenance> result = this.carMaintenanceDao.findAll(pageable).getContent();
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
+		}
+
+		List<CarMaintenanceListDto> response = result.stream()
+				.map(car -> this.modelMapperService.forDto().map(car, CarMaintenanceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
+	}
+	
+	@Override
+	public DataResult<List<CarMaintenanceListDto>> getAllSorted(Direction direction) {
+
+		Sort s = Sort.by(direction, "returnDate");
+
+		List<CarMaintenance> result = this.carMaintenanceDao.findAll(s);
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
+		}
+
+		List<CarMaintenanceListDto> response = result.stream()
+				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
+	}
+
+	@Override
+	public boolean checkIfCarMaintenance(int carMaintenanceId) throws BusinessException {
+
+		if (this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId) == null) {
 			throw new BusinessException("The car maintenance with this ID is not available..");
 		}
 
@@ -104,7 +122,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				CarMaintenance.class);
 
 		this.carMaintenanceDao.save(carMaintenance);
-		return new SuccessResult(carMaintenance.getCarMaintanenceId() + " updated..");
+		return new SuccessResult(carMaintenance.getMaintanenceId() + " updated..");
 	}
 
 	@Override
@@ -115,84 +133,54 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(deleteCarMaintenanceRequest,
 				CarMaintenance.class);
 
-		this.carMaintenanceDao.deleteById(carMaintenance.getCarMaintanenceId());
-		return new SuccessResult(carMaintenance.getCarMaintanenceId() + " deleted..");
+		this.carMaintenanceDao.deleteById(carMaintenance.getMaintanenceId());
+		return new SuccessResult(carMaintenance.getMaintanenceId() + " deleted..");
 
 	}
+
+	
+
+	/*
+	 * model mapper misatake solution private List<CarMaintenanceListDto>
+	 * updateCarCarMaintenance(List<CarMaintenance> result,
+	 * List<CarMaintenanceListDto> response) {
+	 * 
+	 * for (int i = 0; i < result.size(); i++) {
+	 * response.get(i).setCarId(result.get(i).getCar().getCarId()); } return
+	 * response;
+	 * 
+	 * }
+	 */
+
+	
 
 	@Override
-	public DataResult<List<CarMaintenanceListDto>> getAllPaged(int pageNo, int pageSize) throws BusinessException {
+	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(int carMaintanenceId) {
 
-		Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+		CarMaintenance result = this.carMaintenanceDao.getByMaintanenceId(carMaintanenceId);
 
-		List<CarMaintenance> result = this.carMaintenanceDao.findAll(pageable).getContent();
-
-		checkIfListEmpty(result);
-
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(car -> this.modelMapperService.forDto().map(car, CarMaintenanceListDto.class))
-				.collect(Collectors.toList());
-
-		updateCarCarMaintenance(result, response);
-
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response);
-	}
-
-	private List<CarMaintenanceListDto> updateCarCarMaintenance(List<CarMaintenance> result,
-			List<CarMaintenanceListDto> response) {
-
-		for (int i = 0; i < result.size(); i++) {
-			response.get(i).setCarId(result.get(i).getCar().getCarId());
+		if (result == null) {
+			return new ErrorDataResult<CarMaintenanceGetDto>("Maintenances not listed");
 		}
-		return response;
-
-	}
-
-	@Override
-	public DataResult<List<CarMaintenanceListDto>> getAllSorted(Direction direction) throws BusinessException {
-
-		Sort s = Sort.by(direction, "returnDate");
-
-		List<CarMaintenance> result = this.carMaintenanceDao.findAll(s);
-
-		checkIfListEmpty(result);
-
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
-				.collect(Collectors.toList());
-
-		updateCarCarMaintenance(result, response);
-
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response);
-	}
-
-	@Override
-	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(int carMaintanenceId) throws BusinessException {
-
-		CarMaintenance result = this.carMaintenanceDao.getByCarMaintanenceId(carMaintanenceId);
-
-		checkIfEmpty(result);
 
 		CarMaintenanceGetDto response = this.modelMapperService.forDto().map(result, CarMaintenanceGetDto.class);
-		response.setCarId(result.getCarMaintanenceId());
+		response.setCarId(result.getMaintanenceId());
 
 		return new SuccessDataResult<CarMaintenanceGetDto>(response, "Success");
 	}
 
 	@Override
-	public DataResult<List<CarMaintenanceListDto>> getByCarMaintenanceCarId(int carId) throws BusinessException {
+	public DataResult<List<CarMaintenanceListDto>> getByCarMaintenanceCarId(int carId) {
 
 		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
 
 		if (result.isEmpty()) {
-			throw new BusinessException("No data");
+			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
 		}
 
 		List<CarMaintenanceListDto> response = result.stream()
 				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
-
-		updateCarCarMaintenance(result, response);
 
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Success");
 	}

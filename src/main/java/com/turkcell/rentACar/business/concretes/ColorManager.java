@@ -1,8 +1,6 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
-
-
 import com.turkcell.rentACar.business.dtos.ColorGetDto;
 import com.turkcell.rentACar.business.dtos.ColorListDto;
 import com.turkcell.rentACar.business.request.CreateColorRequest;
@@ -11,6 +9,7 @@ import com.turkcell.rentACar.business.request.UpdateColorRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -18,6 +17,10 @@ import com.turkcell.rentACar.dataAccess.abstracts.ColorDao;
 import com.turkcell.rentACar.entities.concretes.Color;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,8 +42,6 @@ public class ColorManager implements ColorService {
 	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
 
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
-
-		checkIfEmpty(color);
 		checkIfNameNotDuplicated(createColorRequest.getColorName());
 
 		this.colorDao.save(color);
@@ -48,25 +49,8 @@ public class ColorManager implements ColorService {
 
 	}
 
-	private Color checkIfEmpty(Color result) throws BusinessException {
-
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
-
-		return result;
-	}
-
-	private List<Color> checkIfListEmpty(List<Color> result) throws BusinessException {
-
-		if (result == null) {
-			throw new BusinessException("No data");
-		}
-
-		return result;
-	}
-
-	private boolean checkIfNameNotDuplicated(String colorName) throws BusinessException {
+	@Override
+	public boolean checkIfNameNotDuplicated(String colorName) throws BusinessException {
 
 		var response = this.colorDao.existsByColorName(colorName);
 
@@ -79,24 +63,63 @@ public class ColorManager implements ColorService {
 	}
 
 	@Override
-	public DataResult<List<ColorListDto>> getAll() throws BusinessException {
+	public DataResult<List<ColorListDto>> getAll() {
 
 		List<Color> result = this.colorDao.findAll();
 
-		checkIfListEmpty(result);
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<ColorListDto>>("Colors not list");
+		}
 
 		List<ColorListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
-		return new SuccessDataResult<List<ColorListDto>>(response, "Success");
+		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
 	}
 
 	@Override
-	public DataResult<ColorGetDto> getByColorId(int colorId) throws BusinessException {
+	public DataResult<List<ColorListDto>> getAllPaged(int pageNo, int pageSize) {
+
+		Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+
+		List<Color> result = this.colorDao.findAll(pageable).getContent();
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<ColorListDto>>("Colors not list - getAllPaged - ");
+		}
+
+		List<ColorListDto> response = result.stream()
+				.map(car -> this.modelMapperService.forDto().map(car, ColorListDto.class)).collect(Collectors.toList());
+
+		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
+	}
+
+	@Override
+	public DataResult<List<ColorListDto>> getAllSorted(Direction direction) {
+
+		Sort s = Sort.by(direction, "colorName");
+
+		List<Color> result = this.colorDao.findAll(s);
+
+		if (result.isEmpty()) {
+			return new ErrorDataResult<List<ColorListDto>>("Colors not list - getAllSorted -");
+		}
+
+		List<ColorListDto> response = result.stream()
+				.map(product -> this.modelMapperService.forDto().map(product, ColorListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
+	}
+
+	@Override
+	public DataResult<ColorGetDto> getByColorId(int colorId) {
 
 		Color result = this.colorDao.getByColorId(colorId);
 
-		checkIfEmpty(result);
+		if (result == null) {
+			return new ErrorDataResult<ColorGetDto>("There is no color in the id sent");
+		}
 
 		ColorGetDto response = this.modelMapperService.forDto().map(result, ColorGetDto.class);
 		return new SuccessDataResult<ColorGetDto>(response, "Success");
@@ -115,10 +138,11 @@ public class ColorManager implements ColorService {
 
 	}
 
-	private boolean checkIfIsData(int colorId) throws BusinessException {
+	@Override
+	public boolean checkIfIsData(int colorId) throws BusinessException {
 
 		if (this.colorDao.getByColorId(colorId) == null) {
-			throw new BusinessException("There is no data in the id sent");
+			throw new BusinessException("There is no color in the id sent");
 		}
 
 		return true;
@@ -136,4 +160,5 @@ public class ColorManager implements ColorService {
 		return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");
 
 	}
+
 }

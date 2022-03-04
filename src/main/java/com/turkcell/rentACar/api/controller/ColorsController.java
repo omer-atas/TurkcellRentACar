@@ -1,8 +1,6 @@
 package com.turkcell.rentACar.api.controller;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
-
-
 import com.turkcell.rentACar.business.dtos.ColorGetDto;
 import com.turkcell.rentACar.business.dtos.ColorListDto;
 import com.turkcell.rentACar.business.request.CreateColorRequest;
@@ -13,6 +11,7 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,12 +33,23 @@ public class ColorsController {
 	}
 
 	@GetMapping("/getall")
-	public DataResult<List<ColorListDto>> getAll() throws BusinessException{
+	public DataResult<List<ColorListDto>> getAll() {
 		return this.colorService.getAll();
 	}
 
+	@GetMapping("/getAllSorted")
+	public DataResult<List<ColorListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction) {
+		return this.colorService.getAllSorted(direction);
+	}
+
+	@GetMapping("/getAllPaged")
+	public DataResult<List<ColorListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
+			@RequestParam("pageSize") int pageSize) {
+		return this.colorService.getAllPaged(pageNo, pageSize);
+	}
+	
 	@GetMapping("/getByColorId/{colorId}")
-	public DataResult<ColorGetDto> getByColorId(@RequestParam("colorId") int colorId) throws BusinessException{
+	public DataResult<ColorGetDto> getByColorId(@RequestParam("colorId") int colorId) {
 		return this.colorService.getByColorId(colorId);
 	}
 

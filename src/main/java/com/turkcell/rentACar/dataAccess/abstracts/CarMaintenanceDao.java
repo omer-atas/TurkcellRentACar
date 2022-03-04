@@ -14,5 +14,5 @@ public interface CarMaintenanceDao extends JpaRepository<CarMaintenance, Integer
 	
 	List<CarMaintenance> deleteByCar_CarId(int carId);
 
-	CarMaintenance getByCarMaintanenceId(int carMaintanenceId);
+	CarMaintenance getByMaintanenceId(int maintanenceId);
 }
