@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class CreateRentalCarRequest {
 
 	private LocalDate startingDate;
+	
+	private LocalDate endDate;
 
 	private int carId;
 

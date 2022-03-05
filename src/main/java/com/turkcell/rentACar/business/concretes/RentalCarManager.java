@@ -82,7 +82,7 @@ public class RentalCarManager implements RentalCarService {
 		for (CarMaintenanceListDto carMaintenance : result) {
 
 			if (createRentalCarRequest.getStartingDate().isBefore(carMaintenance.getReturnDate()) ||
-					createRentalCarRequest.getStartingDate().equals(carMaintenance.getReturnDate())) {
+					createRentalCarRequest.getEndDate().isBefore(carMaintenance.getReturnDate())) {
 				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 
