@@ -85,9 +85,17 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		for (RentalCarListDto rentalCar : result) {
 
-			if (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate())
-					|| createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())) {
+			if ((rentalCar.getEndDate() != null)
+					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate()))) {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
+			}
+
+			if ((rentalCar.getEndDate() == null)
+					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))) {
+				throw new BusinessException(
+						"The car cannot be sent for maintenance because it is on rent. / null end date.");
 			}
 
 		}
