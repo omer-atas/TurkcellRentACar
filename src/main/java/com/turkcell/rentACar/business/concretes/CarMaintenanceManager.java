@@ -79,19 +79,19 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
 
-		if(result == null) {
+		if (result == null) {
 			return true;
 		}
-		
+
 		for (RentalCarListDto rentalCar : result) {
 
-			if (rentalCar.getStartingDate().isBefore(createCarMaintenanceRequest.getReturnDate())
-					|| rentalCar.getStartingDate().equals(createCarMaintenanceRequest.getReturnDate())) {
+			if (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate())
+					|| createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())) {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
 		}
-		
+
 		return true;
 	}
 

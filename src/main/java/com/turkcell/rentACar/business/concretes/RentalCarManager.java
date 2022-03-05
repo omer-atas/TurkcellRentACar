@@ -56,8 +56,6 @@ public class RentalCarManager implements RentalCarService {
 
 		checkIfCarIsAvaliable(createRentalCarRequest.getCarId());
 		checkIfInMaintenance(createRentalCarRequest);
-			
-		
 
 		this.rentalCarDao.save(rentalCar);
 		return new SuccessResult("Added : " + rentalCar.getRentalId());
@@ -76,21 +74,19 @@ public class RentalCarManager implements RentalCarService {
 
 		List<CarMaintenanceListDto> result = this.carMaintenanceService
 				.getByCar_CarId(createRentalCarRequest.getCarId());
-		
-		if(result == null) {
+
+		if (result == null) {
 			return true;
 		}
-		
-		
+
 		for (CarMaintenanceListDto carMaintenance : result) {
 
-			if (createRentalCarRequest.getStartingDate().isBefore(carMaintenance.getReturnDate())
-					|| createRentalCarRequest.getStartingDate().equals(carMaintenance.getReturnDate())) {
+			if (createRentalCarRequest.getStartingDate().isBefore(carMaintenance.getReturnDate())) {
 				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 
 		}
-		
+
 		return true;
 	}
 
