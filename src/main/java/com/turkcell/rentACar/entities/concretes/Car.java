@@ -2,6 +2,7 @@ package com.turkcell.rentACar.entities.concretes;
 
 import java.util.List;
 
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,8 +18,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "cars")
@@ -48,5 +50,8 @@ public class Car {
 	
 	@OneToMany(mappedBy = "car",cascade = CascadeType.ALL)
 	private List<CarMaintenance> carMaintenances;
+	
+	@OneToMany(mappedBy = "car",cascade = CascadeType.ALL)
+	private List<RentalCar> rentalCars;
 
 }

@@ -30,3 +30,5 @@ public class Brand {
 	private List<Car> cars;
 
 }
+
+// Kirada olan araba bakıma gönderilemez - lazy annotion

@@ -19,7 +19,7 @@ public interface CarService {
 
 	DataResult<CarGetDto> getByCarId(int carId);
 
-	DataResult<List<CarListDto>> getAll() ;
+	DataResult<List<CarListDto>> getAll();
 
 	boolean checkIfBrand(int brandId) throws BusinessException;
 
@@ -36,5 +36,7 @@ public interface CarService {
 	DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(double dailyPrice);
 
 	boolean checkIfIsThereCar(int carId) throws BusinessException;
+
+	DataResult<CarGetDto> carCanBeRent(int carId) throws BusinessException;
 
 }

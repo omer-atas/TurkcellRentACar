@@ -1,6 +1,6 @@
 package com.turkcell.rentACar.business.dtos;
 
-import java.time.LocalDate;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +22,5 @@ public class CarGetDto {
 	private String brandName;
 
 	private String colorName;
-
-	private LocalDate returnDate;
 
 }

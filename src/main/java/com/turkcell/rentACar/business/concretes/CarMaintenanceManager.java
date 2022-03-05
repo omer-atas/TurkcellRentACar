@@ -2,10 +2,10 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
-
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,8 +13,12 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
+import com.turkcell.rentACar.business.abstracts.CarService;
+import com.turkcell.rentACar.business.abstracts.RentalCarService;
+import com.turkcell.rentACar.business.dtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenanceGetDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenanceListDto;
+import com.turkcell.rentACar.business.dtos.RentalCarListDto;
 import com.turkcell.rentACar.business.request.CreateCarMaintenanceRequest;
 import com.turkcell.rentACar.business.request.DeleteCarMaintenanceRequest;
 import com.turkcell.rentACar.business.request.UpdateCarMaintenanceRequest;
@@ -33,11 +37,17 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	private CarMaintenanceDao carMaintenanceDao;
 	private ModelMapperService modelMapperService;
+	private RentalCarService rentalCarService;
+	private CarService carService;
 
+	@Lazy
 	@Autowired
-	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService) {
+	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService,
+			RentalCarService rentalCarService, CarService carService) {
 		this.carMaintenanceDao = carMaintenanceDao;
 		this.modelMapperService = modelMapperService;
+		this.rentalCarService = rentalCarService;
+		this.carService = carService;
 	}
 
 	@Override
@@ -46,8 +56,43 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
 
+		carMaintenance.setMaintanenceId(0);
+
+		checkIfCarIsAvaliable(createCarMaintenanceRequest);
+		checkIfIsRent(createCarMaintenanceRequest);
+
 		this.carMaintenanceDao.save(carMaintenance);
 		return new SuccessResult("Added : " + carMaintenance.getMaintanenceId());
+	}
+
+	private void checkIfCarIsAvaliable(CreateCarMaintenanceRequest createCarMaintenanceRequest)
+			throws BusinessException {
+
+		DataResult<CarGetDto> result = this.carService.getByCarId(createCarMaintenanceRequest.getCarId());
+
+		if (!result.isSuccess()) {
+			throw new BusinessException("Araba yok");
+		}
+	}
+
+	private boolean checkIfIsRent(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
+
+		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
+
+		if(result == null) {
+			return true;
+		}
+		
+		for (RentalCarListDto rentalCar : result) {
+
+			if (rentalCar.getStartingDate().isBefore(createCarMaintenanceRequest.getReturnDate())
+					|| rentalCar.getStartingDate().equals(createCarMaintenanceRequest.getReturnDate())) {
+				throw new BusinessException("Araba kirada olduğu için bakıma gönderilemez");
+			}
+
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -66,7 +111,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
 
 	}
-	
+
 	@Override
 	public DataResult<List<CarMaintenanceListDto>> getAllPaged(int pageNo, int pageSize) {
 
@@ -78,13 +123,13 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
 		}
 
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(car -> this.modelMapperService.forDto().map(car, CarMaintenanceListDto.class))
+		List<CarMaintenanceListDto> response = result.stream().map(
+				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
 	}
-	
+
 	@Override
 	public DataResult<List<CarMaintenanceListDto>> getAllSorted(Direction direction) {
 
@@ -96,8 +141,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
 		}
 
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
+		List<CarMaintenanceListDto> response = result.stream().map(
+				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
@@ -138,22 +183,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	}
 
-	
-
-	/*
-	 * model mapper misatake solution private List<CarMaintenanceListDto>
-	 * updateCarCarMaintenance(List<CarMaintenance> result,
-	 * List<CarMaintenanceListDto> response) {
-	 * 
-	 * for (int i = 0; i < result.size(); i++) {
-	 * response.get(i).setCarId(result.get(i).getCar().getCarId()); } return
-	 * response;
-	 * 
-	 * }
-	 */
-
-	
-
 	@Override
 	public DataResult<CarMaintenanceGetDto> getByCarMaintenanceId(int carMaintanenceId) {
 
@@ -178,11 +207,42 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
 		}
 
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(product -> this.modelMapperService.forDto().map(product, CarMaintenanceListDto.class))
+		List<CarMaintenanceListDto> response = result.stream().map(
+				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Success");
+	}
+
+	@Override
+	public List<CarMaintenanceListDto> getAllCarMaintenanceByCarId(int carId) {
+
+		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
+
+		if (result.isEmpty()) {
+			return null;
+		}
+		List<CarMaintenanceListDto> response = result.stream().map(
+				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
+				.collect(Collectors.toList());
+
+		return response;
+	}
+
+	@Override
+	public List<CarMaintenanceListDto> getByCar_CarId(int carId) {
+
+		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
+
+		if (result.isEmpty()) {
+			return null;
+		}
+
+		List<CarMaintenanceListDto> response = result.stream()
+				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, CarMaintenanceListDto.class))
+				.collect(Collectors.toList());
+
+		return response;
 	}
 
 }

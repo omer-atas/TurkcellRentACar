@@ -1,5 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
+import java.time.LocalDate;
+
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -11,10 +13,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.BrandService;
+import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.abstracts.ColorService;
 import com.turkcell.rentACar.business.dtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.CarListDto;
+import com.turkcell.rentACar.business.dtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.request.CreateCarRequest;
 import com.turkcell.rentACar.business.request.DeleteCarRequest;
 import com.turkcell.rentACar.business.request.UpdateCarRequest;
@@ -35,14 +39,16 @@ public class CarManager implements CarService {
 	private ModelMapperService modelMapperService;
 	private BrandService brandService;
 	private ColorService colorService;
+	private CarMaintenanceService carMaintenanceService;
 
 	@Autowired
 	public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandService brandService,
-			ColorService colorService) {
+			ColorService colorService, CarMaintenanceService carMaintenanceService) {
 		this.carDao = carDao;
 		this.modelMapperService = modelMapperService;
 		this.brandService = brandService;
 		this.colorService = colorService;
+		this.carMaintenanceService = carMaintenanceService;
 	}
 
 	@Override
@@ -75,6 +81,7 @@ public class CarManager implements CarService {
 		return false;
 
 	}
+	
 
 	@Override
 	public DataResult<CarGetDto> getByCarId(int carId) {
@@ -194,6 +201,37 @@ public class CarManager implements CarService {
 		}
 
 		return true;
+
+	}
+
+	private void checkIfCarIsInMaintenance(int carId) throws BusinessException {
+
+		checkIfIsThereCar(carId);
+
+		for (CarMaintenanceListDto carMaintenance : this.carMaintenanceService.getAllCarMaintenanceByCarId(carId)) {
+
+			if (carMaintenance.getReturnDate() == null) {
+				throw new BusinessException("Dönüş tarihi null olduğu için kiraya verilemez....");
+			}
+
+			if (LocalDate.now().isBefore(carMaintenance.getReturnDate())
+					|| LocalDate.now().equals(carMaintenance.getReturnDate())) {
+				throw new BusinessException("Araba bakımda olduğu için kiraya verilemez....");
+			}
+
+		}
+	}
+
+	@Override
+	public DataResult<CarGetDto> carCanBeRent(int carId) throws BusinessException {
+
+		Car car = this.carDao.getByCarId(carId);
+
+		checkIfCarIsInMaintenance(carId);
+
+		CarGetDto response = this.modelMapperService.forDto().map(car, CarGetDto.class);
+
+		return new SuccessDataResult<CarGetDto>(response, carId + " id'sine sahip araç kiraya verilebilir..");
 
 	}
 

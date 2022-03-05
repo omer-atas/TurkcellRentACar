@@ -1,7 +1,6 @@
 package com.turkcell.rentACar.entities.concretes;
 
 import java.time.LocalDate;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,24 +19,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "car_maintenances")
-public class CarMaintenance {
+@Table(name = "rental_cars")
+public class RentalCar {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "car_maintanence_id")
-	private int maintanenceId;
+	@Column(name = "rental_car_id")
+	private int rentalId;
 
-	@Column(name = "description")
-	private String description;
+	@Column(name = "starting_date")
+	private LocalDate startingDate;
 
-	@Column(name = "returnDate")
-	private LocalDate returnDate;
+	@Column(name = "end_date")
+	private LocalDate endDate;
 
-	@ManyToOne()
+	@ManyToOne
 	@JoinColumn(name = "car_id")
 	private Car car;
-
-	// Kirada olan araç bakıma gönderilemez..
 
 }

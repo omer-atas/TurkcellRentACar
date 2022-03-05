@@ -61,6 +61,11 @@ public class CarsController {
 	public DataResult<CarGetDto> getByCarId(@RequestParam("carId") int carId) {
 		return this.carService.getByCarId(carId);
 	}
+	
+	@GetMapping("/carCanBeRent/{carId}")
+	public DataResult<CarGetDto> carCanBeRent(@RequestParam("carId") int carId) throws BusinessException{
+		return this.carService.carCanBeRent(carId);
+	}
 
 	@GetMapping("/findByDailyPriceLessThanEqual")
 	public DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(@RequestParam("dailyPrice") double dailyPrice) {
