@@ -71,7 +71,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		DataResult<CarGetDto> result = this.carService.getByCarId(createCarMaintenanceRequest.getCarId());
 
 		if (!result.isSuccess()) {
-			throw new BusinessException("Araba yok");
+			throw new BusinessException("The car with this id does not exist..");
 		}
 	}
 
@@ -87,7 +87,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 			if (rentalCar.getStartingDate().isBefore(createCarMaintenanceRequest.getReturnDate())
 					|| rentalCar.getStartingDate().equals(createCarMaintenanceRequest.getReturnDate())) {
-				throw new BusinessException("Araba kirada olduğu için bakıma gönderilemez");
+				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
 		}

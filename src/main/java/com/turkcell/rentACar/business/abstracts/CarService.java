@@ -37,6 +37,5 @@ public interface CarService {
 
 	boolean checkIfIsThereCar(int carId) throws BusinessException;
 
-	DataResult<CarGetDto> carCanBeRent(int carId) throws BusinessException;
 
 }

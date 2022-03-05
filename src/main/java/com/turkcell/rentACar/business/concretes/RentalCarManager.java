@@ -68,7 +68,7 @@ public class RentalCarManager implements RentalCarService {
 		DataResult<CarGetDto> result = this.carService.getByCarId(carId);
 
 		if (!result.isSuccess()) {
-			throw new BusinessException("Araba yok");
+			throw new BusinessException("The car with this id does not exist");
 		}
 	}
 
@@ -86,7 +86,7 @@ public class RentalCarManager implements RentalCarService {
 
 			if (createRentalCarRequest.getStartingDate().isBefore(carMaintenance.getReturnDate())
 					|| createRentalCarRequest.getStartingDate().equals(carMaintenance.getReturnDate())) {
-				throw new BusinessException("aaa");
+				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 
 		}
