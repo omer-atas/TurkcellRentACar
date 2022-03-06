@@ -17,6 +17,6 @@ public class CreateColorRequest {
 	@NotBlank
 	@NotNull
 	@NotEmpty
-	@Size(min = 0)
+	@Size(min = 1)
 	private String colorName;
 }

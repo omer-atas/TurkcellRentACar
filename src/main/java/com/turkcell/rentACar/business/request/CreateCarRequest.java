@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateCarRequest {
@@ -31,18 +32,14 @@ public class CreateCarRequest {
 	@NotBlank
 	@NotNull
 	@NotEmpty
-	@Size(min = 0)
+	@Size(min = 1)
 	private String description;
 
-	@NotBlank
-	@NotNull
-	@NotEmpty
+	
 	@Positive
 	private int brandId;
 
-	@NotBlank
-	@NotNull
-	@NotEmpty
+	
 	@Positive
 	private int colorId;
 }

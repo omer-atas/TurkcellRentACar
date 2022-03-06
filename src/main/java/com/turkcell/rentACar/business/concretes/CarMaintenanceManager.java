@@ -58,26 +58,25 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		carMaintenance.setMaintanenceId(0);
 
-		checkIfCarIsAvaliable(createCarMaintenanceRequest);
-		checkIfIsRent(createCarMaintenanceRequest);
+		checkIfCarIsAvaliable(carMaintenance);
+		checkIfIsRent(carMaintenance);
 
 		this.carMaintenanceDao.save(carMaintenance);
 		return new SuccessResult("Added : " + carMaintenance.getMaintanenceId());
 	}
 
-	private void checkIfCarIsAvaliable(CreateCarMaintenanceRequest createCarMaintenanceRequest)
-			throws BusinessException {
+	private void checkIfCarIsAvaliable(CarMaintenance carMaintenance) throws BusinessException {
 
-		DataResult<CarGetDto> result = this.carService.getByCarId(createCarMaintenanceRequest.getCarId());
+		DataResult<CarGetDto> result = this.carService.getByCarId(carMaintenance.getCar().getCarId());
 
 		if (!result.isSuccess()) {
 			throw new BusinessException("The car with this id does not exist..");
 		}
 	}
 
-	private boolean checkIfIsRent(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
+	private boolean checkIfIsRent(CarMaintenance carMaintenance) throws BusinessException {
 
-		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
+		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(carMaintenance.getCar().getCarId());
 
 		if (result == null) {
 			return true;
@@ -85,15 +84,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		for (RentalCarListDto rentalCar : result) {
 
-			if ((rentalCar.getEndDate() != null)
-					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getStartingDate())
-							|| createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate()))) {
+			if ((rentalCar.getEndDate() != null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
+					&& carMaintenance.getReturnDate().isBefore(rentalCar.getEndDate()))) {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
 			if ((rentalCar.getEndDate() == null)
-					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getStartingDate())
-							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))) {
+					&& (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
+							|| carMaintenance.getReturnDate().equals(rentalCar.getStartingDate()))) {
 				throw new BusinessException(
 						"The car cannot be sent for maintenance because it is on rent. / null end date.");
 			}
@@ -169,10 +167,11 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	@Override
 	public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
 
-		checkIfCarMaintenance(updateCarMaintenanceRequest.getCarMaintanenceId());
-
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
 				CarMaintenance.class);
+
+		checkIfCarIsAvaliable(carMaintenance);
+		checkIfIsRent(carMaintenance);
 
 		this.carMaintenanceDao.save(carMaintenance);
 		return new SuccessResult(carMaintenance.getMaintanenceId() + " updated..");

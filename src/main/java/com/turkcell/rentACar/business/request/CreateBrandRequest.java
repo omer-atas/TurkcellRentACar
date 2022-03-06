@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateBrandRequest {
@@ -17,7 +18,7 @@ public class CreateBrandRequest {
 	@NotBlank
 	@NotNull
 	@NotEmpty
-	@Size(min = 0)
+	@Size(min = 1)
 	private String brandName;
 
 }

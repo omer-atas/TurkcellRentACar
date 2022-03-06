@@ -54,8 +54,8 @@ public class RentalCarManager implements RentalCarService {
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
 		rentalCar.setRentalId(0);
 
-		checkIfCarIsAvaliable(createRentalCarRequest.getCarId());
-		checkIfInMaintenance(createRentalCarRequest);
+		checkIfCarIsAvaliable(rentalCar.getCar().getCarId());
+		checkIfInMaintenance(rentalCar);
 
 		this.rentalCarDao.save(rentalCar);
 		return new SuccessResult("Added : " + rentalCar.getRentalId());
@@ -70,10 +70,10 @@ public class RentalCarManager implements RentalCarService {
 		}
 	}
 
-	private boolean checkIfInMaintenance(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
+	private boolean checkIfInMaintenance(RentalCar rentalCar) throws BusinessException {
 
 		List<CarMaintenanceListDto> result = this.carMaintenanceService
-				.getByCar_CarId(createRentalCarRequest.getCarId());
+				.getByCar_CarId(rentalCar.getCar().getCarId());
 
 		if (result == null) {
 			return true;
@@ -81,8 +81,8 @@ public class RentalCarManager implements RentalCarService {
 
 		for (CarMaintenanceListDto carMaintenance : result) {
 
-			if (createRentalCarRequest.getStartingDate().isBefore(carMaintenance.getReturnDate()) ||
-					createRentalCarRequest.getEndDate().isBefore(carMaintenance.getReturnDate())) {
+			if (rentalCar.getStartingDate().isBefore(carMaintenance.getReturnDate()) ||
+					rentalCar.getEndDate().isBefore(carMaintenance.getReturnDate())) {
 				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 
@@ -178,8 +178,8 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
 
-		checkIfRentalCar(updateRentalCarRequest.getRentalId());
-		checkIfCarAvaliable(updateRentalCarRequest.getCarId());
+		checkIfCarIsAvaliable(rentalCar.getCar().getCarId());
+		checkIfInMaintenance(rentalCar);
 
 		this.rentalCarDao.save(rentalCar);
 		return new SuccessResult(updateRentalCarRequest.getCarId() + " updated..");
@@ -200,11 +200,11 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(deleteRentalCarRequest, RentalCar.class);
 
-		checkIfRentalCar(deleteRentalCarRequest.getCarId());
+		checkIfRentalCar(deleteRentalCarRequest.getRentalId());
 
 		this.rentalCarDao.deleteById(rentalCar.getRentalId());
 
-		return new SuccessResult(deleteRentalCarRequest.getCarId() + " deleted..");
+		return new SuccessResult(deleteRentalCarRequest.getRentalId() + " deleted..");
 	}
 
 	@Override

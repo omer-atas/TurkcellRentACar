@@ -1,7 +1,9 @@
 package com.turkcell.rentACar.business.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateCarRequest {
 
+	@NotBlank
+	@NotNull
+	@NotEmpty
 	@Positive
 	private int carId;
 
@@ -21,7 +26,6 @@ public class UpdateCarRequest {
 	@Positive
 	private int modelYear;
 
-	@Size(min = 1)
 	private String description;
 
 	@Positive
