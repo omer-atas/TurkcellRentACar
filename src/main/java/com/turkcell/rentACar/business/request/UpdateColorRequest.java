@@ -1,7 +1,5 @@
 package com.turkcell.rentACar.business.request;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -15,15 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateColorRequest {
 
-	@NotBlank
 	@NotNull
-	@NotEmpty
 	@Positive
 	private int colorId;
 
-	@NotBlank
 	@NotNull
-	@NotEmpty
 	@Size(min = 1)
 	private String colorName;
 }

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/colors")
 public class ColorsController {
@@ -28,7 +30,7 @@ public class ColorsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody CreateColorRequest createColorRequest) throws BusinessException {
+	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest) throws BusinessException {
 		return this.colorService.add(createColorRequest);
 	}
 
@@ -47,15 +49,14 @@ public class ColorsController {
 			@RequestParam("pageSize") int pageSize) {
 		return this.colorService.getAllPaged(pageNo, pageSize);
 	}
-	
+
 	@GetMapping("/getByColorId/{colorId}")
 	public DataResult<ColorGetDto> getByColorId(@RequestParam("colorId") int colorId) {
 		return this.colorService.getByColorId(colorId);
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody UpdateColorRequest updateColorRequest) throws BusinessException {
-
+	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) throws BusinessException {
 		return this.colorService.update(updateColorRequest);
 
 	}
