@@ -89,9 +89,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
-			if ((rentalCar.getEndDate() == null)
-					&& (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
-							|| carMaintenance.getReturnDate().equals(rentalCar.getStartingDate()))) {
+			if ((rentalCar.getEndDate() == null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
+					|| carMaintenance.getReturnDate().equals(rentalCar.getStartingDate()))) {
 				throw new BusinessException(
 						"The car cannot be sent for maintenance because it is on rent. / null end date.");
 			}
@@ -200,7 +199,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		}
 
 		CarMaintenanceGetDto response = this.modelMapperService.forDto().map(result, CarMaintenanceGetDto.class);
-		response.setCarId(result.getMaintanenceId());
 
 		return new SuccessDataResult<CarMaintenanceGetDto>(response, "Success");
 	}

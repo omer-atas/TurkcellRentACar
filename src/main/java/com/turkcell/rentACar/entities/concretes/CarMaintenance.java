@@ -38,6 +38,4 @@ public class CarMaintenance {
 	@JoinColumn(name = "car_id")
 	private Car car;
 
-	// Kirada olan araç bakıma gönderilemez..
-
 }
