@@ -42,6 +42,7 @@ public class ColorManager implements ColorService {
 	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
 
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
+		
 		checkIfNameNotDuplicated(createColorRequest.getColorName());
 
 		this.colorDao.save(color);

@@ -63,7 +63,7 @@ public class CarManager implements CarService {
 		if (this.brandService.getByBrandId(brandId).isSuccess()) {
 			return true;
 		}
-		return false;
+		throw new BusinessException("There is no brand corresponding to the sent id");
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class CarManager implements CarService {
 		if (this.colorService.getByColorId(colorId).isSuccess()) {
 			return true;
 		}
-		return false;
+		throw new BusinessException("There is no color corresponding to the sent id");
 
 	}
 
