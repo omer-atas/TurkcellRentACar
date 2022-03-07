@@ -1,8 +1,6 @@
 package com.turkcell.rentACar.business.request;
 
-import javax.validation.constraints.NotBlank;
-
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -14,8 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateBrandRequest {
 
-	@NotBlank
-	@NotEmpty
+	@NotNull
 	@Size(min = 1)
 	private String brandName;
 }

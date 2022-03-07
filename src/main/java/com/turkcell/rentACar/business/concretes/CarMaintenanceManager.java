@@ -169,6 +169,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		CarMaintenance carMaintenance = this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId);
 
+		checkIfParameterIsNull(updateCarMaintenanceRequest, carMaintenance);
+
 		CarMaintenance carMaintenanceUpdate = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
 				CarMaintenance.class);
 
@@ -176,6 +178,20 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		this.carMaintenanceDao.save(carMaintenanceUpdate);
 		return new SuccessResult(carMaintenanceUpdate.getMaintanenceId() + " updated..");
+	}
+
+	private UpdateCarMaintenanceRequest checkIfParameterIsNull(UpdateCarMaintenanceRequest updateCarMaintenanceRequest,
+			CarMaintenance carMaintenance) {
+
+		if (updateCarMaintenanceRequest.getDescription() == null) {
+			updateCarMaintenanceRequest.setDescription(carMaintenance.getDescription());
+		}
+
+		if (updateCarMaintenanceRequest.getReturnDate() == null) {
+			updateCarMaintenanceRequest.setReturnDate(carMaintenance.getReturnDate());
+		}
+
+		return updateCarMaintenanceRequest;
 	}
 
 	private void IdCorrector(CarMaintenance carMaintenance, CarMaintenance carMaintenanceUpdate) {

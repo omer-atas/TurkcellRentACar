@@ -177,12 +177,28 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar rentalCar = this.rentalCarDao.getByRentalId(rentalId);
 
+		checkIfParameterIsNull(updateRentalCarRequest, rentalCar);
+
 		RentalCar rentalCarUpdate = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
 
 		IdCorrector(rentalCar, rentalCarUpdate);
 
 		this.rentalCarDao.save(rentalCarUpdate);
 		return new SuccessResult(rentalCarUpdate.getRentalId() + " updated..");
+	}
+
+	private UpdateRentalCarRequest checkIfParameterIsNull(UpdateRentalCarRequest updateRentalCarRequest,
+			RentalCar rentalCar) {
+
+		if (updateRentalCarRequest.getStartingDate() == null) {
+			updateRentalCarRequest.setStartingDate(rentalCar.getStartingDate());
+		}
+
+		if (updateRentalCarRequest.getEndDate() == null) {
+			updateRentalCarRequest.setEndDate(rentalCar.getEndDate());
+		}
+
+		return updateRentalCarRequest;
 	}
 
 	private void IdCorrector(RentalCar rentalCar, RentalCar rentalCarUpdate) {

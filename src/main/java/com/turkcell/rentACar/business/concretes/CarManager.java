@@ -2,7 +2,6 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
-
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,14 +147,37 @@ public class CarManager implements CarService {
 
 		Car car = this.carDao.getByCarId(carId);
 
+		checkIfParameterIsNull(updateCarRequest, car);
+		checkIfColor(car.getColor().getColorId());
+
 		Car carUpdate = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
 
 		IdCorrector(car, carUpdate);
-		checkIfColor(car.getColor().getColorId());
 
 		this.carDao.save(carUpdate);
 		return new SuccessResult(car.getCarId() + " updated..");
 
+	}
+
+	private UpdateCarRequest checkIfParameterIsNull(UpdateCarRequest updateCarRequest, Car car) {
+
+		if (updateCarRequest.getDescription() == null) {
+			updateCarRequest.setDescription(car.getDescription());
+		}
+
+		if (updateCarRequest.getDailyPrice() == 0) {
+			updateCarRequest.setDailyPrice(car.getDailyPrice());
+		}
+
+		if (updateCarRequest.getModelYear() == 0) {
+			updateCarRequest.setModelYear(car.getModelYear());
+		}
+
+		if (updateCarRequest.getColorId() == 0) {
+			updateCarRequest.setColorId(car.getColor().getColorId());
+		}
+
+		return updateCarRequest;
 	}
 
 	private void IdCorrector(Car car, Car carUpdate) {
