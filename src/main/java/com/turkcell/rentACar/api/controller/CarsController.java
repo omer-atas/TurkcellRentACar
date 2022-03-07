@@ -70,8 +70,8 @@ public class CarsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateCarRequest updateCarRequest) throws BusinessException {
-		return this.carService.update(updateCarRequest);
+	public Result update(int carId, @RequestBody @Valid UpdateCarRequest updateCarRequest) throws BusinessException {
+		return this.carService.update( carId,updateCarRequest);
 	}
 
 	@DeleteMapping("/delete")

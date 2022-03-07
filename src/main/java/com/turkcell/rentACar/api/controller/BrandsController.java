@@ -55,8 +55,9 @@ public class BrandsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) throws BusinessException {
-		return this.brandService.update(updateBrandRequest);
+	public Result update(@RequestParam("brandId") int brandId,
+			@RequestBody @Valid UpdateBrandRequest updateBrandRequest) throws BusinessException {
+		return this.brandService.update(brandId, updateBrandRequest);
 	}
 
 	@DeleteMapping("/delete")

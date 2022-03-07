@@ -1,7 +1,7 @@
 package com.turkcell.rentACar.business.request;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -12,10 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateColorRequest {
-
-	@NotNull
-	@Positive
-	private int colorId;
 
 	@NotNull
 	@Size(min = 1)

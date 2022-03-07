@@ -29,7 +29,7 @@ public interface ColorService {
 
 	boolean checkIfNameNotDuplicated(String colorName) throws BusinessException;
 
-	Result update(UpdateColorRequest updateColorRequest) throws BusinessException;
+	Result update(int colorId, UpdateColorRequest updateColorRequest) throws BusinessException;
 
 	boolean checkIfIsData(int colorId) throws BusinessException;
 

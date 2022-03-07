@@ -138,16 +138,22 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result update(UpdateBrandRequest updateBrandRequest) throws BusinessException {
+	public Result update(int brandId, UpdateBrandRequest updateBrandRequest) throws BusinessException {
 
-		Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
+		Brand brand = this.brandDao.getByBrandId(brandId);
 
-		checkIfIsThereBrand(brand.getBrandId());
-		checkIfSameName(updateBrandRequest.getBrandName());
+		Brand brandUpdate = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 
-		this.brandDao.save(brand);
+		IdCorrector(brand, brandUpdate);
+		checkIfSameName(brandUpdate.getBrandName());
+
+		this.brandDao.save(brandUpdate);
 		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
 
+	}
+
+	private void IdCorrector(Brand brand, Brand brandUpdate) {
+		brandUpdate.setBrandId(brand.getBrandId());
 	}
 
 	@Override

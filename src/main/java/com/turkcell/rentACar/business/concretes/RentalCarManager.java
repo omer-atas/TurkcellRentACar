@@ -72,8 +72,7 @@ public class RentalCarManager implements RentalCarService {
 
 	private boolean checkIfInMaintenance(RentalCar rentalCar) throws BusinessException {
 
-		List<CarMaintenanceListDto> result = this.carMaintenanceService
-				.getByCar_CarId(rentalCar.getCar().getCarId());
+		List<CarMaintenanceListDto> result = this.carMaintenanceService.getByCar_CarId(rentalCar.getCar().getCarId());
 
 		if (result == null) {
 			return true;
@@ -81,8 +80,8 @@ public class RentalCarManager implements RentalCarService {
 
 		for (CarMaintenanceListDto carMaintenance : result) {
 
-			if (rentalCar.getStartingDate().isBefore(carMaintenance.getReturnDate()) ||
-					rentalCar.getEndDate().isBefore(carMaintenance.getReturnDate())) {
+			if (rentalCar.getStartingDate().isBefore(carMaintenance.getReturnDate())
+					|| rentalCar.getEndDate().isBefore(carMaintenance.getReturnDate())) {
 				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 
@@ -174,15 +173,21 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
-	public Result update(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+	public Result update(int rentalId, UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
 
-		RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
+		RentalCar rentalCar = this.rentalCarDao.getByRentalId(rentalId);
 
-		checkIfCarIsAvaliable(rentalCar.getCar().getCarId());
-		checkIfInMaintenance(rentalCar);
+		RentalCar rentalCarUpdate = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
 
-		this.rentalCarDao.save(rentalCar);
-		return new SuccessResult(updateRentalCarRequest.getCarId() + " updated..");
+		IdCorrector(rentalCar, rentalCarUpdate);
+
+		this.rentalCarDao.save(rentalCarUpdate);
+		return new SuccessResult(rentalCarUpdate.getRentalId() + " updated..");
+	}
+
+	private void IdCorrector(RentalCar rentalCar, RentalCar rentalCarUpdate) {
+		rentalCarUpdate.setCar(rentalCar.getCar());
+		rentalCarUpdate.setRentalId(rentalCar.getRentalId());
 	}
 
 	@Override

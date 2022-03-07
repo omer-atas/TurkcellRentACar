@@ -38,7 +38,7 @@ public class RentalCarsController {
 	}
 
 	@PostMapping("/add")
-	Result add(@RequestBody  @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
+	Result add(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 		return this.rentalCarService.add(createRentalCarRequest);
 	}
 
@@ -64,12 +64,13 @@ public class RentalCarsController {
 	}
 
 	@PutMapping("/update")
-	Result update(@RequestBody  @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
-		return this.rentalCarService.update(updateRentalCarRequest);
+	Result update(@RequestParam("rentalId") int rentalId, @RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest)
+			throws BusinessException {
+		return this.rentalCarService.update(rentalId, updateRentalCarRequest);
 	}
 
 	@DeleteMapping("/delete")
-	Result delete(@RequestBody DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException{
+	Result delete(@RequestBody DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException {
 		return this.rentalCarService.delete(deleteRentalCarRequest);
 	}
 

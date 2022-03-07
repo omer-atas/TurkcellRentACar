@@ -27,7 +27,7 @@ public interface BrandService {
 
 	DataResult<List<BrandListDto>> getAllSorted(Sort.Direction direction);
 
-	Result update(UpdateBrandRequest updateBrandRequest) throws BusinessException;
+	Result update(int brandId,UpdateBrandRequest updateBrandRequest) throws BusinessException;
 
 	boolean checkIfIsThereBrand(int brandId) throws BusinessException;
 

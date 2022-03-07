@@ -2,7 +2,6 @@ package com.turkcell.rentACar.business.abstracts;
 
 import java.util.List;
 
-
 import org.springframework.data.domain.Sort;
 
 import com.turkcell.rentACar.business.dtos.CarMaintenanceGetDto;
@@ -28,12 +27,13 @@ public interface CarMaintenanceService {
 
 	DataResult<List<CarMaintenanceListDto>> getAllSorted(Sort.Direction direction);
 
-	Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException;
+	Result update(int carMaintenanceId, UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
+			throws BusinessException;
 
 	Result delete(DeleteCarMaintenanceRequest deleteCarMaintenanceRequest) throws BusinessException;
 
 	boolean checkIfCarMaintenance(int carMaintenanceId) throws BusinessException;
-	
+
 	List<CarMaintenanceListDto> getAllCarMaintenanceByCarId(int carId);
 
 	List<CarMaintenanceListDto> getByCar_CarId(int carId);

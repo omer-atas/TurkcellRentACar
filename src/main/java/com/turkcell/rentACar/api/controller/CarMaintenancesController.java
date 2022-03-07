@@ -70,9 +70,9 @@ public class CarMaintenancesController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
+	public Result update(@RequestParam("carMaintenanceId") int carMaintenanceId,@RequestBody @Valid UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
 			throws BusinessException {
-		return this.carMaintenanceService.update(updateCarMaintenanceRequest);
+		return this.carMaintenanceService.update(carMaintenanceId,updateCarMaintenanceRequest);
 	}
 
 	@DeleteMapping("/delete")

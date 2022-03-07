@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.util.List;
 
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,17 +144,23 @@ public class CarManager implements CarService {
 	}
 
 	@Override
-	public Result update(UpdateCarRequest updateCarRequest) throws BusinessException {
+	public Result update(int carId, UpdateCarRequest updateCarRequest) throws BusinessException {
 
-		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
+		Car car = this.carDao.getByCarId(carId);
 
-		checkIfIsThereCar(car.getCarId());
-		checkIfBrand(car.getBrand().getBrandId());
+		Car carUpdate = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
+
+		IdCorrector(car, carUpdate);
 		checkIfColor(car.getColor().getColorId());
 
-		this.carDao.save(car);
-		return new SuccessResult(updateCarRequest.getCarId() + " updated..");
+		this.carDao.save(carUpdate);
+		return new SuccessResult(car.getCarId() + " updated..");
 
+	}
+
+	private void IdCorrector(Car car, Car carUpdate) {
+		carUpdate.setCarId(car.getCarId());
+		carUpdate.setBrand(car.getBrand());
 	}
 
 	@Override

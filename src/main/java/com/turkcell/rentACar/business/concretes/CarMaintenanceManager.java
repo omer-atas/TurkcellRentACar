@@ -164,16 +164,23 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	}
 
 	@Override
-	public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
+	public Result update(int carMaintenanceId, UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
+			throws BusinessException {
 
-		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
+		CarMaintenance carMaintenance = this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId);
+
+		CarMaintenance carMaintenanceUpdate = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
 				CarMaintenance.class);
 
-		checkIfCarIsAvaliable(carMaintenance);
-		checkIfIsRent(carMaintenance);
+		IdCorrector(carMaintenance, carMaintenanceUpdate);
 
-		this.carMaintenanceDao.save(carMaintenance);
-		return new SuccessResult(carMaintenance.getMaintanenceId() + " updated..");
+		this.carMaintenanceDao.save(carMaintenanceUpdate);
+		return new SuccessResult(carMaintenanceUpdate.getMaintanenceId() + " updated..");
+	}
+
+	private void IdCorrector(CarMaintenance carMaintenance, CarMaintenance carMaintenanceUpdate) {
+		carMaintenanceUpdate.setCar(carMaintenance.getCar());
+		carMaintenanceUpdate.setMaintanenceId(carMaintenance.getMaintanenceId());
 	}
 
 	@Override

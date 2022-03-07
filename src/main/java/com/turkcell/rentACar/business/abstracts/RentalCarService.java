@@ -14,24 +14,24 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 
 public interface RentalCarService {
-	
+
 	Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
 
 	DataResult<RentalCarGetDto> getByRentalId(int rentalId);
 
 	DataResult<List<RentalCarListDto>> getAll();
-	
+
 	DataResult<List<RentalCarListDto>> getAllPaged(int pageNo, int pageSize);
 
 	DataResult<List<RentalCarListDto>> getAllSorted(Sort.Direction direction);
-	
+
 	boolean checkIfRentalCar(int rentalId) throws BusinessException;
-	
+
 	boolean checkIfCarAvaliable(int carId) throws BusinessException;
-	
+
 	List<RentalCarListDto> getByCar_CarId(int carId);
-	
-	Result update(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
+
+	Result update(int rentalId, UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
 
 	Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
 

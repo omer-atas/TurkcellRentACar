@@ -56,8 +56,9 @@ public class ColorsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) throws BusinessException {
-		return this.colorService.update(updateColorRequest);
+	public Result update(@RequestParam("colorId") int colorId,
+			@RequestBody @Valid UpdateColorRequest updateColorRequest) throws BusinessException {
+		return this.colorService.update(colorId, updateColorRequest);
 
 	}
 

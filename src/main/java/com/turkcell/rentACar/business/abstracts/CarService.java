@@ -29,13 +29,12 @@ public interface CarService {
 
 	DataResult<List<CarListDto>> getAllSorted(Sort.Direction direction);
 
-	Result update(UpdateCarRequest updateCarRequest) throws BusinessException;
+	Result update(int carId, UpdateCarRequest updateCarRequest) throws BusinessException;
 
 	Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException;
 
 	DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(double dailyPrice);
 
 	boolean checkIfIsThereCar(int carId) throws BusinessException;
-
 
 }

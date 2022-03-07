@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
+
 import com.turkcell.rentACar.business.dtos.ColorGetDto;
 import com.turkcell.rentACar.business.dtos.ColorListDto;
 import com.turkcell.rentACar.business.request.CreateColorRequest;
@@ -42,7 +43,7 @@ public class ColorManager implements ColorService {
 	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
 
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
-		
+
 		checkIfNameNotDuplicated(createColorRequest.getColorName());
 
 		this.colorDao.save(color);
@@ -127,16 +128,22 @@ public class ColorManager implements ColorService {
 	}
 
 	@Override
-	public Result update(UpdateColorRequest updateColorRequest) throws BusinessException {
+	public Result update(int colorId, UpdateColorRequest updateColorRequest) throws BusinessException {
 
-		Color color = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
+		Color color = this.colorDao.getByColorId(colorId);
 
-		checkIfIsData(color.getColorId());
+		Color colorUpdate = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
+
+		IdCorrector(color, colorUpdate);
 		checkIfNameNotDuplicated(updateColorRequest.getColorName());
 
-		this.colorDao.save(color);
+		this.colorDao.save(colorUpdate);
 		return new SuccessResult(updateColorRequest.getColorName() + " updated..");
 
+	}
+
+	private void IdCorrector(Color color, Color colorUpdate) {
+		colorUpdate.setColorId(color.getColorId());
 	}
 
 	@Override
