@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.dtos.rentalCarDtos;
 
 import java.time.LocalDate;
 
@@ -10,10 +10,14 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateRentalCarRequest {
+public class RentalCarListDto {
+	
+	private int rentalId;
 
 	private LocalDate startingDate;
 
 	private LocalDate endDate;
+
+	private int carId;
 
 }

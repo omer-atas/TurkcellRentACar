@@ -1,18 +1,20 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.request.rentalCarRequests;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateBrandRequest {
+public class DeleteRentalCarRequest {
 
 	@NotNull
-	@Size(min = 1)
-	private String brandName;
+	@Positive
+	private int rentalId;
+
 }

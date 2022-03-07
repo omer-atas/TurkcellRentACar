@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.business.dtos;
+package com.turkcell.rentACar.business.dtos.colorDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrandGetDto {
+public class ColorGetDto {
 
-	private int brandId;
+	private int colorId;
 
-	private String brandName;
+	private String colorName;
 }

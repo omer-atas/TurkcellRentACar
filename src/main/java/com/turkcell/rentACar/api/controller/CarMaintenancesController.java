@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
-import com.turkcell.rentACar.business.dtos.CarMaintenanceGetDto;
-import com.turkcell.rentACar.business.dtos.CarMaintenanceListDto;
-import com.turkcell.rentACar.business.request.CreateCarMaintenanceRequest;
-import com.turkcell.rentACar.business.request.DeleteCarMaintenanceRequest;
-import com.turkcell.rentACar.business.request.UpdateCarMaintenanceRequest;
+import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceGetDto;
+import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
+import com.turkcell.rentACar.business.request.carMaintenanceRequests.CreateCarMaintenanceRequest;
+import com.turkcell.rentACar.business.request.carMaintenanceRequests.DeleteCarMaintenanceRequest;
+import com.turkcell.rentACar.business.request.carMaintenanceRequests.UpdateCarMaintenanceRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;

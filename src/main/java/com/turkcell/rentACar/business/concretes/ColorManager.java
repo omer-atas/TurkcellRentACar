@@ -1,12 +1,11 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
-
-import com.turkcell.rentACar.business.dtos.ColorGetDto;
-import com.turkcell.rentACar.business.dtos.ColorListDto;
-import com.turkcell.rentACar.business.request.CreateColorRequest;
-import com.turkcell.rentACar.business.request.DeleteColorRequest;
-import com.turkcell.rentACar.business.request.UpdateColorRequest;
+import com.turkcell.rentACar.business.dtos.colorDtos.ColorGetDto;
+import com.turkcell.rentACar.business.dtos.colorDtos.ColorListDto;
+import com.turkcell.rentACar.business.request.colorRequests.CreateColorRequest;
+import com.turkcell.rentACar.business.request.colorRequests.DeleteColorRequest;
+import com.turkcell.rentACar.business.request.colorRequests.UpdateColorRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;

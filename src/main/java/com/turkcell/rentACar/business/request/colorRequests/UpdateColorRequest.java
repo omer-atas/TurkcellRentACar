@@ -1,8 +1,7 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.request.colorRequests;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -12,11 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateColorRequest {
+public class UpdateColorRequest {
 
-	@NotBlank
 	@NotNull
-	@NotEmpty
 	@Size(min = 1)
 	private String colorName;
 }

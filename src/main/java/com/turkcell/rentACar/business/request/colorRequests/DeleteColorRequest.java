@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.request.colorRequests;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;

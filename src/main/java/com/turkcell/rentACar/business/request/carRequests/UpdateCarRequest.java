@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.request.carRequests;
 
 import javax.validation.constraints.Positive;
 

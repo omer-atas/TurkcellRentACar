@@ -1,7 +1,6 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.request.brandRequests;
 
 import javax.validation.constraints.NotNull;
-
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -11,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateColorRequest {
+public class UpdateBrandRequest {
 
 	@NotNull
 	@Size(min = 1)
-	private String colorName;
+	private String brandName;
 }

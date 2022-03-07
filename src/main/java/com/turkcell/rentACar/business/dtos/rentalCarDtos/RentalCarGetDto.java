@@ -1,8 +1,6 @@
-package com.turkcell.rentACar.business.request;
+package com.turkcell.rentACar.business.dtos.rentalCarDtos;
 
 import java.time.LocalDate;
-
-import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,13 +10,14 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateRentalCarRequest {
+public class RentalCarGetDto {
+	
+	private int rentalId;
 
 	private LocalDate startingDate;
 
 	private LocalDate endDate;
 
-	@Positive
 	private int carId;
 
 }
