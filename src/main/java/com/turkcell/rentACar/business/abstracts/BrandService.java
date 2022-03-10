@@ -27,7 +27,7 @@ public interface BrandService {
 
 	Result update(int brandId,UpdateBrandRequest updateBrandRequest) throws BusinessException;
 
-	boolean checkIfIsThereBrand(int brandId) throws BusinessException;
+	boolean checkIfBrandExists(int brandId) throws BusinessException;
 
 	Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException;
 

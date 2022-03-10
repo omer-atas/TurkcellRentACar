@@ -1,5 +1,8 @@
 package com.turkcell.rentACar.business.abstracts;
 
+
+
+
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -32,7 +35,7 @@ public interface CarMaintenanceService {
 
 	Result delete(DeleteCarMaintenanceRequest deleteCarMaintenanceRequest) throws BusinessException;
 
-	boolean checkIfCarMaintenance(int carMaintenanceId) throws BusinessException;
+	boolean checkIfCarMaintenanceExists(int carMaintenanceId) throws BusinessException;
 
 	List<CarMaintenanceListDto> getAllCarMaintenanceByCarId(int carId);
 

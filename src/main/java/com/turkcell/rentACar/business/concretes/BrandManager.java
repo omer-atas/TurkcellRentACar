@@ -44,22 +44,20 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 
-		checkIfSameName(createBrandRequest.getBrandName());
+		checkIfNameNotDuplicated(createBrandRequest.getBrandName());
 
 		this.brandDao.save(brand);
 		return new SuccessResult("Brand added : " + brand.getBrandName());
 
 	}
 
-	private boolean checkIfSameName(String brandName) throws BusinessException {
+	private void checkIfNameNotDuplicated(String brandName) throws BusinessException {
 
 		if (this.brandDao.existsByBrandName(brandName)) {
 			throw new BusinessException("Names can't be the same");
 		}
 
-		return true;
-
-	}
+    }
 
 	@Override
 	public DataResult<List<BrandListDto>> getAll() {
@@ -127,7 +125,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public boolean checkIfIsThereBrand(int brandId) throws BusinessException {
+	public boolean checkIfBrandExists(int brandId) throws BusinessException {
 
 		if (this.brandDao.getByBrandId(brandId) == null) {
 			throw new BusinessException("There is no data in the id sent");
@@ -145,7 +143,7 @@ public class BrandManager implements BrandService {
 		Brand brandUpdate = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 
 		IdCorrector(brand, brandUpdate);
-		checkIfSameName(brandUpdate.getBrandName());
+		checkIfNameNotDuplicated(brandUpdate.getBrandName());
 
 		this.brandDao.save(brandUpdate);
 		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
@@ -161,7 +159,7 @@ public class BrandManager implements BrandService {
 
 		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 
-		checkIfIsThereBrand(brand.getBrandId());
+		checkIfBrandExists(brand.getBrandId());
 
 		this.brandDao.deleteById(brand.getBrandId());
 		return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");

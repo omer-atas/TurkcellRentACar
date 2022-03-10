@@ -21,10 +21,6 @@ public interface CarService {
 
 	DataResult<List<CarListDto>> getAll();
 
-	boolean checkIfBrand(int brandId) throws BusinessException;
-
-	boolean checkIfColor(int colorId) throws BusinessException;
-
 	DataResult<List<CarListDto>> getAllPaged(int pageNo, int pageSize);
 
 	DataResult<List<CarListDto>> getAllSorted(Sort.Direction direction);
@@ -35,6 +31,6 @@ public interface CarService {
 
 	DataResult<List<CarListDto>> findByDailyPriceLessThanEqual(double dailyPrice);
 
-	boolean checkIfIsThereCar(int carId) throws BusinessException;
+	boolean checkIfCarExists(int carId) throws BusinessException;
 
 }

@@ -25,11 +25,9 @@ public interface ColorService {
 
 	DataResult<ColorGetDto> getByColorId(int colorId);
 
-	boolean checkIfNameNotDuplicated(String colorName) throws BusinessException;
-
 	Result update(int colorId, UpdateColorRequest updateColorRequest) throws BusinessException;
 
-	boolean checkIfIsData(int colorId) throws BusinessException;
+	boolean checkIfColorExists(int colorId) throws BusinessException;
 
 	Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException;
 }

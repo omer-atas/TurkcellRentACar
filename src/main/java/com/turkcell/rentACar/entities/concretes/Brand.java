@@ -22,7 +22,6 @@ public class Brand {
 	@Column(name = "brand_id")
 	private int brandId;
 
-
 	@Column(name = "brand_name", unique = true)
 	private String brandName;
 	
@@ -30,5 +29,3 @@ public class Brand {
 	private List<Car> cars;
 
 }
-
-// Kirada olan araba bakıma gönderilemez - lazy annotion

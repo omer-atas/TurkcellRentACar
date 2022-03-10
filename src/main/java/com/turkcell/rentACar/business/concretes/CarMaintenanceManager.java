@@ -40,7 +40,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	private RentalCarService rentalCarService;
 	private CarService carService;
 
-	@Lazy
+	@Lazy 
 	@Autowired
 	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService,
 			RentalCarService rentalCarService, CarService carService) {
@@ -58,46 +58,49 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		carMaintenance.setMaintanenceId(0);
 
-		checkIfCarIsAvaliable(carMaintenance);
-		checkIfIsRent(carMaintenance);
+		checkIfCarExists(createCarMaintenanceRequest);
+		checkIfCarRented(createCarMaintenanceRequest);
 
 		this.carMaintenanceDao.save(carMaintenance);
 		return new SuccessResult("Added : " + carMaintenance.getMaintanenceId());
 	}
 
-	private void checkIfCarIsAvaliable(CarMaintenance carMaintenance) throws BusinessException {
+	private void checkIfCarExists(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-		DataResult<CarGetDto> result = this.carService.getByCarId(carMaintenance.getCar().getCarId());
+		DataResult<CarGetDto> result = this.carService.getByCarId(createCarMaintenanceRequest.getCarId());
 
 		if (!result.isSuccess()) {
 			throw new BusinessException("The car with this id does not exist..");
 		}
 	}
 
-	private boolean checkIfIsRent(CarMaintenance carMaintenance) throws BusinessException {
+	private void checkIfCarRented(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(carMaintenance.getCar().getCarId());
+		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
 
 		if (result == null) {
-			return true;
+			return;
 		}
 
 		for (RentalCarListDto rentalCar : result) {
 
-			if ((rentalCar.getEndDate() != null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
-					&& carMaintenance.getReturnDate().isBefore(rentalCar.getEndDate()))) {
+			if ((rentalCar.getEndDate() != null)
+					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))
+					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getEndDate()))) {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
-			if ((rentalCar.getEndDate() == null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
-					|| carMaintenance.getReturnDate().equals(rentalCar.getStartingDate()))) {
+			if ((rentalCar.getEndDate() == null)
+					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))) {
 				throw new BusinessException(
 						"The car cannot be sent for maintenance because it is on rent. / null end date.");
 			}
 
 		}
 
-		return true;
 	}
 
 	@Override
@@ -154,7 +157,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	}
 
 	@Override
-	public boolean checkIfCarMaintenance(int carMaintenanceId) throws BusinessException {
+	public boolean checkIfCarMaintenanceExists(int carMaintenanceId) throws BusinessException {
 
 		if (this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId) == null) {
 			throw new BusinessException("The car maintenance with this ID is not available..");
@@ -202,7 +205,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	@Override
 	public Result delete(DeleteCarMaintenanceRequest deleteCarMaintenanceRequest) throws BusinessException {
 
-		checkIfCarMaintenance(deleteCarMaintenanceRequest.getCarMaintanenceId());
+		checkIfCarMaintenanceExists(deleteCarMaintenanceRequest.getCarMaintanenceId());
 
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(deleteCarMaintenanceRequest,
 				CarMaintenance.class);

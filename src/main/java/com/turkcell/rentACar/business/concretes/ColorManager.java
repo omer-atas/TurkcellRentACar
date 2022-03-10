@@ -50,16 +50,13 @@ public class ColorManager implements ColorService {
 
 	}
 
-	@Override
-	public boolean checkIfNameNotDuplicated(String colorName) throws BusinessException {
+	public void checkIfNameNotDuplicated(String colorName) throws BusinessException {
 
 		var response = this.colorDao.existsByColorName(colorName);
 
 		if (response) {
 			throw new BusinessException("Names can't be the same");
 		}
-
-		return true;
 
 	}
 
@@ -146,7 +143,7 @@ public class ColorManager implements ColorService {
 	}
 
 	@Override
-	public boolean checkIfIsData(int colorId) throws BusinessException {
+	public boolean checkIfColorExists(int colorId) throws BusinessException {
 
 		if (this.colorDao.getByColorId(colorId) == null) {
 			throw new BusinessException("There is no color in the id sent");
@@ -161,7 +158,7 @@ public class ColorManager implements ColorService {
 
 		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 
-		checkIfIsData(color.getColorId());
+		checkIfColorExists(color.getColorId());
 
 		this.colorDao.deleteById(color.getColorId());
 		return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");
