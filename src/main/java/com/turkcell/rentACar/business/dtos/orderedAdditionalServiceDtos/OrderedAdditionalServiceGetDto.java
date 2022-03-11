@@ -12,5 +12,5 @@ public class OrderedAdditionalServiceGetDto {
 
     private int additionalServiceId;
 
-    private int rentalId;
+    private int rentId;
 }

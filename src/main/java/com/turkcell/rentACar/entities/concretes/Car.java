@@ -56,6 +56,6 @@ public class Car {
 	private List<CarMaintenance> carMaintenances;
 	
 	@OneToMany(mappedBy = "car",cascade = CascadeType.ALL)
-	private List<RentalCar> rentalCars;
+	private List<Rent> rentalCars;
 
 }

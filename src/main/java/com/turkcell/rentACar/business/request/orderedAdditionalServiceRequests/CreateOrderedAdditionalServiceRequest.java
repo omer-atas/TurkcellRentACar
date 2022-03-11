@@ -11,5 +11,5 @@ public class CreateOrderedAdditionalServiceRequest {
 
     private int additionalServiceId;
 
-    private int rentalId;
+    private int rentId;
 }

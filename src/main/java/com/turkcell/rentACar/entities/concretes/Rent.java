@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rental_cars")
-public class RentalCar {
+@Table(name = "rents")
+public class Rent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "rental_car_id")
-    private int rentalId;
+    @Column(name = "rent_id")
+    private int rentId;
 
     @Column(name = "starting_date")
     private LocalDate startingDate;
@@ -38,7 +38,7 @@ public class RentalCar {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @OneToMany(mappedBy = "rentalCar")
+    @OneToMany(mappedBy = "rent")
     private List<OrderedAdditionalService> orderedAdditionalService;
 
 }

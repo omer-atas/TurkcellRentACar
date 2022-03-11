@@ -27,5 +27,5 @@ public class City {
     private List<Car> cars;
 
     @OneToMany(mappedBy = "returnCity")
-    private List<RentalCar> rentalCarsReturnCity;
+    private List<Rent> rentalCarsReturnCity;
 }

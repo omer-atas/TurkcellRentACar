@@ -11,5 +11,5 @@ public interface OrderedAdditionalServiceDao extends JpaRepository<OrderedAdditi
 
     OrderedAdditionalService getByOrderedAdditionalServiceId( int orderedAdditionalServiceId);
 
-    List<OrderedAdditionalService> getByRentalCar_RentalId(int rentalId);
+    List<OrderedAdditionalService> getByRent_RentId(int rentId);
 }

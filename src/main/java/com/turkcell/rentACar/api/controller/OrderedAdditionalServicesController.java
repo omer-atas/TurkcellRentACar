@@ -58,9 +58,9 @@ public class OrderedAdditionalServicesController {
         return this.orderedAdditionalServiceService.getByOrderedAdditionalServiceId(orderedAdditionalServiceId);
     }
 
-    @GetMapping("/getByRentalCar_RentalId/{rentalId}")
-    public DataResult<List<OrderedAdditionalServiceListDto>> getByRentalCar_RentalId(int rentalId){
-        return this.orderedAdditionalServiceService.getByRentalCar_RentalId(rentalId);
+    @GetMapping("/getByRent_RentId/{rentId}")
+    public DataResult<List<OrderedAdditionalServiceListDto>> getByRent_RentId(int rentId){
+        return this.orderedAdditionalServiceService.getByRent_RentId(rentId);
     }
 
     @PutMapping("/update")

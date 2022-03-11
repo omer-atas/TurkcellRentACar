@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACar.business.abstracts.CarService;
-import com.turkcell.rentACar.business.abstracts.RentalCarService;
+import com.turkcell.rentACar.business.abstracts.RentService;
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
-import com.turkcell.rentACar.business.dtos.rentalCarDtos.RentalCarListDto;
+import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
 import com.turkcell.rentACar.business.request.carMaintenanceRequests.CreateCarMaintenanceRequest;
 import com.turkcell.rentACar.business.request.carMaintenanceRequests.DeleteCarMaintenanceRequest;
 import com.turkcell.rentACar.business.request.carMaintenanceRequests.UpdateCarMaintenanceRequest;
@@ -37,16 +37,16 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	private CarMaintenanceDao carMaintenanceDao;
 	private ModelMapperService modelMapperService;
-	private RentalCarService rentalCarService;
+	private RentService rentService;
 	private CarService carService;
 
 	@Lazy 
 	@Autowired
 	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService,
-			RentalCarService rentalCarService, CarService carService) {
+								 RentService rentService, CarService carService) {
 		this.carMaintenanceDao = carMaintenanceDao;
 		this.modelMapperService = modelMapperService;
-		this.rentalCarService = rentalCarService;
+		this.rentService = rentService;
 		this.carService = carService;
 	}
 
@@ -76,25 +76,25 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	private void checkIfCarRented(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-		List<RentalCarListDto> result = this.rentalCarService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
+		List<RentListDto> result = this.rentService.getByCar_CarId(createCarMaintenanceRequest.getCarId());
 
 		if (result == null) {
 			return;
 		}
 
-		for (RentalCarListDto rentalCar : result) {
+		for (RentListDto rent : result) {
 
-			if ((rentalCar.getEndDate() != null)
-					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())
-							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))
-					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rentalCar.getEndDate())
-							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getEndDate()))) {
+			if ((rent.getEndDate() != null)
+					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rent.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getStartingDate()))
+					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rent.getEndDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getEndDate()))) {
 				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
 			}
 
-			if ((rentalCar.getEndDate() == null)
-					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rentalCar.getStartingDate())
-							|| createCarMaintenanceRequest.getReturnDate().equals(rentalCar.getStartingDate()))) {
+			if ((rent.getEndDate() == null)
+					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rent.getStartingDate())
+							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getStartingDate()))) {
 				throw new BusinessException(
 						"The car cannot be sent for maintenance because it is on rent. / null end date.");
 			}

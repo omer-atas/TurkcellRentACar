@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 
 @Entity
@@ -26,8 +24,8 @@ public class OrderedAdditionalService {
     private AdditionalService additionalService;
 
     @ManyToOne()
-    @JoinColumn(name = "rental_car_id")
-    private RentalCar rentalCar;
+    @JoinColumn(name = "rent_id")
+    private Rent rent;
 
 
 }
