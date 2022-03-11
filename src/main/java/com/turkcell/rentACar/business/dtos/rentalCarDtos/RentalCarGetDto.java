@@ -18,6 +18,10 @@ public class RentalCarGetDto {
 
 	private LocalDate endDate;
 
+	private double totalPayment;
+
+	private int cityPlate;
+
 	private int carId;
 
 }

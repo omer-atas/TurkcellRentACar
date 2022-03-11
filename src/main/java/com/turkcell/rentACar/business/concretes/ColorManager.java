@@ -104,7 +104,7 @@ public class ColorManager implements ColorService {
 		}
 
 		List<ColorListDto> response = result.stream()
-				.map(product -> this.modelMapperService.forDto().map(product, ColorListDto.class))
+				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");

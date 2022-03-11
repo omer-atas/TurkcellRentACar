@@ -3,8 +3,6 @@ package com.turkcell.rentACar.business.concretes;
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceGetDto;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceListDto;
-import com.turkcell.rentACar.business.dtos.brandDtos.BrandGetDto;
-import com.turkcell.rentACar.business.dtos.brandDtos.BrandListDto;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.CreateAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.DeleteAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.UpdateAdditionalServiceRequest;
@@ -13,7 +11,6 @@ import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.*;
 import com.turkcell.rentACar.dataAccess.abstracts.AdditionalServiceDao;
 import com.turkcell.rentACar.entities.concretes.AdditionalService;
-import com.turkcell.rentACar.entities.concretes.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -85,11 +82,11 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         List<AdditionalService> result = this.additionalServiceDao.findAll(s);
 
         if (result.isEmpty()) {
-            return new ErrorDataResult<List<AdditionalServiceListDto>>("Cars not list - getAllSorted -");
+            return new ErrorDataResult<List<AdditionalServiceListDto>>("AdditionalServices not list - getAllSorted -");
         }
 
         List<AdditionalServiceListDto> response = result.stream()
-                .map(product -> this.modelMapperService.forDto().map(product, AdditionalServiceListDto.class))
+                .map(additionalService -> this.modelMapperService.forDto().map(additionalService, AdditionalServiceListDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<List<AdditionalServiceListDto>>(response);
@@ -101,7 +98,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         AdditionalService result = this.additionalServiceDao.getByAdditionalServiceId(additionalServiceId);
 
         if (result == null) {
-            return new ErrorDataResult<AdditionalServiceGetDto>("Brand not found");
+            return new ErrorDataResult<AdditionalServiceGetDto>("AdditionalService not found");
         }
 
         AdditionalServiceGetDto response = this.modelMapperService.forDto().map(result, AdditionalServiceGetDto.class);

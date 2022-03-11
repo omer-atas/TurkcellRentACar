@@ -26,7 +26,6 @@ public class CreateCarMaintenanceRequest {
 	@Size(min = 1)
 	private String description;
 
-	
 	@Positive
 	private int carId;
 }

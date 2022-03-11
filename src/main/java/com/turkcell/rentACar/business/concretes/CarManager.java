@@ -4,6 +4,9 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACar.business.abstracts.CityService;
+import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
+import com.turkcell.rentACar.entities.concretes.City;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,13 +38,15 @@ public class CarManager implements CarService {
     private ModelMapperService modelMapperService;
     private BrandService brandService;
     private ColorService colorService;
+    private CityService cityService;
 
     @Autowired
-    public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandService brandService, ColorService colorService) {
+    public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandService brandService, ColorService colorService, CityService cityService) {
         this.carDao = carDao;
         this.modelMapperService = modelMapperService;
         this.brandService = brandService;
         this.colorService = colorService;
+        this.cityService = cityService;
     }
 
     @Override
@@ -49,12 +54,33 @@ public class CarManager implements CarService {
 
         Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
+        checkIfCityExists(createCarRequest.getCityPlate());
         checkIfBrandExists(createCarRequest.getBrandId());
         checkIfColorExists(createCarRequest.getColorId());
+
+        plateCorrector(createCarRequest,car);
 
         this.carDao.save(car);
         return new SuccessResult("Car added : " + car.getCarId());
     }
+
+    private void checkIfCityExists(int cityPlate) throws BusinessException {
+        if(this.cityService.getByCityPlate(cityPlate) == null){
+            throw new BusinessException("There is no color in the id sent");
+        }
+    }
+
+    private Car plateCorrector(CreateCarRequest createCarRequest,Car car){
+
+        CityGetDto cityGetDto = this.cityService.getByCityPlate(createCarRequest.getCityPlate());
+
+        City city = this.modelMapperService.forDto().map(cityGetDto,City.class);
+
+        car.setCurrentCity(city);
+
+        return  car;
+    }
+
 
     public boolean checkIfBrandExists(int brandId) throws BusinessException {
 
@@ -129,7 +155,7 @@ public class CarManager implements CarService {
             return new ErrorDataResult<List<CarListDto>>("Car not list - getAllSorted -");
         }
 
-        List<CarListDto> response = result.stream().map(product -> this.modelMapperService.forDto().map(product, CarListDto.class)).collect(Collectors.toList());
+        List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
         return new SuccessDataResult<List<CarListDto>>(response);
     }

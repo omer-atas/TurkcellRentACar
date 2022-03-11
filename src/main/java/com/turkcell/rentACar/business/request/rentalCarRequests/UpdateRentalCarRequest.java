@@ -16,4 +16,8 @@ public class UpdateRentalCarRequest {
 
 	private LocalDate endDate;
 
+	private double totalPayment;
+
+	private int cityPlate;
+
 }

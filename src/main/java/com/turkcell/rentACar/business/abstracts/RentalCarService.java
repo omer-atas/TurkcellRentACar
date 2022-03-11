@@ -33,6 +33,7 @@ public interface RentalCarService {
 
 	Result update(int rentalId, UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
 
+
 	Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
 
 }

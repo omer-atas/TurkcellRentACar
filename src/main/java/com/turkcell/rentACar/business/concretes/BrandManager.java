@@ -104,7 +104,7 @@ public class BrandManager implements BrandService {
 		}
 
 		List<BrandListDto> response = result.stream()
-				.map(product -> this.modelMapperService.forDto().map(product, BrandListDto.class))
+				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<BrandListDto>>(response);

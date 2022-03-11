@@ -13,4 +13,6 @@ public class OrderedAdditionalServiceListDto {
     private int orderedAdditionalServiceId;
 
     private int additionalServiceId;
+
+    private int rentalId;
 }

@@ -39,6 +39,10 @@ public class Car {
 
 	@Column(name = "description")
 	private String description;
+
+	@ManyToOne
+	@JoinColumn(name = "city_plate")
+	private City currentCity;
 	
 	@ManyToOne()
 	@JoinColumn(name="brand_id")

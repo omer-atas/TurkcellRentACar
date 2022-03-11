@@ -23,8 +23,8 @@ public class City {
     @Column(name = "city_name")
     private String cityName;
 
-    @OneToMany(mappedBy = "rentCity")
-    private List<RentalCar> rentalCarsRentCity;
+    @OneToMany(mappedBy = "currentCity")
+    private List<Car> cars;
 
     @OneToMany(mappedBy = "returnCity")
     private List<RentalCar> rentalCarsReturnCity;

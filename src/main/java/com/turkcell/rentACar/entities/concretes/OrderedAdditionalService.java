@@ -25,8 +25,9 @@ public class OrderedAdditionalService {
     @JoinColumn(name = "additional_service_id")
     private AdditionalService additionalService;
 
-    @OneToMany(mappedBy = "orderedAdditionalService")
-    private List<RentalCar> rentalCars;
+    @ManyToOne()
+    @JoinColumn(name = "rental_car_id")
+    private RentalCar rentalCar;
 
 
 }

@@ -18,6 +18,8 @@ public class CreateRentalCarRequest {
 
 	private LocalDate endDate;
 
+	private int cityPlate;
+
 	@Positive
 	private int carId;
 

@@ -3,14 +3,9 @@ package com.turkcell.rentACar.api.controller;
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceGetDto;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceListDto;
-import com.turkcell.rentACar.business.dtos.brandDtos.BrandGetDto;
-import com.turkcell.rentACar.business.dtos.brandDtos.BrandListDto;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.CreateAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.DeleteAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.additionalServiceRequests.UpdateAdditionalServiceRequest;
-import com.turkcell.rentACar.business.request.brandRequests.CreateBrandRequest;
-import com.turkcell.rentACar.business.request.brandRequests.DeleteBrandRequest;
-import com.turkcell.rentACar.business.request.brandRequests.UpdateBrandRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
@@ -23,12 +18,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/additionalServices")
-public class AdditionalServiceController {
+public class AdditionalServicesController {
 
     private AdditionalServiceService additionalServiceService;
 
     @Autowired
-    public AdditionalServiceController(AdditionalServiceService additionalServiceService) {
+    public AdditionalServicesController(AdditionalServiceService additionalServiceService) {
         this.additionalServiceService = additionalServiceService;
     }
 

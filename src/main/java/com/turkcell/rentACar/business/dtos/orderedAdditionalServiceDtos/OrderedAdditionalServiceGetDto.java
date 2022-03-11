@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 public class OrderedAdditionalServiceGetDto {
 
     private int additionalServiceId;
+
+    private int rentalId;
 }
