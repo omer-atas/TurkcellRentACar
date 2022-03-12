@@ -15,7 +15,7 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 
 public interface RentService {
 
-	Result add(CreateRentRequest createRentalCarRequest) throws BusinessException;
+	Result add(CreateRentRequest createRentRequest) throws BusinessException;
 
 	DataResult<RentGetDto> getByRentId(int rentId);
 

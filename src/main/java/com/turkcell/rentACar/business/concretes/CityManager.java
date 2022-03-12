@@ -32,6 +32,7 @@ public class CityManager implements  CityService{
         }
 
         CityGetDto response = this.modelMapperService.forDto().map(result, CityGetDto.class);
+
         return response;
     }
 }

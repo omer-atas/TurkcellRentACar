@@ -58,6 +58,7 @@ public class CarManager implements CarService {
         checkIfColorExists(createCarRequest.getColorId());
 
         this.carDao.save(car);
+
         return new SuccessResult("Car added : " + car.getCarId());
     }
 
@@ -152,6 +153,7 @@ public class CarManager implements CarService {
         IdCorrector(car, carUpdate);
 
         this.carDao.save(carUpdate);
+
         return new SuccessResult(car.getCarId() + " updated..");
 
     }

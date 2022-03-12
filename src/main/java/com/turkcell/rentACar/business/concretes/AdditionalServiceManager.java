@@ -102,6 +102,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         }
 
         AdditionalServiceGetDto response = this.modelMapperService.forDto().map(result, AdditionalServiceGetDto.class);
+
         return new SuccessDataResult<AdditionalServiceGetDto>(response, "Success");
     }
 
@@ -115,6 +116,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         IdCorrector(additionalService, additionalServiceUpdate);
 
         this.additionalServiceDao.save(additionalServiceUpdate);
+
         return new SuccessResult(additionalServiceUpdate.getAdditionalServiceName() + " updated..");
 
     }
@@ -131,6 +133,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         checkIfAdditionalServiceExists(additionalService.getAdditionalServiceId());
 
         this.additionalServiceDao.deleteById(additionalService.getAdditionalServiceId());
+
         return new SuccessResult(deleteAdditionalServiceRequest.getAdditionalServiceId() + " deleted..");
     }
 

@@ -47,6 +47,7 @@ public class BrandManager implements BrandService {
 		checkIfNameNotDuplicated(createBrandRequest.getBrandName());
 
 		this.brandDao.save(brand);
+
 		return new SuccessResult("Brand added : " + brand.getBrandName());
 
 	}
@@ -120,6 +121,7 @@ public class BrandManager implements BrandService {
 		}
 
 		BrandGetDto response = this.modelMapperService.forDto().map(result, BrandGetDto.class);
+
 		return new SuccessDataResult<BrandGetDto>(response, "Success");
 
 	}
@@ -146,6 +148,7 @@ public class BrandManager implements BrandService {
 		checkIfNameNotDuplicated(brandUpdate.getBrandName());
 
 		this.brandDao.save(brandUpdate);
+
 		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
 
 	}
@@ -162,6 +165,7 @@ public class BrandManager implements BrandService {
 		checkIfBrandExists(brand.getBrandId());
 
 		this.brandDao.deleteById(brand.getBrandId());
+
 		return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");
 
 	}

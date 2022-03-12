@@ -46,24 +46,26 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     public Result add(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException {
 
         checkIfAdditionalServiceExists(createOrderedAdditionalServiceRequest.getAdditionalServiceId());
-        checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
+        checkIfRentExists(createOrderedAdditionalServiceRequest.getRentId());
 
         OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forRequest().map(createOrderedAdditionalServiceRequest, OrderedAdditionalService.class);
         orderedAdditionalService.setOrderedAdditionalServiceId(0);
 
-        Rent rent = checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
+        Rent rent = getByRent(createOrderedAdditionalServiceRequest.getRentId());
         orderedAdditionalService.setRent(rent);
 
         this.orderedAdditionalServiceDao.save(orderedAdditionalService);
+
         calculateTotalPayment(createOrderedAdditionalServiceRequest);
+
         return new SuccessResult("OrderedAdditionalService added : " + orderedAdditionalService.getOrderedAdditionalServiceId());
     }
 
-    private Rent checkIfRentalExists(int rentId){
+    private Rent getByRent(int rentId){
 
         RentGetDto rentGetDto = this.rentService.getByRentId(rentId).getData();
-        Rent rentalCar = this.modelMapperService.forDto().map(rentGetDto, Rent.class);
-        return rentalCar;
+        Rent rent = this.modelMapperService.forDto().map(rentGetDto, Rent.class);
+        return rent;
     }
 
 
@@ -84,28 +86,26 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         if(orderedAdditionalServices != null){
             for (OrderedAdditionalService o : orderedAdditionalServices) {
                 totalAdditionalServicesPrice += o.getAdditionalService().getDailyPrice();
-                System.out.println(totalAdditionalServicesPrice);
             }
         }
 
         totalAdditionalServicesPrice += this.additionalServiceService.getByAdditionalServiceId(createOrderedAdditionalServiceRequest.getAdditionalServiceId()).getData().getDailyPrice();
-        System.out.println(totalAdditionalServicesPrice);
 
         return  totalAdditionalServicesPrice;
     }
 
     private void calculateTotalPayment(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException {
 
-        double rentedCarDailyPrice = 0 , totalAdditionalServicesPrice = 0 ,totalpayment, citySwapPrice = 750.00;
+        double rentedDailyPrice = 0 , totalAdditionalServicesPrice = 0 ,totalpayment, citySwapPrice = 750.00;
 
         totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(createOrderedAdditionalServiceRequest);
 
-        Rent rent = checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
+        Rent rent = getByRent(createOrderedAdditionalServiceRequest.getRentId());
         RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent, RentGetDto.class);
 
-        rentedCarDailyPrice += this.carService.getByCarId(this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getCarId()).getData().getDailyPrice();
+        rentedDailyPrice += this.carService.getByCarId(this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getCarId()).getData().getDailyPrice();
 
-        totalpayment = rentedCarDailyPrice + totalAdditionalServicesPrice;
+        totalpayment = rentedDailyPrice + totalAdditionalServicesPrice;
 
         if (checkIfSameCity(rent)) {
             totalpayment = (totalpayment * findNoOfDaysBetween(rentGetDto));
@@ -131,8 +131,10 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
     @Override
     public double findNoOfDaysBetween(RentGetDto rentGetDto) {
+
         Rent rent = this.modelMapperService.forDto().map(rentGetDto, Rent.class);
         long noOfDaysBetween = ChronoUnit.DAYS.between(rent.getStartingDate(), rent.getEndDate());
+
         return (double) noOfDaysBetween;
     }
 
@@ -145,7 +147,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
     }
 
-    private void checkIfRentalCarExists(int rentalCarId) throws BusinessException {
+    private void checkIfRentExists(int rentalCarId) throws BusinessException {
 
         if (this.rentService.getByRentId(rentalCarId).getData() == null) {
             throw new BusinessException("There is no rental car corresponding to the sent id");
@@ -209,6 +211,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         }
 
         OrderedAdditionalServiceGetDto response = this.modelMapperService.forDto().map(result, OrderedAdditionalServiceGetDto.class);
+
         return new SuccessDataResult<OrderedAdditionalServiceGetDto>(response, "Success");
     }
 
@@ -239,6 +242,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         IdCorrector(orderedAdditionalService, orderedAdditionalServiceUpdate);
 
         this.orderedAdditionalServiceDao.save(orderedAdditionalServiceUpdate);
+
         return new SuccessResult(orderedAdditionalServiceUpdate.getOrderedAdditionalServiceId() + " updated..");
     }
 
@@ -255,6 +259,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         checkIfOrderedAdditionalServiceExists(orderedAdditionalService.getOrderedAdditionalServiceId());
 
         extractionOfAdditionalServicesPrice(deleteOrderedAdditionalServiceRequest);
+
         this.orderedAdditionalServiceDao.deleteById(orderedAdditionalService.getOrderedAdditionalServiceId());
 
         return new SuccessResult(orderedAdditionalService.getOrderedAdditionalServiceId() + " deleted..");
@@ -272,9 +277,9 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         totalpayment = (this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getTotalPayment())  -  (this.orderedAdditionalServiceDao.
                 getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getAdditionalService().getDailyPrice())*(findNoOfDaysBetween);
 
-        Rent rentalCar = checkIfRentalExists(this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId());
+        Rent rentUpdate = getByRent(this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId());
 
-        updateRentalCarTotalPaymnet( this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId() ,rentalCar,totalpayment);
+        updateRentalCarTotalPaymnet( this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId() ,rentUpdate,totalpayment);
 
     }
 
