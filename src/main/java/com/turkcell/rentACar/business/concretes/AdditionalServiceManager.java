@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Service
 public class AdditionalServiceManager implements AdditionalServiceService {
 
-    private final AdditionalServiceDao additionalServiceDao;
-    private final ModelMapperService modelMapperService;
+    private AdditionalServiceDao additionalServiceDao;
+    private ModelMapperService modelMapperService;
 
     @Autowired
     public AdditionalServiceManager(AdditionalServiceDao additionalServiceDao, ModelMapperService modelMapperService) {

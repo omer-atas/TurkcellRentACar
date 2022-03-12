@@ -39,10 +39,6 @@ public class Car {
 
 	@Column(name = "description")
 	private String description;
-
-	@ManyToOne
-	@JoinColumn(name = "city_plate")
-	private City currentCity;
 	
 	@ManyToOne()
 	@JoinColumn(name="brand_id")
@@ -52,10 +48,10 @@ public class Car {
 	@JoinColumn(name="color_id")
 	private Color color;
 	
-	@OneToMany(mappedBy = "car",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "car")
 	private List<CarMaintenance> carMaintenances;
 	
-	@OneToMany(mappedBy = "car",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "car")
 	private List<Rent> rentalCars;
 
 }

@@ -54,33 +54,12 @@ public class CarManager implements CarService {
 
         Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
-        checkIfCityExists(createCarRequest.getCityPlate());
         checkIfBrandExists(createCarRequest.getBrandId());
         checkIfColorExists(createCarRequest.getColorId());
-
-        plateCorrector(createCarRequest,car);
 
         this.carDao.save(car);
         return new SuccessResult("Car added : " + car.getCarId());
     }
-
-    private void checkIfCityExists(int cityPlate) throws BusinessException {
-        if(this.cityService.getByCityPlate(cityPlate) == null){
-            throw new BusinessException("There is no color in the id sent");
-        }
-    }
-
-    private Car plateCorrector(CreateCarRequest createCarRequest,Car car){
-
-        CityGetDto cityGetDto = this.cityService.getByCityPlate(createCarRequest.getCityPlate());
-
-        City city = this.modelMapperService.forDto().map(cityGetDto,City.class);
-
-        car.setCurrentCity(city);
-
-        return  car;
-    }
-
 
     public boolean checkIfBrandExists(int brandId) throws BusinessException {
 

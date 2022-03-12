@@ -29,9 +29,6 @@ public class CreateCarRequest {
 	private String description;
 
 	@Positive
-	private int cityPlate;
-
-	@Positive
 	private int brandId;
 
 	@Positive

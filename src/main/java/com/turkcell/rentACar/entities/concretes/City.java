@@ -23,9 +23,9 @@ public class City {
     @Column(name = "city_name")
     private String cityName;
 
-    @OneToMany(mappedBy = "currentCity")
-    private List<Car> cars;
+    @OneToMany(mappedBy = "fromCity")
+    private List<Rent> fromRentCars;
 
-    @OneToMany(mappedBy = "returnCity")
-    private List<Rent> rentalCarsReturnCity;
+    @OneToMany(mappedBy = "toCity")
+    private List<Rent> toRentCars;
 }

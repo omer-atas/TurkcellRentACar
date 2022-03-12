@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
 @Service
 public class OrderedAdditionalServiceManager implements OrderedAdditionalServiceService {
 
-    private final OrderedAdditionalServiceDao orderedAdditionalServiceDao;
-    private final ModelMapperService modelMapperService;
-    private final AdditionalServiceService additionalServiceService;
-    private final RentService rentService;
-    private final CarService carService;
+    private OrderedAdditionalServiceDao orderedAdditionalServiceDao;
+    private ModelMapperService modelMapperService;
+    private AdditionalServiceService additionalServiceService;
+    private RentService rentService;
+    private CarService carService;
 
     @Autowired
     public OrderedAdditionalServiceManager(OrderedAdditionalServiceDao orderedAdditionalServiceDao, ModelMapperService modelMapperService, AdditionalServiceService additionalServiceService, RentService rentService, CarService carService) {
@@ -46,11 +46,12 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     public Result add(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException {
 
         checkIfAdditionalServiceExists(createOrderedAdditionalServiceRequest.getAdditionalServiceId());
-        checkIfRentalCarExists(createOrderedAdditionalServiceRequest.getRentId());
+        checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
 
         OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forRequest().map(createOrderedAdditionalServiceRequest, OrderedAdditionalService.class);
+        orderedAdditionalService.setOrderedAdditionalServiceId(0);
 
-        Rent rent = checkIRentalCarExists(createOrderedAdditionalServiceRequest.getRentId());
+        Rent rent = checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
         orderedAdditionalService.setRent(rent);
 
         this.orderedAdditionalServiceDao.save(orderedAdditionalService);
@@ -58,7 +59,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         return new SuccessResult("OrderedAdditionalService added : " + orderedAdditionalService.getOrderedAdditionalServiceId());
     }
 
-    private Rent checkIRentalCarExists(int rentId){
+    private Rent checkIfRentalExists(int rentId){
 
         RentGetDto rentGetDto = this.rentService.getByRentId(rentId).getData();
         Rent rentalCar = this.modelMapperService.forDto().map(rentGetDto, Rent.class);
@@ -67,7 +68,8 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
 
     private boolean checkIfSameCity(Rent rent) {
-        if(this.rentService.getByRentId(rent.getRentId()).getData().getCityPlate() == this.carService.getByCarId(this.rentService.getByRentId(rent.getRentId()).getData().getCarId()).getData().getCityPlate()){
+
+        if(this.rentService.getByRentId(rent.getRentId()).getData().getFromCityId() == this.rentService.getByRentId(rent.getRentId()).getData().getToCityId()){
             return true;
         }
         return  false;
@@ -77,10 +79,17 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
         double totalAdditionalServicesPrice = 0;
 
-        for (OrderedAdditionalService o : this.orderedAdditionalServiceDao.getByRent_RentId(createOrderedAdditionalServiceRequest.getRentId())) {
-                totalAdditionalServicesPrice += o.getAdditionalService().getDailyPrice();
+        List<OrderedAdditionalService> orderedAdditionalServices= this.orderedAdditionalServiceDao.getByRent_RentId(createOrderedAdditionalServiceRequest.getRentId());
 
+        if(orderedAdditionalServices != null){
+            for (OrderedAdditionalService o : orderedAdditionalServices) {
+                totalAdditionalServicesPrice += o.getAdditionalService().getDailyPrice();
+                System.out.println(totalAdditionalServicesPrice);
+            }
         }
+
+        totalAdditionalServicesPrice += this.additionalServiceService.getByAdditionalServiceId(createOrderedAdditionalServiceRequest.getAdditionalServiceId()).getData().getDailyPrice();
+        System.out.println(totalAdditionalServicesPrice);
 
         return  totalAdditionalServicesPrice;
     }
@@ -91,7 +100,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
         totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(createOrderedAdditionalServiceRequest);
 
-        Rent rent = checkIRentalCarExists(createOrderedAdditionalServiceRequest.getRentId());
+        Rent rent = checkIfRentalExists(createOrderedAdditionalServiceRequest.getRentId());
         RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent, RentGetDto.class);
 
         rentedCarDailyPrice += this.carService.getByCarId(this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getCarId()).getData().getDailyPrice();
@@ -115,7 +124,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         updateRentRequest.setEndDate(rent.getEndDate());
         updateRentRequest.setStartingDate(rent.getStartingDate());
         updateRentRequest.setTotalPayment(totalpayment);
-        updateRentRequest.setCityPlate(0);
+        updateRentRequest.setToCityId(rent.getToCity().getCityPlate());
 
         this.rentService.update(rentalCarId, updateRentRequest);
     }
@@ -263,7 +272,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         totalpayment = (this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getTotalPayment())  -  (this.orderedAdditionalServiceDao.
                 getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getAdditionalService().getDailyPrice())*(findNoOfDaysBetween);
 
-        Rent rentalCar = checkIRentalCarExists(this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId());
+        Rent rentalCar = checkIfRentalExists(this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId());
 
         updateRentalCarTotalPaymnet( this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId() ,rentalCar,totalpayment);
 

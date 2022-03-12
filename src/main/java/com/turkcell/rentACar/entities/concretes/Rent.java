@@ -31,8 +31,11 @@ public class Rent {
     private double totalPayment;
 
     @ManyToOne
-    @JoinColumn(name = "city_plate")
-    private City returnCity;
+    @JoinColumn(name = "from_city_id")
+    private City fromCity;
+    @ManyToOne
+    @JoinColumn(name = "to_city_id")
+    private City toCity;
 
     @ManyToOne
     @JoinColumn(name = "car_id")

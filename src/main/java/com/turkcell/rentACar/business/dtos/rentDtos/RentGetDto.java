@@ -20,7 +20,9 @@ public class RentGetDto {
 
 	private double totalPayment;
 
-	private int cityPlate;
+	private int fromCityId;
+
+	private int toCityId;
 
 	private int carId;
 

@@ -20,9 +20,6 @@ public class UpdateCarRequest {
 	private String description;
 
 	@Positive
-	private int cityPlate;
-
-	@Positive
 	private int colorId;
 
 }

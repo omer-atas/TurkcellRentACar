@@ -19,7 +19,6 @@ public class CarGetDto {
 
 	private String description;
 
-	private int cityPlate;
 
 	private String brandName;
 
