@@ -61,6 +61,7 @@ public class RentManager implements RentService {
     @Override
     public Result carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException{
 
+        checkIfEndDateBeforeStartDate(createRentRequest.getStartingDate(),createRentRequest.getEndDate());
         checkIfCustomerExists(createRentRequest.getCustomerId());
         checkIfIndividualCustomerExists(createRentRequest.getCustomerId());
         checkIfCarExists(createRentRequest.getCarId());
@@ -80,6 +81,12 @@ public class RentManager implements RentService {
         return new SuccessResult("Added : " + rent.getRentId());
     }
 
+    private void checkIfEndDateBeforeStartDate(LocalDate startingDate,LocalDate endDate) throws BusinessException {
+        if(endDate.isBefore(startingDate)){
+            throw new BusinessException("End date cannot be earlier than start date");
+        }
+    }
+
     private double  calculatorRentalPriceOfTheCar(int carId,LocalDate startingDate,LocalDate endDate){
         return this.carService.getByCarId(carId).getData().getDailyPrice()* this.orderedAdditionalServiceService.findNoOfDaysBetween(startingDate,endDate);
     }
@@ -93,6 +100,7 @@ public class RentManager implements RentService {
     @Override
     public Result carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
 
+        checkIfEndDateBeforeStartDate(createRentRequest.getStartingDate(),createRentRequest.getEndDate());
         checkIfCustomerExists(createRentRequest.getCustomerId());
         checkIfCorporateCustomerExists(createRentRequest.getCustomerId());
         checkIfCarExists(createRentRequest.getCarId());
@@ -277,7 +285,7 @@ public class RentManager implements RentService {
     @Override
     public DataResult<List<RentListDto>> getAllSorted(Direction direction) {
 
-        Sort s = Sort.by(direction, "returnDate");
+        Sort s = Sort.by(direction, "endDate");
 
         List<Rent> result = this.rentDao.findAll(s);
 
@@ -304,6 +312,8 @@ public class RentManager implements RentService {
 
     @Override
     public Result update(int rentalId, UpdateRentRequest updateRentRequest) throws BusinessException {
+
+        checkIfRentExists(rentalId);
 
         Rent rent = this.rentDao.getByRentId(rentalId);
 
@@ -376,20 +386,9 @@ public class RentManager implements RentService {
     }
 
     @Override
-    public boolean checkIfCarAvaliable(int carId) throws BusinessException {
-
-        if (this.carService.getByCarId(carId) == null) {
-            throw new BusinessException("Araba yok");
-        }
-
-        return true;
-
-    }
-
-    @Override
     public Result delete(DeleteRentRequest deleteRentalCarRequest) throws BusinessException {
 
-        checkIfRentalCarExists(deleteRentalCarRequest.getRentId());
+        checkIfRentExists(deleteRentalCarRequest.getRentId());
 
         Rent rentalCar = this.modelMapperService.forRequest().map(deleteRentalCarRequest, Rent.class);
 
@@ -399,7 +398,7 @@ public class RentManager implements RentService {
     }
 
     @Override
-    public boolean checkIfRentalCarExists(int rentalId) throws BusinessException {
+    public boolean checkIfRentExists(int rentalId) throws BusinessException {
 
         if (this.rentDao.getByRentId(rentalId) == null) {
             throw new BusinessException("The rental car with this ID is not available..");

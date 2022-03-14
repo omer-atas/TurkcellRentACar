@@ -213,6 +213,8 @@ public class InvoiceManager implements InvoiceService{
     @Override
     public Result update(int invoiceId, UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
 
+        checkIfInvoiceExists(invoiceId);
+
         Invoice invoice = this.invoiceDao.getByInvoiceId(invoiceId);
 
         Invoice invoiceUpdate = this.modelMapperService.forRequest().map(invoice, Invoice.class);

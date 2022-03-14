@@ -27,9 +27,7 @@ public interface RentService {
 
 	DataResult<List<RentListDto>> getAllSorted(Sort.Direction direction);
 
-	boolean checkIfRentalCarExists(int rentalId) throws BusinessException;
-
-	boolean checkIfCarAvaliable(int carId) throws BusinessException;
+	boolean checkIfRentExists(int rentalId) throws BusinessException;
 
 	List<RentListDto> getByCar_CarId(int carId);
 
