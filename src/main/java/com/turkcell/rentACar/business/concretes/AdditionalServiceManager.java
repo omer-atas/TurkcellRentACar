@@ -47,10 +47,6 @@ public class AdditionalServiceManager implements AdditionalServiceService {
 
         List<AdditionalService> result = this.additionalServiceDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<AdditionalServiceListDto>>("AdditionalServices not listed");
-        }
-
         List<AdditionalServiceListDto> response = result.stream()
                 .map(additionalService -> this.modelMapperService.forDto().map(additionalService, AdditionalServiceListDto.class))
                 .collect(Collectors.toList());
@@ -65,10 +61,6 @@ public class AdditionalServiceManager implements AdditionalServiceService {
 
         List<AdditionalService> result = this.additionalServiceDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<AdditionalServiceListDto>>("AdditionalServices not list - getAllPaged - ");
-        }
-
         List<AdditionalServiceListDto> response = result.stream()
                 .map(car -> this.modelMapperService.forDto().map(car, AdditionalServiceListDto.class)).collect(Collectors.toList());
 
@@ -81,10 +73,6 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         Sort s = Sort.by(direction, "additionalServiceName");
 
         List<AdditionalService> result = this.additionalServiceDao.findAll(s);
-
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<AdditionalServiceListDto>>("AdditionalServices not list - getAllSorted -");
-        }
 
         List<AdditionalServiceListDto> response = result.stream()
                 .map(additionalService -> this.modelMapperService.forDto().map(additionalService, AdditionalServiceListDto.class))

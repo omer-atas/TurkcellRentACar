@@ -22,9 +22,7 @@ public class RentGetDto {
 
 	private LocalDate endDate;
 
-	private int totalRentalDays;
-
-	private double totalPayment;
+	private int rentalPriceOfTheCar;
 
 	private int fromCityId;
 

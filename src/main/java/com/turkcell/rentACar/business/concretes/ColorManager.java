@@ -66,10 +66,6 @@ public class ColorManager implements ColorService {
 
 		List<Color> result = this.colorDao.findAll();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<ColorListDto>>("Colors not list");
-		}
-
 		List<ColorListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
@@ -84,10 +80,6 @@ public class ColorManager implements ColorService {
 
 		List<Color> result = this.colorDao.findAll(pageable).getContent();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<ColorListDto>>("Colors not list - getAllPaged - ");
-		}
-
 		List<ColorListDto> response = result.stream()
 				.map(car -> this.modelMapperService.forDto().map(car, ColorListDto.class)).collect(Collectors.toList());
 
@@ -100,10 +92,6 @@ public class ColorManager implements ColorService {
 		Sort s = Sort.by(direction, "colorName");
 
 		List<Color> result = this.colorDao.findAll(s);
-
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<ColorListDto>>("Colors not list - getAllSorted -");
-		}
 
 		List<ColorListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))

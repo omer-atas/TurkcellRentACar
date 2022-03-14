@@ -11,13 +11,14 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderedAdditionalServiceService {
 
     Result add(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException;
 
-    double findNoOfDaysBetween(RentGetDto rentGetDto);
+    double findNoOfDaysBetween(LocalDate startingDate, LocalDate endDate);
 
     DataResult<List<OrderedAdditionalServiceListDto>> getAll();
 

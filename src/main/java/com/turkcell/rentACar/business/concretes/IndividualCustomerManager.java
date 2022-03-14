@@ -52,7 +52,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public DataResult<IndividualCustomerGetDto> getByIndividualCustomer(int individualCustomerId){
+    public DataResult<IndividualCustomerGetDto> getByIndividualCustomerId(int individualCustomerId){
 
         IndividualCustomer result = this.individualCustomerDao.getByCustomerId(individualCustomerId);
 
@@ -70,10 +70,6 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         List<IndividualCustomer> result = this.individualCustomerDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<IndividualCustomerListDto>>("IndividualCustomers not listed");
-        }
-
         List<IndividualCustomerListDto> response = result.stream()
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class))
                 .collect(Collectors.toList());
@@ -88,10 +84,6 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         List<IndividualCustomer> result = this.individualCustomerDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<IndividualCustomerListDto>>("IndividualCustomers not list - getAllPaged - ");
-        }
-
         List<IndividualCustomerListDto> response = result.stream()
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class)).collect(Collectors.toList());
 
@@ -104,10 +96,6 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         Sort s = Sort.by(direction, "nationalIdentity");
 
         List<IndividualCustomer> result = this.individualCustomerDao.findAll(s);
-
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<IndividualCustomerListDto>>("IndividualCustomers not list - getAllSorted -");
-        }
 
         List<IndividualCustomerListDto> response = result.stream()
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class))

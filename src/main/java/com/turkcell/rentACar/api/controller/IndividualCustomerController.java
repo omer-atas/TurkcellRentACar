@@ -32,9 +32,9 @@ public class IndividualCustomerController {
         return this.individualCustomerService.add(createIndividualCustomerRequest);
     }
 
-    @GetMapping("/getByIndividualCustomer/{individualCustomerId}")
-    public DataResult<IndividualCustomerGetDto> getByIndividualCustomer(@RequestParam("individualCustomerId") int individualCustomerId) {
-        return this.individualCustomerService.getByIndividualCustomer(individualCustomerId);
+    @GetMapping("/getByIndividualCustomerId/{individualCustomerId}")
+    public DataResult<IndividualCustomerGetDto> getByIndividualCustomerId(@RequestParam("individualCustomerId") int individualCustomerId) {
+        return this.individualCustomerService.getByIndividualCustomerId(individualCustomerId);
     }
 
     @GetMapping("/getAll")

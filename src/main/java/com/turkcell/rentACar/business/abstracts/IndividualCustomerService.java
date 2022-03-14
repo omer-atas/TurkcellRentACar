@@ -16,7 +16,7 @@ public interface IndividualCustomerService {
 
     Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws BusinessException;
 
-    DataResult<IndividualCustomerGetDto> getByIndividualCustomer(int individualCustomerId);
+    DataResult<IndividualCustomerGetDto> getByIndividualCustomerId(int individualCustomerId);
 
     DataResult<List<IndividualCustomerListDto>> getAll();
 

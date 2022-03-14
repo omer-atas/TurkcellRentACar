@@ -99,10 +99,6 @@ public class CarManager implements CarService {
 
         List<Car> result = this.carDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CarListDto>>("Cars not listed");
-        }
-
         List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
 
         return new SuccessDataResult<List<CarListDto>>(response, "Cars Listed Successfully");
@@ -115,10 +111,6 @@ public class CarManager implements CarService {
 
         List<Car> result = this.carDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CarListDto>>("Cars not list - getAllPaged - ");
-        }
-
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
         return new SuccessDataResult<List<CarListDto>>(response);
@@ -130,10 +122,6 @@ public class CarManager implements CarService {
         Sort s = Sort.by(direction, "dailyPrice");
 
         List<Car> result = this.carDao.findAll(s);
-
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CarListDto>>("Car not list - getAllSorted -");
-        }
 
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 

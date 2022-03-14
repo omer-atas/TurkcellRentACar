@@ -65,10 +65,6 @@ public class BrandManager implements BrandService {
 
 		List<Brand> result = this.brandDao.findAll();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<BrandListDto>>("Brands not listed");
-		}
-
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
@@ -83,10 +79,6 @@ public class BrandManager implements BrandService {
 
 		List<Brand> result = this.brandDao.findAll(pageable).getContent();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<BrandListDto>>("Brands not list - getAllPaged - ");
-		}
-
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class)).collect(Collectors.toList());
 
@@ -99,10 +91,6 @@ public class BrandManager implements BrandService {
 		Sort s = Sort.by(direction, "brandName");
 
 		List<Brand> result = this.brandDao.findAll(s);
-
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<BrandListDto>>("Brands not list - getAllSorted -");
-		}
 
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))

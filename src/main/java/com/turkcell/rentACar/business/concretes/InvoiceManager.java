@@ -2,10 +2,10 @@ package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.CustomerService;
 import com.turkcell.rentACar.business.abstracts.InvoiceService;
+import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentService;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceGetDto;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceListDto;
-import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.request.invoiceRequests.DeleteInvoiceRequest;
 import com.turkcell.rentACar.business.request.invoiceRequests.UpdateInvoiceRequest;
@@ -43,18 +43,20 @@ public class InvoiceManager implements InvoiceService{
     @Override
     public Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
 
-        ccheckIfRentAvaliable(createInvoiceRequest.getRentId());
+        checkIfRentAvaliable(createInvoiceRequest.getRentId());
         checkIfRentExists(createInvoiceRequest.getRentId());
         checkIfInvoiceNoNotDuplicated(createInvoiceRequest.getInvoiceNo());
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
+
+        invoice.setTotalPayment(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getRentalPriceOfTheCar());
 
         this.invoiceDao.save(invoice);
 
         return new SuccessResult("Invoice added : " + invoice.getInvoiceId());
     }
 
-    private void ccheckIfRentAvaliable(int rentId) throws BusinessException {
+    private void checkIfRentAvaliable(int rentId) throws BusinessException {
 
         if(this.invoiceDao.getByRent_RentId(rentId) != null){
             throw new BusinessException("Göndeerilen kiranın faturası bulunmaktadır.");
@@ -80,6 +82,21 @@ public class InvoiceManager implements InvoiceService{
     public DataResult<InvoiceGetDto> getByInvoiceId(int invoiceId) {
 
         Invoice result = this.invoiceDao.getByInvoiceId(invoiceId);
+
+        if (result == null) {
+            return new ErrorDataResult<InvoiceGetDto>("Invoice no not found");
+        }
+
+        InvoiceGetDto response = this.modelMapperService.forDto().map(result, InvoiceGetDto.class);
+
+
+        return new SuccessDataResult<InvoiceGetDto>(response, "Success");
+    }
+
+    @Override
+    public DataResult<InvoiceGetDto> getByRent_RentId(int rentId) {
+
+        Invoice result = this.invoiceDao.getByRent_RentId(rentId);
 
         if (result == null) {
             return new ErrorDataResult<InvoiceGetDto>("Invoice no not found");
@@ -136,17 +153,11 @@ public class InvoiceManager implements InvoiceService{
 
         List<Invoice> result = this.invoiceDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<InvoiceListDto>>("Invoices not listed");
-        }
-
         List<InvoiceListDto> response = result.stream()
                 .map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class))
                 .collect(Collectors.toList());
 
-        for(int i=0 ; i< result.size() ; i++){
-            response.get(i).setCustomerId(result.get(i).getRent().getCustomer().getCustomerId());
-        }
+        response = manuelMappingForGetAll(result,response);
 
         return new SuccessDataResult<List<InvoiceListDto>>(response, "Success");
     }
@@ -158,18 +169,19 @@ public class InvoiceManager implements InvoiceService{
 
         List<Invoice> result = this.invoiceDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<InvoiceListDto>>("Invoices not list - getAllPaged - ");
-        }
-
         List<InvoiceListDto> response = result.stream()
                 .map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
 
+        response = manuelMappingForGetAll(result,response);
+
+        return new SuccessDataResult<List<InvoiceListDto>>(response, "Brands Listed Successfully");
+    }
+
+    private List<InvoiceListDto> manuelMappingForGetAll(List<Invoice> result,List<InvoiceListDto> response){
         for(int i=0 ; i< result.size() ; i++){
             response.get(i).setCustomerId(result.get(i).getRent().getCustomer().getCustomerId());
         }
-
-        return new SuccessDataResult<List<InvoiceListDto>>(response, "Brands Listed Successfully");
+        return  response;
     }
 
     @Override
@@ -187,9 +199,7 @@ public class InvoiceManager implements InvoiceService{
                 .map(brand -> this.modelMapperService.forDto().map(brand, InvoiceListDto.class))
                 .collect(Collectors.toList());
 
-        for(int i=0 ; i< result.size() ; i++){
-            response.get(i).setCustomerId(result.get(i).getRent().getCustomer().getCustomerId());
-        }
+        response = manuelMappingForGetAll(result,response);
 
         return new SuccessDataResult<List<InvoiceListDto>>(response);
     }
@@ -197,18 +207,19 @@ public class InvoiceManager implements InvoiceService{
     private void IdCorrector(Invoice invoice, Invoice invoiceUpdate) {
         invoiceUpdate.setInvoiceId(invoice.getInvoiceId());
         invoiceUpdate.setRent(invoice.getRent());
+        invoiceUpdate.setInvoiceNo(invoice.getInvoiceNo());
     }
 
     @Override
     public Result update(int invoiceId, UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
-
-        checkIfInvoiceNoNotDuplicated(updateInvoiceRequest.getInvoiceNo());
 
         Invoice invoice = this.invoiceDao.getByInvoiceId(invoiceId);
 
         Invoice invoiceUpdate = this.modelMapperService.forRequest().map(invoice, Invoice.class);
 
         IdCorrector(invoice, invoiceUpdate);
+
+        invoiceUpdate.setTotalPayment(updateInvoiceRequest.getTotalPayment());
 
         this.invoiceDao.save(invoiceUpdate);
 

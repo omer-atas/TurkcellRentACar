@@ -109,10 +109,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		List<CarMaintenance> result = this.carMaintenanceDao.findAll();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
-		}
-
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
@@ -128,10 +124,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		List<CarMaintenance> result = this.carMaintenanceDao.findAll(pageable).getContent();
 
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
-		}
-
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
@@ -145,10 +137,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		Sort s = Sort.by(direction, "returnDate");
 
 		List<CarMaintenance> result = this.carMaintenanceDao.findAll(s);
-
-		if (result.isEmpty()) {
-			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
-		}
 
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))

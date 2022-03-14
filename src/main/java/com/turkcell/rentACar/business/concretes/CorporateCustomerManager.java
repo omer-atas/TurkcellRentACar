@@ -72,10 +72,6 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         List<CorporateCustomer> result = this.corporateCustomerDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CorporateCustomerListDto>>("CorporateCustomers not listed");
-        }
-
         List<CorporateCustomerListDto> response = result.stream()
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class))
                 .collect(Collectors.toList());
@@ -90,10 +86,6 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         List<CorporateCustomer> result = this.corporateCustomerDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CorporateCustomerListDto>>("CorporateCustomers not list - getAllPaged - ");
-        }
-
         List<CorporateCustomerListDto> response = result.stream()
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class)).collect(Collectors.toList());
 
@@ -106,10 +98,6 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         Sort s = Sort.by(direction, "taxNumber");
 
         List<CorporateCustomer> result = this.corporateCustomerDao.findAll(s);
-
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<CorporateCustomerListDto>>("CorporateCustomers not list - getAllSorted -");
-        }
 
         List<CorporateCustomerListDto> response = result.stream()
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class))

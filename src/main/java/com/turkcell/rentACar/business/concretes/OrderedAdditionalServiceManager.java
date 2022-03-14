@@ -4,6 +4,7 @@ import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceGetDto;
 import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
+import com.turkcell.rentACar.business.request.invoiceRequests.UpdateInvoiceRequest;
 import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.CreateOrderedAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.DeleteOrderedAdditionalServiceRequest;
 import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.UpdateOrderedAdditionalServiceRequest;
@@ -14,12 +15,14 @@ import com.turkcell.rentACar.core.utilities.results.*;
 import com.turkcell.rentACar.dataAccess.abstracts.OrderedAdditionalServiceDao;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import com.turkcell.rentACar.entities.concretes.Rent;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +35,17 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     private AdditionalServiceService additionalServiceService;
     private RentService rentService;
     private CarService carService;
+    private InvoiceService invoiceService;
 
     @Autowired
-    public OrderedAdditionalServiceManager(OrderedAdditionalServiceDao orderedAdditionalServiceDao, ModelMapperService modelMapperService, AdditionalServiceService additionalServiceService, RentService rentService, CarService carService) {
+    public OrderedAdditionalServiceManager(OrderedAdditionalServiceDao orderedAdditionalServiceDao, ModelMapperService modelMapperService,
+                                           AdditionalServiceService additionalServiceService, RentService rentService, CarService carService,InvoiceService invoiceService) {
         this.orderedAdditionalServiceDao = orderedAdditionalServiceDao;
         this.modelMapperService = modelMapperService;
         this.additionalServiceService = additionalServiceService;
         this.rentService = rentService;
         this.carService = carService;
+        this.invoiceService = invoiceService;
     }
 
     @Override
@@ -68,15 +74,6 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         return rent;
     }
 
-
-    private boolean checkIfSameCity(Rent rent) {
-
-        if(this.rentService.getByRentId(rent.getRentId()).getData().getFromCityId() == this.rentService.getByRentId(rent.getRentId()).getData().getToCityId()){
-            return true;
-        }
-        return  false;
-    }
-
     private double sumOfAdditionalServicesPrice(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest){
 
         double totalAdditionalServicesPrice = 0;
@@ -96,44 +93,33 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
     private void calculateTotalPayment(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException {
 
-        double rentedDailyPrice = 0 , totalAdditionalServicesPrice = 0 ,totalpayment, citySwapPrice = 750.00;
+        double rentedCarTotalPrice = 0 , totalAdditionalServicesPrice = 0 ,totalpayment, citySwapPrice = 750.00;
 
-        totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(createOrderedAdditionalServiceRequest);
+        LocalDate startDate = this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getStartingDate();
+        LocalDate endDate = this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getEndDate();
 
-        Rent rent = getByRent(createOrderedAdditionalServiceRequest.getRentId());
-        RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent, RentGetDto.class);
+        totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(createOrderedAdditionalServiceRequest) * findNoOfDaysBetween(startDate,endDate);
 
-        rentedDailyPrice += this.carService.getByCarId(this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getCarId()).getData().getDailyPrice();
+        rentedCarTotalPrice += this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getRentalPriceOfTheCar();
 
-        totalpayment = rentedDailyPrice + totalAdditionalServicesPrice;
-
-        if (checkIfSameCity(rent)) {
-            totalpayment = (totalpayment * findNoOfDaysBetween(rentGetDto));
-        } else {
-            totalpayment = totalpayment * findNoOfDaysBetween(rentGetDto) + citySwapPrice;
+        if(this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getToCityId() !=
+                    this.rentService.getByRentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getFromCityId()){
+            totalpayment = totalAdditionalServicesPrice + rentedCarTotalPrice + citySwapPrice;
+        }else{
+            totalpayment = totalAdditionalServicesPrice + rentedCarTotalPrice;
         }
 
-        updateRentalCarTotalPaymnet(createOrderedAdditionalServiceRequest.getRentId(),rent,totalpayment);
+        UpdateInvoiceRequest updateInvoiceRequest = new UpdateInvoiceRequest();
 
-    }
+        updateInvoiceRequest.setTotalPayment(totalpayment);
 
-    private void updateRentalCarTotalPaymnet(int rentalCarId, Rent rent, double totalpayment) throws BusinessException {
-
-        UpdateRentRequest updateRentRequest = new UpdateRentRequest();
-
-        updateRentRequest.setEndDate(rent.getEndDate());
-        updateRentRequest.setStartingDate(rent.getStartingDate());
-        updateRentRequest.setTotalPayment(totalpayment);
-        updateRentRequest.setToCityId(rent.getToCity().getCityPlate());
-
-        this.rentService.update(rentalCarId, updateRentRequest);
+        this.invoiceService.update(this.invoiceService.getByRent_RentId(createOrderedAdditionalServiceRequest.getRentId()).getData().getInvoiceId(),updateInvoiceRequest);
     }
 
     @Override
-    public double findNoOfDaysBetween(RentGetDto rentGetDto) {
+    public double findNoOfDaysBetween(LocalDate startingDate, LocalDate endDate) {
 
-        Rent rent = this.modelMapperService.forDto().map(rentGetDto, Rent.class);
-        long noOfDaysBetween = ChronoUnit.DAYS.between(rent.getStartingDate(), rent.getEndDate());
+        long noOfDaysBetween = ChronoUnit.DAYS.between(startingDate,endDate);
 
         return (double) noOfDaysBetween;
     }
@@ -267,19 +253,24 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
     private void extractionOfAdditionalServicesPrice(DeleteOrderedAdditionalServiceRequest deleteOrderedAdditionalServiceRequest) throws BusinessException {
 
-        double totalpayment = 0;
+        OrderedAdditionalService orderedAdditionalService = this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId());
 
-        Rent rent = this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent();
-        RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent, RentGetDto.class);
+        LocalDate startingDate = orderedAdditionalService.getRent().getStartingDate();
+        LocalDate endDate = orderedAdditionalService.getRent().getEndDate();
 
-        double findNoOfDaysBetween  = findNoOfDaysBetween(rentGetDto);
+        double day = findNoOfDaysBetween(startingDate,endDate);
 
-        totalpayment = (this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getTotalPayment())  -  (this.orderedAdditionalServiceDao.
-                getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getAdditionalService().getDailyPrice())*(findNoOfDaysBetween);
+        double dailyPrice = this.additionalServiceService.getByAdditionalServiceId(orderedAdditionalService.getAdditionalService().getAdditionalServiceId()).getData().getDailyPrice();
 
-        Rent rentUpdate = getByRent(this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId());
+        double bill = this.invoiceService.getByRent_RentId(orderedAdditionalService.getRent().getRentId()).getData().getTotalPayment();
 
-        updateRentalCarTotalPaymnet( this.orderedAdditionalServiceDao.getByOrderedAdditionalServiceId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getRent().getRentId() ,rentUpdate,totalpayment);
+        bill -= (day * dailyPrice);
+
+        UpdateInvoiceRequest updateInvoiceRequest = new UpdateInvoiceRequest();
+
+        updateInvoiceRequest.setTotalPayment(bill);
+
+        this.invoiceService.update(this.invoiceService.getByRent_RentId(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId()).getData().getInvoiceId(),updateInvoiceRequest);
 
     }
 

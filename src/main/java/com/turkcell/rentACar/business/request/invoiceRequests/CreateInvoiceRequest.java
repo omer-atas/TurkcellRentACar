@@ -16,7 +16,5 @@ public class CreateInvoiceRequest {
 
     private LocalDate creationDate;
 
-    private double totalPayment;
-
     private int rentId;
 }

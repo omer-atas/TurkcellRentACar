@@ -39,12 +39,14 @@ public class RentManager implements RentService {
     private CityService cityService;
     private OrderedAdditionalServiceService orderedAdditionalServiceService;
     private CustomerService customerService;
+    private IndividualCustomerService individualCustomerService;
+    private CorporateCustomerService corporateCustomerService;
 
     @Lazy
     @Autowired
     public RentManager(RentDao rentDao, ModelMapperService modelMapperService, CarMaintenanceService carMaintenanceService, CarService carService,
                        CityService cityService, OrderedAdditionalServiceService orderedAdditionalServiceService,
-                       CustomerService customerService) {
+                       CustomerService customerService,IndividualCustomerService individualCustomerService,CorporateCustomerService corporateCustomerService) {
         this.rentDao = rentDao;
         this.modelMapperService = modelMapperService;
         this.carMaintenanceService = carMaintenanceService;
@@ -52,12 +54,47 @@ public class RentManager implements RentService {
         this.cityService = cityService;
         this.orderedAdditionalServiceService = orderedAdditionalServiceService;
         this.customerService = customerService;
+        this.individualCustomerService = individualCustomerService;
+        this.corporateCustomerService = corporateCustomerService;
     }
 
     @Override
-    public Result add(CreateRentRequest createRentRequest) throws BusinessException {
+    public Result carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException{
 
         checkIfCustomerExists(createRentRequest.getCustomerId());
+        checkIfIndividualCustomerExists(createRentRequest.getCustomerId());
+        checkIfCarExists(createRentRequest.getCarId());
+        checkIfToCityExists(createRentRequest.getToCityId());
+        checkIfFromCityExists(createRentRequest.getFromCityId());
+
+        checkIfCarMaintenance(createRentRequest.getCarId(),createRentRequest.getStartingDate(),createRentRequest.getEndDate());
+
+        Rent rent = this.modelMapperService.forRequest().map(createRentRequest, Rent.class);
+
+        rent.setRentId(0);
+        rent = manuelMappingForRentAdd(createRentRequest,rent);
+        rent.setRentalPriceOfTheCar(calculatorRentalPriceOfTheCar(rent.getCar().getCarId(),rent.getStartingDate(),rent.getEndDate()));
+
+        this.rentDao.save(rent);
+
+        return new SuccessResult("Added : " + rent.getRentId());
+    }
+
+    private double  calculatorRentalPriceOfTheCar(int carId,LocalDate startingDate,LocalDate endDate){
+        return this.carService.getByCarId(carId).getData().getDailyPrice()* this.orderedAdditionalServiceService.findNoOfDaysBetween(startingDate,endDate);
+    }
+
+    private void checkIfIndividualCustomerExists(int customerId) throws BusinessException {
+        if(this.individualCustomerService.getByIndividualCustomerId(customerId).getData() == null){
+            throw new BusinessException("There is no individual customer with this id");
+        }
+    }
+
+    @Override
+    public Result carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+
+        checkIfCustomerExists(createRentRequest.getCustomerId());
+        checkIfCorporateCustomerExists(createRentRequest.getCustomerId());
         checkIfCarExists(createRentRequest.getCarId());
         checkIfToCityExists(createRentRequest.getToCityId());
         checkIfFromCityExists(createRentRequest.getFromCityId());
@@ -68,15 +105,20 @@ public class RentManager implements RentService {
         RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent,RentGetDto.class);
 
         rent.setRentId(0);
-        rent.setTotalRentalDays(this.orderedAdditionalServiceService.findNoOfDaysBetween(rentGetDto));
-
         rent = manuelMappingForRentAdd(createRentRequest,rent);
-
-        rent.setTotalPayment(calculatorTotalPaymentNotExisistsAdditionalService(createRentRequest.getCarId(),rent));
+        rent.setRentalPriceOfTheCar(calculatorRentalPriceOfTheCar(rent.getCar().getCarId(),rent.getStartingDate(),rent.getEndDate()));
 
         this.rentDao.save(rent);
 
         return new SuccessResult("Added : " + rent.getRentId());
+    }
+
+    private void checkIfCorporateCustomerExists(int customerId) throws BusinessException{
+
+        if(this.corporateCustomerService.getByCorporateCustomerId(customerId).getData() == null){
+            throw new BusinessException("There is no corporate customer with this id");
+        }
+
     }
 
     private Rent manuelMappingForRentAdd(CreateRentRequest createRentRequest,Rent rent){
@@ -139,23 +181,6 @@ public class RentManager implements RentService {
         return city;
     }
 
-    private double calculatorTotalPaymentNotExisistsAdditionalService(int carId, Rent rentalCar ){
-
-        double totalPayment = 0;
-
-        double carDailyPrice = this.carService.getByCarId(carId).getData().getDailyPrice();
-
-        RentGetDto rentGetDto = this.modelMapperService.forDto().map(rentalCar, RentGetDto.class);
-
-        if(this.orderedAdditionalServiceService.getByRent_RentId(rentalCar.getRentId()).getData() == null){
-            totalPayment = carDailyPrice * this.orderedAdditionalServiceService.findNoOfDaysBetween(rentGetDto) ;
-        }
-
-        return  totalPayment;
-    }
-
-
-
     private void checkIfCarExists(int carId) throws BusinessException {
 
         DataResult<CarGetDto> result = this.carService.getByCarId(carId);
@@ -217,10 +242,6 @@ public class RentManager implements RentService {
 
         List<Rent> result = this.rentDao.findAll();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<RentListDto>>("Rental Cars not listed");
-        }
-
         List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
 
         response = manuelMappingForGetAll(result,response);
@@ -246,11 +267,9 @@ public class RentManager implements RentService {
 
         List<Rent> result = this.rentDao.findAll(pageable).getContent();
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<RentListDto>>("Rental Cars not listed");
-        }
-
         List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
+
+        response = manuelMappingForGetAll(result,response);
 
         return new SuccessDataResult<List<RentListDto>>(response, "Rental Cars listed successfully..");
     }
@@ -262,11 +281,9 @@ public class RentManager implements RentService {
 
         List<Rent> result = this.rentDao.findAll(s);
 
-        if (result.isEmpty()) {
-            return new ErrorDataResult<List<RentListDto>>("Rental Cars not listed");
-        }
-
         List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
+
+        response = manuelMappingForGetAll(result,response);
 
         return new SuccessDataResult<List<RentListDto>>(response, "Rental Cars listed successfully..");
     }

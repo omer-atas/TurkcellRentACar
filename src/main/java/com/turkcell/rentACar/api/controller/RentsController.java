@@ -37,40 +37,45 @@ public class RentsController {
 		this.rentService = rentService;
 	}
 
-	@PostMapping("/add")
-	Result add(@RequestBody @Valid CreateRentRequest createRentRequest) throws BusinessException {
-		return this.rentService.add(createRentRequest);
+	@PostMapping("/carRentalForIndividualCustomer")
+	public Result carRentalForIndividualCustomer(@RequestBody @Valid CreateRentRequest createRentRequest) throws BusinessException{
+		return this.rentService.carRentalForIndividualCustomer(createRentRequest);
+	}
+
+	@PostMapping("/carRentalForCorporateCustomer")
+	public Result carRentalForCorporateCustomer(@RequestBody @Valid CreateRentRequest createRentRequest) throws BusinessException {
+		return this.rentService.carRentalForCorporateCustomer(createRentRequest);
 	}
 
 	@GetMapping("/getByRentId/{rentId}")
-	DataResult<RentGetDto> getByRentId(@RequestParam("rentId") int rentId) {
+	public DataResult<RentGetDto> getByRentId(@RequestParam("rentId") int rentId) {
 		return this.rentService.getByRentId(rentId);
 	}
 
 	@GetMapping("/getAll")
-	DataResult<List<RentListDto>> getAll() {
+	public DataResult<List<RentListDto>> getAll() {
 		return this.rentService.getAll();
 	}
 
 	@GetMapping("/getAllPaged")
-	DataResult<List<RentListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
+	public DataResult<List<RentListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
 											  @RequestParam("pageSize") int pageSize) {
 		return this.rentService.getAllPaged(pageNo, pageSize);
 	}
 
 	@GetMapping("/getAllSorted")
-	DataResult<List<RentListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction) {
+	public DataResult<List<RentListDto>> getAllSorted(@RequestParam("direction") Sort.Direction direction) {
 		return this.rentService.getAllSorted(direction);
 	}
 
 	@PutMapping("/update")
-	Result update(@RequestParam("rentalId") int rentalId, @RequestBody @Valid UpdateRentRequest updateRentRequest)
+	public Result update(@RequestParam("rentalId") int rentalId, @RequestBody @Valid UpdateRentRequest updateRentRequest)
 			throws BusinessException {
 		return this.rentService.update(rentalId, updateRentRequest);
 	}
 
 	@DeleteMapping("/delete")
-	Result delete(@RequestBody @Valid DeleteRentRequest deleteRentRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteRentRequest deleteRentRequest) throws BusinessException {
 		return this.rentService.delete(deleteRentRequest);
 	}
 

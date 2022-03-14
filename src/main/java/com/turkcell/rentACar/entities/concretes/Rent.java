@@ -27,11 +27,8 @@ public class Rent {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "total_rental_days")
-    private double totalRentalDays;
-
-    @Column(name = "total_payment")
-    private double totalPayment;
+    @Column(name = "rental_price_of_the_car")
+    private double rentalPriceOfTheCar;
 
     @ManyToOne
     @JoinColumn(name = "from_city_id")
