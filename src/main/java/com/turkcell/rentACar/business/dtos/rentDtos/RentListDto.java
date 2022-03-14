@@ -11,12 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RentListDto {
-	
+
 	private int rentId;
 
 	private LocalDate startingDate;
 
 	private LocalDate endDate;
+
+	private int totalRentalDays;
 
 	private double totalPayment;
 
@@ -25,5 +27,7 @@ public class RentListDto {
 	private int toCityId;
 
 	private int carId;
+
+	private int customerId;
 
 }

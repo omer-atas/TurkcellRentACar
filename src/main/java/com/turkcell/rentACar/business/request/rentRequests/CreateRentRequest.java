@@ -25,4 +25,7 @@ public class CreateRentRequest {
 	@Positive
 	private int carId;
 
+	@Positive
+	private int customerId;
+
 }

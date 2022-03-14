@@ -70,7 +70,7 @@ public class OrderedAdditionalServicesController {
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody DeleteOrderedAdditionalServiceRequest deleteOrderedAdditionalServiceRequest) throws BusinessException {
+    public Result delete(@RequestBody @Valid DeleteOrderedAdditionalServiceRequest deleteOrderedAdditionalServiceRequest) throws BusinessException {
         return this.orderedAdditionalServiceService.delete(deleteOrderedAdditionalServiceRequest);
     }
 }

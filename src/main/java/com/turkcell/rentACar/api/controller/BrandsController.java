@@ -60,7 +60,7 @@ public class BrandsController {
 	}
 
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody DeleteBrandRequest deleteBrandRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) throws BusinessException {
 		return this.brandService.delete(deleteBrandRequest);
 	}
 }

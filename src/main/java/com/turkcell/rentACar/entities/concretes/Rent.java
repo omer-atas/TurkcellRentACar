@@ -27,6 +27,9 @@ public class Rent {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "total_rental_days")
+    private double totalRentalDays;
+
     @Column(name = "total_payment")
     private double totalPayment;
 
@@ -43,5 +46,12 @@ public class Rent {
 
     @OneToMany(mappedBy = "rent")
     private List<OrderedAdditionalService> orderedAdditionalService;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    @OneToOne(mappedBy = "rent")
+    private Invoice invoice;
 
 }

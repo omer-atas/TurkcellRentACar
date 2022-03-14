@@ -52,10 +52,10 @@ public class CarManager implements CarService {
     @Override
     public Result add(CreateCarRequest createCarRequest) throws BusinessException {
 
-        Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
-
         checkIfBrandExists(createCarRequest.getBrandId());
         checkIfColorExists(createCarRequest.getColorId());
+
+        Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
         this.carDao.save(car);
 
@@ -187,9 +187,9 @@ public class CarManager implements CarService {
     @Override
     public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
 
-        Car car = this.modelMapperService.forRequest().map(deleteCarRequest, Car.class);
-
         checkIfCarExists(deleteCarRequest.getCarId());
+
+        Car car = this.modelMapperService.forRequest().map(deleteCarRequest, Car.class);
 
         this.carDao.deleteById(car.getCarId());
 

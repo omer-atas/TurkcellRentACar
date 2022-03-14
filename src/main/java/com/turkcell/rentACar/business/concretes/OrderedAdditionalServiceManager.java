@@ -188,7 +188,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     @Override
     public DataResult<List<OrderedAdditionalServiceListDto>> getAllSorted(Sort.Direction direction) {
 
-        Sort s = Sort.by(direction, "additionalServiceId");
+        Sort s = Sort.by(direction, "orderedAdditionalServiceId");
 
         List<OrderedAdditionalService> result = this.orderedAdditionalServiceDao.findAll(s);
 
@@ -254,9 +254,9 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     @Override
     public Result delete(DeleteOrderedAdditionalServiceRequest deleteOrderedAdditionalServiceRequest) throws BusinessException {
 
-        OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forRequest().map(deleteOrderedAdditionalServiceRequest, OrderedAdditionalService.class);
+        checkIfOrderedAdditionalServiceExists(deleteOrderedAdditionalServiceRequest.getOrderedAdditionalServiceId());
 
-        checkIfOrderedAdditionalServiceExists(orderedAdditionalService.getOrderedAdditionalServiceId());
+        OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forRequest().map(deleteOrderedAdditionalServiceRequest, OrderedAdditionalService.class);
 
         extractionOfAdditionalServicesPrice(deleteOrderedAdditionalServiceRequest);
 

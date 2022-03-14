@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 
 public interface BrandService {
 
-	Result add(CreateBrandRequest CreateBrandRequest) throws BusinessException;
+	Result add(CreateBrandRequest createBrandRequest) throws BusinessException;
 
 	DataResult<BrandGetDto> getByBrandId(int brandId);
 

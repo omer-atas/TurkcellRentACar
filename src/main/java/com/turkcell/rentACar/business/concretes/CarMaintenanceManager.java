@@ -53,13 +53,13 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	@Override
 	public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
+		checkIfCarExists(createCarMaintenanceRequest);
+		checkIfCarRented(createCarMaintenanceRequest);
+
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
 
 		carMaintenance.setMaintanenceId(0);
-
-		checkIfCarExists(createCarMaintenanceRequest);
-		checkIfCarRented(createCarMaintenanceRequest);
 
 		this.carMaintenanceDao.save(carMaintenance);
 
@@ -170,6 +170,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	@Override
 	public Result update(int carMaintenanceId, UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
 			throws BusinessException {
+
+		checkIfCarMaintenanceExists(carMaintenanceId);
 
 		CarMaintenance carMaintenance = this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId);
 

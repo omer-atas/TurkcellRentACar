@@ -128,6 +128,8 @@ public class ColorManager implements ColorService {
 	@Override
 	public Result update(int colorId, UpdateColorRequest updateColorRequest) throws BusinessException {
 
+		checkIfColorExists(colorId);
+
 		Color color = this.colorDao.getByColorId(colorId);
 
 		Color colorUpdate = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
@@ -159,9 +161,9 @@ public class ColorManager implements ColorService {
 	@Override
 	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
 
-		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
+		checkIfColorExists(deleteColorRequest.getColorId());
 
-		checkIfColorExists(color.getColorId());
+		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 
 		this.colorDao.deleteById(color.getColorId());
 

@@ -42,9 +42,9 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result add(CreateBrandRequest createBrandRequest) throws BusinessException {
 
-		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
-
 		checkIfNameNotDuplicated(createBrandRequest.getBrandName());
+
+		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 
 		this.brandDao.save(brand);
 
@@ -88,7 +88,7 @@ public class BrandManager implements BrandService {
 		}
 
 		List<BrandListDto> response = result.stream()
-				.map(car -> this.modelMapperService.forDto().map(car, BrandListDto.class)).collect(Collectors.toList());
+				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class)).collect(Collectors.toList());
 
 		return new SuccessDataResult<List<BrandListDto>>(response, "Brands Listed Successfully");
 	}
@@ -101,7 +101,7 @@ public class BrandManager implements BrandService {
 		List<Brand> result = this.brandDao.findAll(s);
 
 		if (result.isEmpty()) {
-			return new ErrorDataResult<List<BrandListDto>>("Cars not list - getAllSorted -");
+			return new ErrorDataResult<List<BrandListDto>>("Brands not list - getAllSorted -");
 		}
 
 		List<BrandListDto> response = result.stream()
@@ -140,12 +140,14 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result update(int brandId, UpdateBrandRequest updateBrandRequest) throws BusinessException {
 
+		checkIfBrandExists(brandId);
+		checkIfNameNotDuplicated(updateBrandRequest.getBrandName());
+
 		Brand brand = this.brandDao.getByBrandId(brandId);
 
 		Brand brandUpdate = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 
 		IdCorrector(brand, brandUpdate);
-		checkIfNameNotDuplicated(brandUpdate.getBrandName());
 
 		this.brandDao.save(brandUpdate);
 
@@ -160,9 +162,9 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException {
 
-		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
+		checkIfBrandExists(deleteBrandRequest.getBrandId());
 
-		checkIfBrandExists(brand.getBrandId());
+		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 
 		this.brandDao.deleteById(brand.getBrandId());
 

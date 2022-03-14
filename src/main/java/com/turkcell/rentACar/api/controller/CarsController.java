@@ -75,7 +75,7 @@ public class CarsController {
 	}
 
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody DeleteCarRequest deleteCarRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteCarRequest deleteCarRequest) throws BusinessException {
 		return this.carService.delete(deleteCarRequest);
 	}
 }

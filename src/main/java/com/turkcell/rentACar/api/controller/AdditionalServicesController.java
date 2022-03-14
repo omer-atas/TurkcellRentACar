@@ -60,7 +60,7 @@ public class AdditionalServicesController {
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody DeleteAdditionalServiceRequest deleteAdditionalServiceRequest) throws BusinessException {
+    public Result delete(@RequestBody @Valid DeleteAdditionalServiceRequest deleteAdditionalServiceRequest) throws BusinessException {
         return this.additionalServiceService.delete(deleteAdditionalServiceRequest);
     }
 }

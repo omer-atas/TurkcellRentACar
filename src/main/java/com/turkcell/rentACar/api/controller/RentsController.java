@@ -70,7 +70,7 @@ public class RentsController {
 	}
 
 	@DeleteMapping("/delete")
-	Result delete(@RequestBody DeleteRentRequest deleteRentRequest) throws BusinessException {
+	Result delete(@RequestBody @Valid DeleteRentRequest deleteRentRequest) throws BusinessException {
 		return this.rentService.delete(deleteRentRequest);
 	}
 

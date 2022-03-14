@@ -38,6 +38,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         AdditionalService additionalService = this.modelMapperService.forRequest().map(createAdditionalServiceRequest, AdditionalService.class);
 
         this.additionalServiceDao.save(additionalService);
+
         return new SuccessResult("AdditionalService added : " + additionalService.getAdditionalServiceName());
     }
 
@@ -109,6 +110,8 @@ public class AdditionalServiceManager implements AdditionalServiceService {
     @Override
     public Result update(int additionalServiceId, UpdateAdditionalServiceRequest updateAdditionalServiceRequest) throws BusinessException {
 
+        checkIfAdditionalServiceExists(additionalServiceId);
+
         AdditionalService additionalService = this.additionalServiceDao.getByAdditionalServiceId(additionalServiceId);
 
         AdditionalService additionalServiceUpdate = this.modelMapperService.forRequest().map(updateAdditionalServiceRequest, AdditionalService.class);
@@ -127,10 +130,10 @@ public class AdditionalServiceManager implements AdditionalServiceService {
 
     @Override
     public Result delete(DeleteAdditionalServiceRequest deleteAdditionalServiceRequest) throws BusinessException {
+
+        checkIfAdditionalServiceExists(deleteAdditionalServiceRequest.getAdditionalServiceId());
         
         AdditionalService additionalService = this.modelMapperService.forRequest().map(deleteAdditionalServiceRequest, AdditionalService.class);
-
-        checkIfAdditionalServiceExists(additionalService.getAdditionalServiceId());
 
         this.additionalServiceDao.deleteById(additionalService.getAdditionalServiceId());
 
