@@ -57,6 +57,16 @@ public class RentsController {
 		return this.rentService.getAll();
 	}
 
+	@GetMapping("/getAllForCorporateCustomer")
+	public DataResult<List<RentListDto>> getAllForCorporateCustomer() {
+		return this.rentService.getAllForCorporateCustomer();
+	}
+
+	@GetMapping("/getAllForIndividualCustomer")
+	public DataResult<List<RentListDto>> getAllForIndividualCustomer() {
+		return this.rentService.getAllForIndividualCustomer();
+	}
+
 	@GetMapping("/getAllPaged")
 	public DataResult<List<RentListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
 											  @RequestParam("pageSize") int pageSize) {

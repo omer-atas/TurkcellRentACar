@@ -23,6 +23,10 @@ public interface RentService {
 
 	DataResult<List<RentListDto>> getAll();
 
+	DataResult<List<RentListDto>> getAllForCorporateCustomer();
+
+	DataResult<List<RentListDto>> getAllForIndividualCustomer();
+
 	DataResult<List<RentListDto>> getAllPaged(int pageNo, int pageSize);
 
 	DataResult<List<RentListDto>> getAllSorted(Sort.Direction direction);

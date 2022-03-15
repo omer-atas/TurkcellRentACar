@@ -4,6 +4,7 @@ import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
+import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
@@ -249,6 +250,43 @@ public class RentManager implements RentService {
     public DataResult<List<RentListDto>> getAll() {
 
         List<Rent> result = this.rentDao.findAll();
+
+        List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
+
+        response = manuelMappingForGetAll(result,response);
+
+        return new SuccessDataResult<List<RentListDto>>(response, "Rental Cars Listed successfully..");
+    }
+
+    @Override
+    public DataResult<List<RentListDto>> getAllForCorporateCustomer() {
+
+        List<Rent> result = this.rentDao.findAll();
+
+        for(int i=0 ; i < result.size(); i++){
+            if(this.corporateCustomerService.getByCorporateCustomerId(result.get(i).getCustomer().getCustomerId()).getData() == null){
+                result.remove(i);
+            }
+        }
+
+        List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
+
+        response = manuelMappingForGetAll(result,response);
+
+
+        return new SuccessDataResult<List<RentListDto>>(response, "Rental Cars Listed successfully..");
+    }
+
+    @Override
+    public DataResult<List<RentListDto>> getAllForIndividualCustomer() {
+
+        List<Rent> result = this.rentDao.findAll();
+
+        for(int i=0 ; i < result.size(); i++){
+            if(this.corporateCustomerService.getByCorporateCustomerId(result.get(i).getCustomer().getCustomerId()).getData() == null){
+                result.remove(i);
+            }
+        }
 
         List<RentListDto> response = result.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentListDto.class)).collect(Collectors.toList());
 

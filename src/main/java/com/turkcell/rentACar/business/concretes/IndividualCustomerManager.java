@@ -36,6 +36,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws BusinessException {
 
         checkIfNationalIdentityNotDuplicated(createIndividualCustomerRequest.getNationalIdentity());
+        checkIfNationalIdentityNumberRegex(createIndividualCustomerRequest.getNationalIdentity());
 
         IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(createIndividualCustomerRequest, IndividualCustomer.class);
         individualCustomer.setCustomerId(0);
@@ -45,9 +46,21 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         return new SuccessResult("IndividualCustomer added : " + individualCustomer.getNationalIdentity());
     }
 
+    private void checkIfNationalIdentityNumberRegex(String nationalIdentity) throws BusinessException {
+
+        String identityNumber = new String("nationalIdentity");
+        boolean matches = identityNumber.matches("^[1-9]{1}[0-9]{9}[02468]{1}$");
+
+        if(!matches){
+            throw new BusinessException("Enter the correct ID number.");
+        }
+
+
+    }
+
     private void checkIfNationalIdentityNotDuplicated(String nationalIdentity) throws BusinessException {
         if(this.individualCustomerDao.existsByNationalIdentity(nationalIdentity) == true){
-            throw new BusinessException("Tax number can't be the same");
+            throw new BusinessException("Identity number can't be the same");
         }
     }
 
@@ -109,6 +122,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         checkIfIndividualCustomerExists(individualCustomerId);
         checkIfNationalIdentityNotDuplicated(updateIndividualCustomerRequest.getNationalIdentity());
+        checkIfNationalIdentityNumberRegex(updateIndividualCustomerRequest.getNationalIdentity());
 
         IndividualCustomer individualCustomer = this.individualCustomerDao.getByCustomerId(individualCustomerId);
 

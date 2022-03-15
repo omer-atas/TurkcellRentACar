@@ -37,6 +37,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException {
         
         checkIfTaxNumberNotDuplicated(createCorporateCustomerRequest.getTaxNumber());
+        checkIfTaxNumberRegex(createCorporateCustomerRequest.getTaxNumber());
 
         CorporateCustomer corporateCustomer = this.modelMapperService.forRequest().map(createCorporateCustomerRequest, CorporateCustomer.class);
         corporateCustomer.setCustomerId(0);
@@ -44,6 +45,18 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         this.corporateCustomerDao.save(corporateCustomer);
 
         return new SuccessResult("CorporateCustomer added : " + createCorporateCustomerRequest.getTaxNumber());
+    }
+
+    private void checkIfTaxNumberRegex(String taxNumber) throws BusinessException {
+
+        String identityNumber = new String("nationalIdentity");
+        boolean matches = identityNumber.matches("/^[0-9]{10}$/");
+
+        if(!matches){
+            throw new BusinessException("Enter the correct ID number.");
+        }
+
+
     }
 
     private void checkIfTaxNumberNotDuplicated(String taxNumber) throws BusinessException {
@@ -111,6 +124,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         checkIfCorporateCustomerExists(corporateCustomerId);
         checkIfTaxNumberNotDuplicated(updateCorporateCustomerRequest.getTaxNumber());
+        checkIfTaxNumberRegex(updateCorporateCustomerRequest.getTaxNumber());
 
         CorporateCustomer corporateCustomer = this.corporateCustomerDao.getByCustomerId(corporateCustomerId);
 
