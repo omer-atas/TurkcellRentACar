@@ -141,9 +141,7 @@ public class InvoiceManager implements InvoiceService{
                 .map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class))
                 .collect(Collectors.toList());
 
-        for(int i=0 ; i< result.size() ; i++){
-            response.get(i).setCustomerId(result.get(i).getRent().getCustomer().getCustomerId());
-        }
+        response = manuelMappingForGetAll(result,response);
 
         return new SuccessDataResult<List<InvoiceListDto>>(response, "Success");
     }

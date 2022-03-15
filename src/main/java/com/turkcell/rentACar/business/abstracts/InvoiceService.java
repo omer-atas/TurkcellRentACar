@@ -8,7 +8,6 @@ import com.turkcell.rentACar.business.request.invoiceRequests.UpdateInvoiceReque
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
-import com.turkcell.rentACar.entities.concretes.Invoice;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
