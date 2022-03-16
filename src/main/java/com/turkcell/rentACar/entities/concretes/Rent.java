@@ -30,6 +30,12 @@ public class Rent {
     @Column(name = "rental_price_of_the_car")
     private double rentalPriceOfTheCar;
 
+    @Column(name = "starting_kilometer")
+    private double startingKilometer;
+
+    @Column(name = "return_kilometer")
+    private double returnKilometer;
+
     @ManyToOne
     @JoinColumn(name = "from_city_id")
     private City fromCity;

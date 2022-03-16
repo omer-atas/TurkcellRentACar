@@ -24,6 +24,10 @@ public class RentGetDto {
 
 	private int rentalPriceOfTheCar;
 
+	private double startingKilometer;
+
+	private double returnKilometer;
+
 	private int fromCityId;
 
 	private int toCityId;

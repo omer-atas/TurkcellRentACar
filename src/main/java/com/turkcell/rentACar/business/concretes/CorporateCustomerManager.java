@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Exceptionları ayır yani her durumlara karşı özel handler ekle - ilerideki karşılaşabilecek durumları karşı;
 @Service
 public class CorporateCustomerManager implements CorporateCustomerService {
 

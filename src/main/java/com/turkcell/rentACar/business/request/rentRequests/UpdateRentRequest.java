@@ -16,6 +16,8 @@ public class UpdateRentRequest {
 
 	private LocalDate endDate;
 
+	private double returnKilometer;
+
 	private int fromCityId;
 
 	private int toCityId;

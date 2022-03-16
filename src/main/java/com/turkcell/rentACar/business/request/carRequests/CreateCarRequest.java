@@ -29,6 +29,9 @@ public class CreateCarRequest {
 	private String description;
 
 	@Positive
+	private double kilometerInformation;
+
+	@Positive
 	private int brandId;
 
 	@Positive

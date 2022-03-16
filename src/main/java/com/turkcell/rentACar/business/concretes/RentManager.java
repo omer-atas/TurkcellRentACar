@@ -72,6 +72,8 @@ public class RentManager implements RentService {
         Rent rent = this.modelMapperService.forRequest().map(createRentRequest, Rent.class);
 
         rent.setRentId(0);
+        rent.setStartingKilometer(this.carService.getByCarId(createRentRequest.getCarId()).getData().getKilometerInformation());
+        rent.setReturnKilometer(this.carService.getByCarId(createRentRequest.getCarId()).getData().getKilometerInformation());
         rent = manuelMappingForRentAdd(createRentRequest,rent);
         rent.setRentalPriceOfTheCar(calculatorRentalPriceOfTheCar(rent.getCar().getCarId(),rent.getStartingDate(),rent.getEndDate()));
 
@@ -110,6 +112,8 @@ public class RentManager implements RentService {
         Rent rent = this.modelMapperService.forRequest().map(createRentRequest, Rent.class);
 
         rent.setRentId(0);
+        rent.setStartingKilometer(this.carService.getByCarId(createRentRequest.getCarId()).getData().getKilometerInformation());
+        rent.setReturnKilometer(this.carService.getByCarId(createRentRequest.getCarId()).getData().getKilometerInformation());
         rent = manuelMappingForRentAdd(createRentRequest,rent);
         rent.setRentalPriceOfTheCar(calculatorRentalPriceOfTheCar(rent.getCar().getCarId(),rent.getStartingDate(),rent.getEndDate()));
 
@@ -354,6 +358,9 @@ public class RentManager implements RentService {
         checkIfParameterIsNull(updateRentRequest, rent);
 
         Rent rentUpdate = this.modelMapperService.forRequest().map(updateRentRequest, Rent.class);
+
+        rentUpdate.setReturnKilometer(updateRentRequest.getReturnKilometer());
+        this.carService.getByCarId(this.rentDao.getByRentId(rentId).getCar().getCarId()).getData().setKilometerInformation(updateRentRequest.getReturnKilometer());
 
         IdCorrector(rent, rentUpdate);
 

@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 
@@ -17,6 +14,9 @@ import javax.persistence.Table;
 @Table(name = "corporate_customers")
 @PrimaryKeyJoinColumn(name = "corporate_customer_id",referencedColumnName = "customer_id")
 public class CorporateCustomer extends Customer{
+
+    @Column(name = "corporate_customer_id",insertable = false,updatable = false)
+    private int corporateCustomerId;
 
     @Column(name = "company_name")
     private String companyName;

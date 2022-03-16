@@ -19,6 +19,7 @@ public class CarGetDto {
 
 	private String description;
 
+	private double kilometerInformation;
 
 	private String brandName;
 

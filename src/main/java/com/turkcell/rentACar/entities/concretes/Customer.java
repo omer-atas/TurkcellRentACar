@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,6 +20,9 @@ public class Customer extends User {
 
     @Column(name = "customer_id",insertable = false,updatable = false)
     private int customerId;
+
+    @Column(name = "date_registered")
+    private LocalDate dateRegistered;
 
     @OneToMany(mappedBy = "customer")
     List<Rent> rents;

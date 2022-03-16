@@ -18,6 +18,8 @@ public class CarListDto {
 	private int modelYear;
 
 	private String description;
+
+	private double kilometerInformation;
 	
 	private String brandName;
 	

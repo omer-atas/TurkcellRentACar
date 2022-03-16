@@ -15,6 +15,8 @@ import java.time.LocalDate;
 @Table(name = "invoices")
 public class Invoice {
 
+    // Denormalize edebileceğin kadar et !
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "invoice_id")

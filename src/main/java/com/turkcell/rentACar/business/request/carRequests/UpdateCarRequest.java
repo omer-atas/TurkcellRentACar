@@ -20,6 +20,9 @@ public class UpdateCarRequest {
 	private String description;
 
 	@Positive
+	private double kilometerInformation;
+
+	@Positive
 	private int colorId;
 
 }
