@@ -27,7 +27,7 @@ public class CreateIndividualCustomerRequest {
     @NotBlank
     @NotNull
     @NotEmpty
-    @Size(min = 1)
+    @Size(min = 11,max = 11)
     private String nationalIdentity;
 
     @NotBlank
