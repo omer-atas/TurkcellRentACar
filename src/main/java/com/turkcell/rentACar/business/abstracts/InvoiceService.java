@@ -34,4 +34,12 @@ public interface InvoiceService {
     Result update(int invoiceId, UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException;
 
     Result delete(DeleteInvoiceRequest deleteInvoiceRequest) throws BusinessException;
+
+    void extractionOfAdditionalServicesPrice(int orderedAdditionalServiceId) throws BusinessException;
+
+    void calculatingDailyPriceToSubtractAfterAdditionalServiceUpdate(double dailyPrice,int rentId);
+
+    void calculatingDailyPriceToAddingAfterAdditionalServiceUpdate(double dailyPrice,int rentId);
+
+    double calculationTotalPayment(int rentId);
 }

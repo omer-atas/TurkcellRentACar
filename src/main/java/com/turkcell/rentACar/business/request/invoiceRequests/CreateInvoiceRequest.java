@@ -14,7 +14,5 @@ public class CreateInvoiceRequest {
 
     private String invoiceNo;
 
-    private LocalDate creationDate;
-
     private int rentId;
 }

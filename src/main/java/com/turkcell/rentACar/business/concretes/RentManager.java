@@ -4,7 +4,6 @@ import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
-import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
@@ -68,7 +67,6 @@ public class RentManager implements RentService {
         checkIfCarExists(createRentRequest.getCarId());
         checkIfToCityExists(createRentRequest.getToCityId());
         checkIfFromCityExists(createRentRequest.getFromCityId());
-
         checkIfCarMaintenance(createRentRequest.getCarId(),createRentRequest.getStartingDate(),createRentRequest.getEndDate());
 
         Rent rent = this.modelMapperService.forRequest().map(createRentRequest, Rent.class);
@@ -107,11 +105,9 @@ public class RentManager implements RentService {
         checkIfCarExists(createRentRequest.getCarId());
         checkIfToCityExists(createRentRequest.getToCityId());
         checkIfFromCityExists(createRentRequest.getFromCityId());
-
         checkIfCarMaintenance(createRentRequest.getCarId(),createRentRequest.getStartingDate(),createRentRequest.getEndDate());
 
         Rent rent = this.modelMapperService.forRequest().map(createRentRequest, Rent.class);
-        RentGetDto rentGetDto = this.modelMapperService.forDto().map(rent,RentGetDto.class);
 
         rent.setRentId(0);
         rent = manuelMappingForRentAdd(createRentRequest,rent);
@@ -349,11 +345,11 @@ public class RentManager implements RentService {
     }
 
     @Override
-    public Result update(int rentalId, UpdateRentRequest updateRentRequest) throws BusinessException {
+    public Result update(int rentId, UpdateRentRequest updateRentRequest) throws BusinessException {
 
-        checkIfRentExists(rentalId);
+        checkIfRentExists(rentId);
 
-        Rent rent = this.rentDao.getByRentId(rentalId);
+        Rent rent = this.rentDao.getByRentId(rentId);
 
         checkIfParameterIsNull(updateRentRequest, rent);
 
@@ -361,46 +357,10 @@ public class RentManager implements RentService {
 
         IdCorrector(rent, rentUpdate);
 
-        rentUpdate = updateCity(updateRentRequest.getToCityId(),updateRentRequest.getFromCityId(),rentUpdate,rent);
-
         this.rentDao.save(rentUpdate);
 
         return new SuccessResult(rentUpdate.getRentId() + " updated..");
     }
-
-    private Rent updateCity(int toCityId, int fromCityId, Rent rentUpdate,Rent rent ){
-
-        if(toCityId == 0){
-            CityGetDto cityGetDto = this.cityService.getByCityPlate(rent.getToCity().getCityPlate());
-            City toCity = this.modelMapperService.forDto().map(cityGetDto,City.class);
-            rentUpdate.setToCity(toCity);
-        }
-
-        if (toCityId != 0) {
-
-            CityGetDto cityGetDto = this.cityService.getByCityPlate(toCityId);
-            City toCity = this.modelMapperService.forDto().map(cityGetDto,City.class);
-
-            rentUpdate.setToCity(toCity);
-        }
-
-        if(fromCityId == 0){
-            CityGetDto cityGetDto = this.cityService.getByCityPlate(rent.getToCity().getCityPlate());
-            City fromCity = this.modelMapperService.forDto().map(cityGetDto,City.class);
-            rentUpdate.setFromCity(fromCity);
-        }
-
-        if (fromCityId != 0) {
-
-            CityGetDto cityGetDto = this.cityService.getByCityPlate(fromCityId);
-            City fromCity = this.modelMapperService.forDto().map(cityGetDto,City.class);
-
-            rentUpdate.setToCity(fromCity);
-        }
-
-        return rentUpdate;
-    }
-
 
     private UpdateRentRequest checkIfParameterIsNull(UpdateRentRequest updateRentRequest, Rent rentalCar) {
 

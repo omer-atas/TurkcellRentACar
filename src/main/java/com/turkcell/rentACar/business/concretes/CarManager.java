@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.turkcell.rentACar.business.abstracts.CityService;
-import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
-import com.turkcell.rentACar.entities.concretes.City;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

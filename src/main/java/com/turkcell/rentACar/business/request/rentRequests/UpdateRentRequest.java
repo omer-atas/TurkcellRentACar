@@ -16,8 +16,6 @@ public class UpdateRentRequest {
 
 	private LocalDate endDate;
 
-	private double totalPayment;
-
 	private int fromCityId;
 
 	private int toCityId;

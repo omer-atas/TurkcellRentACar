@@ -10,7 +10,6 @@ import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.*;
 import com.turkcell.rentACar.dataAccess.abstracts.CorporateCustomerDao;
-import com.turkcell.rentACar.entities.concretes.Brand;
 import com.turkcell.rentACar.entities.concretes.CorporateCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;

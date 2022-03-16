@@ -35,8 +35,7 @@ public interface RentService {
 
 	List<RentListDto> getByCar_CarId(int carId);
 
-	Result update(int rentalId, UpdateRentRequest updateRentRequest) throws BusinessException;
-
+	Result update(int rentId, UpdateRentRequest updateRentRequest) throws BusinessException;
 
 	Result delete(DeleteRentRequest deleteRentalCarRequest) throws BusinessException;
 
