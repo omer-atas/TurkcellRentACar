@@ -209,4 +209,9 @@ public class CarManager implements CarService {
 
     }
 
+    @Override
+    public void updateKilometerInformation(int carId, double kilometerInformation) {
+        this.carDao.getByCarId(carId).setKilometerInformation(kilometerInformation);
+    }
+
 }

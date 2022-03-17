@@ -41,6 +41,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
         checkIfCarExists(createCarCrashInformationRequest.getCarId());
 
         CarCrashInformation carCrashInformation = this.modelMapperService.forRequest().map(createCarCrashInformationRequest, CarCrashInformation.class);
+        carCrashInformation.setCarCrashInformationId(0);
 
         this.carCrashInformationDao.save(carCrashInformation);
 
@@ -50,7 +51,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
     private void checkIfCarExists(int carId) throws BusinessException {
 
         if(this.carService.getByCarId(carId).getData() == null){
-            throw new BusinessException("Araba yok..");
+            throw new BusinessException("There is no carr with this id");
         }
     }
 
@@ -125,7 +126,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
 
     private void checkIfCarCrashInformatioExists(int carCrashInformationId) throws BusinessException {
         if(this.carCrashInformationDao.getByCarCrashInformationId(carCrashInformationId) == null){
-            throw new BusinessException("Yok");
+            throw new BusinessException("There is no car carsh information with this id");
         }
     }
 
@@ -142,8 +143,8 @@ public class CarCrashInformationManager implements CarCrashInformationService {
 
         CarCrashInformation carCrashInformation = this.modelMapperService.forRequest().map(deleteCarCrashInformationRequest, CarCrashInformation.class);
 
-        this.carCrashInformationDao.deleteById(deleteCarCrashInformationRequest.getCarCrashInformationId());
+        this.carCrashInformationDao.deleteById(carCrashInformation.getCarCrashInformationId());
 
-        return new SuccessResult(deleteCarCrashInformationRequest.getCarCrashInformationId() + " deleted..");
+        return new SuccessResult(carCrashInformation.getCarCrashInformationId() + " deleted..");
     }
 }

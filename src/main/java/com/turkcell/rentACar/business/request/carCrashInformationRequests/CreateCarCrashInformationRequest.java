@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateCarCrashInformationRequest {
 
-    private int carCrashInformationId;
-
     private String crashDetail;
 
     private int carId;

@@ -14,6 +14,7 @@ import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.*;
 import com.turkcell.rentACar.dataAccess.abstracts.RentDao;
+import com.turkcell.rentACar.entities.concretes.Car;
 import com.turkcell.rentACar.entities.concretes.City;
 import com.turkcell.rentACar.entities.concretes.Customer;
 import com.turkcell.rentACar.entities.concretes.Rent;
@@ -355,18 +356,28 @@ public class RentManager implements RentService {
 
         Rent rent = this.rentDao.getByRentId(rentId);
 
-        checkIfParameterIsNull(updateRentRequest, rent);
+        updateRentRequest = checkIfParameterIsNull(updateRentRequest, rent);
 
         Rent rentUpdate = this.modelMapperService.forRequest().map(updateRentRequest, Rent.class);
 
-        rentUpdate.setReturnKilometer(updateRentRequest.getReturnKilometer());
-        this.carService.getByCarId(this.rentDao.getByRentId(rentId).getCar().getCarId()).getData().setKilometerInformation(updateRentRequest.getReturnKilometer());
+        rentUpdate = manuelMappingToRentUpdate(rentId,rentUpdate);
+
+        this.carService.updateKilometerInformation(this.rentDao.getByRentId(rentId).getCar().getCarId(),updateRentRequest.getReturnKilometer());
 
         IdCorrector(rent, rentUpdate);
 
         this.rentDao.save(rentUpdate);
 
         return new SuccessResult(rentUpdate.getRentId() + " updated..");
+    }
+
+    private Rent manuelMappingToRentUpdate(int rentId,Rent rentUpdate){
+        rentUpdate.setToCity(this.rentDao.getByRentId(rentId).getToCity());
+        rentUpdate.setFromCity(this.rentDao.getByRentId(rentId).getFromCity());
+        rentUpdate.setRentalPriceOfTheCar(this.rentDao.getByRentId(rentId).getRentalPriceOfTheCar());
+        rentUpdate.setStartingKilometer(this.rentDao.getByRentId(rentId).getStartingKilometer());
+
+        return  rentUpdate;
     }
 
     private UpdateRentRequest checkIfParameterIsNull(UpdateRentRequest updateRentRequest, Rent rentalCar) {

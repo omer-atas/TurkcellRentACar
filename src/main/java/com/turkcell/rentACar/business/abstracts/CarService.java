@@ -33,4 +33,6 @@ public interface CarService {
 
 	boolean checkIfCarExists(int carId) throws BusinessException;
 
+	void updateKilometerInformation(int carId,double kilometerInformation);
+
 }

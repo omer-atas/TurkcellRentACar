@@ -51,7 +51,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         String identityNumber = new String("nationalIdentity");
         boolean matches = identityNumber.matches("^[1-9]{1}[0-9]{9}[02468]{1}$");
 
-        if(!matches){
+        if(matches){
             throw new BusinessException("Enter the correct ID number.");
         }
 
