@@ -1,14 +1,17 @@
 package com.turkcell.rentACar.business.concretes;
 
+import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.InvoiceService;
 import com.turkcell.rentACar.business.abstracts.PaymentService;
 import com.turkcell.rentACar.business.abstracts.RentService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
+import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.DeletePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.UpdatePaymentRequest;
+import com.turkcell.rentACar.core.bankServices.PostService;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.*;
@@ -26,26 +29,46 @@ public class PaymentManager implements PaymentService {
     private PaymentDao paymentDao;
     private ModelMapperService modelMapperService;
     private InvoiceService invoiceService;
+    private PostService postService;
 
     @Autowired
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService,InvoiceService invoiceService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService,InvoiceService invoiceService,PostService postService) {
         this.paymentDao = paymentDao;
         this.modelMapperService = modelMapperService;
         this.invoiceService = invoiceService;
+        this.postService = postService;
     }
 
     @Override
-    public Result add(CreatePaymentRequest createPaymentRequest) throws BusinessException {
+    public Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
 
-        this.invoiceService.checkIfInvoiceExists(createPaymentRequest.getInvoiceId());
 
-        Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
+        this.invoiceService.checkIfInvoiceExists(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId());
+        checkIfPaymentForTheInvoice(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId());
+        checkIfRentPossible(paymentPostServiceModal.getCreateCreditCardRequest(),
+                this.invoiceService.getByInvoiceId(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId()).getData().getTotalPayment());
+
+        Payment payment = this.modelMapperService.forRequest().map(paymentPostServiceModal.getCreateCreditCardRequest(), Payment.class);
         payment.setPaymentId(0);
-        payment.setAmount(this.invoiceService.getByInvoiceId(createPaymentRequest.getInvoiceId()).getData().getTotalPayment());
+        payment.setAmount(this.invoiceService.getByInvoiceId(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId()).getData().getTotalPayment());
 
         this.paymentDao.save(payment);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD + payment.getPaymentId());
+    }
+
+    private void checkIfPaymentForTheInvoice(int invoiceId) throws BusinessException {
+        if(this.paymentDao.getByInvoice_InvoiceId(invoiceId) != null){
+            throw new BusinessException(BusinessMessages.PAYMENT_FOR_THE_INVOICE);
+        }
+    }
+
+    private void checkIfRentPossible(CreateCreditCardRequest createCreditCardRequest,double totalPayment) throws BusinessException {
+
+        if (!this.postService.addPayment(createCreditCardRequest.getCardOwnerName(), createCreditCardRequest.getCardNumber(), createCreditCardRequest.getCardCVC(),
+                createCreditCardRequest.getCardEndMonth(), createCreditCardRequest.getCardEndYear(), totalPayment)) {
+            throw new BusinessException(BusinessMessages.RENT_CAN_NOT_MAKE_PAYMENT);
+        }
     }
 
     @Override

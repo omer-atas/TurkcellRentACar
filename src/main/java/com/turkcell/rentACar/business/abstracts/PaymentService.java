@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.abstracts;
 
+import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
 import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public interface PaymentService {
 
-    Result add(CreatePaymentRequest createPaymentRequest) throws BusinessException;
+    Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
 
     DataResult<PaymentGetDto> getByPaymentId(int paymentId);
 

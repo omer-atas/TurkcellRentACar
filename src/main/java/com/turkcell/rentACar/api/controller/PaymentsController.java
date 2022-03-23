@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.api.controller;
 
+import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.PaymentService;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
@@ -27,8 +28,8 @@ public class PaymentsController {
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreatePaymentRequest createPaymentRequest) throws BusinessException {
-        return this.paymentService.add(createPaymentRequest);
+    public Result add(@RequestBody @Valid PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+        return this.paymentService.add(paymentPostServiceModal);
     }
 
     @GetMapping("/getall")

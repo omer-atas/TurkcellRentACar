@@ -146,4 +146,5 @@ public class BusinessMessages {
     public static final String RENT_CUSTOMER_NOT_FOUND ="The customer with this ID is not available";
     public static final String RENT_TO_CITY_NOT_FOUND ="The city with this ID is not available - toCity";
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
+    public static final String PAYMENT_FOR_THE_INVOICE = "There is no payment for this invoice. Therefore, a second payment cannot be made.";
 }

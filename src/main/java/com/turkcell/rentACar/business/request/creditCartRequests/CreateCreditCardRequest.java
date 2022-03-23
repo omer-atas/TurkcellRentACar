@@ -29,7 +29,4 @@ public class CreateCreditCardRequest {
 
     @Positive
     private int cardCVC;
-
-    @Positive
-    private int amount;
 }

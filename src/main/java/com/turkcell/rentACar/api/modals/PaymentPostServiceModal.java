@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.api.modals;
 
 import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
+import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,8 +11,8 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class RentPostServiceModal {
+public class PaymentPostServiceModal {
 
-    private CreateRentRequest createRentRequest;
+    private CreatePaymentRequest createPaymentRequest;
     private CreateCreditCardRequest createCreditCardRequest;
 }
