@@ -20,12 +20,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoices")
-public class InvoiceController {
+public class InvoicesController {
 
     private InvoiceService invoiceService;
 
     @Autowired
-    public InvoiceController(InvoiceService invoiceService) {
+    public InvoicesController(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
     }
 

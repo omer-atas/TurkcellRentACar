@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.individualCustomerDtos.IndividualCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.individualCustomerDtos.IndividualCustomerListDto;
 import com.turkcell.rentACar.business.request.individualCustomerRequests.CreateIndividualCustomerRequest;
@@ -43,7 +44,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.save(individualCustomer);
 
-        return new SuccessResult("IndividualCustomer added : " + individualCustomer.getNationalIdentity());
+        return new SuccessResult(BusinessMessages.INDIVIDUAL_CUSTOMER_ADD + individualCustomer.getNationalIdentity());
     }
 
     private void checkIfNationalIdentityNumberRegex(String nationalIdentity) throws BusinessException {
@@ -52,7 +53,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         boolean matches = identityNumber.matches("^[1-9]{1}[0-9]{9}[02468]{1}$");
 
         if(matches){
-            throw new BusinessException("Enter the correct ID number.");
+            throw new BusinessException(BusinessMessages.INDIVIDUAL_CUSTOMER_NATIONAL_IDENTITY_REGEX);
         }
 
 
@@ -60,7 +61,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
     private void checkIfNationalIdentityNotDuplicated(String nationalIdentity) throws BusinessException {
         if(this.individualCustomerDao.existsByNationalIdentity(nationalIdentity) == true){
-            throw new BusinessException("Identity number can't be the same");
+            throw new BusinessException(BusinessMessages.INDIVIDUAL_CUSTOMER_NATIONAL_IDENTITY_NOT_DUPLICATED);
         }
     }
 
@@ -70,12 +71,12 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         IndividualCustomer result = this.individualCustomerDao.getByCustomerId(individualCustomerId);
 
         if (result == null) {
-            return new ErrorDataResult<IndividualCustomerGetDto>("IndividualCustomer not found");
+            return new ErrorDataResult<IndividualCustomerGetDto>(BusinessMessages.INDIVIDUAL_CUSTOMER_NOT_FOUND);
         }
 
         IndividualCustomerGetDto response = this.modelMapperService.forDto().map(result, IndividualCustomerGetDto.class);
 
-        return new SuccessDataResult<IndividualCustomerGetDto>(response, "Success");
+        return new SuccessDataResult<IndividualCustomerGetDto>(response, BusinessMessages.INDIVIDUAL_CUSTOMER_GET_BY_ID);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<IndividualCustomerListDto>>(response, "Success");
+        return new SuccessDataResult<List<IndividualCustomerListDto>>(response, BusinessMessages.INDIVIDUAL_CUSTOMER_GET_ALL);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         List<IndividualCustomerListDto> response = result.stream()
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<IndividualCustomerListDto>>(response, "IndividualCustomers Listed Successfully");
+        return new SuccessDataResult<List<IndividualCustomerListDto>>(response, BusinessMessages.INDIVIDUAL_CUSTOMER_GET_ALL_PAGED);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
                 .map(individualCustomer -> this.modelMapperService.forDto().map(individualCustomer, IndividualCustomerListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<IndividualCustomerListDto>>(response);
+        return new SuccessDataResult<List<IndividualCustomerListDto>>(response,BusinessMessages.INDIVIDUAL_CUSTOMER_GET_ALL_SORTED);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.save(individualCustomerUpdate);
 
-        return new SuccessResult(updateIndividualCustomerRequest.getNationalIdentity() + " updated..");
+        return new SuccessResult(updateIndividualCustomerRequest.getNationalIdentity() + BusinessMessages.INDIVIDUAL_CUSTOMER_UPDATE);
     }
 
     private void IdCorrector(IndividualCustomer individualCustomer, IndividualCustomer individualCustomerUpdate) {
@@ -141,7 +142,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
     private void checkIfIndividualCustomerExists(int individualCustomerId) throws BusinessException {
         if(this.individualCustomerDao.getByCustomerId(individualCustomerId) == null){
-            throw new BusinessException("There is no data in the id sent");
+            throw new BusinessException(BusinessMessages.INDIVIDUAL_CUSTOMER_NOT_FOUND);
         }
     }
 
@@ -154,7 +155,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.deleteById(individualCustomer.getCustomerId());
 
-        return new SuccessResult(deleteIndividualCustomerRequest.getIndividualCustomerId() + " deleted..");
+        return new SuccessResult(deleteIndividualCustomerRequest.getIndividualCustomerId() + BusinessMessages.INDIVIDUAL_CUSTOMER_DELETE);
     }
 }
 

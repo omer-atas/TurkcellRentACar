@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "customers")
+@Inheritance(strategy = InheritanceType.JOINED)
 @PrimaryKeyJoinColumn(name = "customer_id",referencedColumnName = "user_id")
 public class Customer extends User {
 

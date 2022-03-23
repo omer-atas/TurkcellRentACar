@@ -58,7 +58,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
-
 		carMaintenance.setMaintanenceId(0);
 
 		this.carMaintenanceDao.save(carMaintenance);

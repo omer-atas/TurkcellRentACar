@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,17 +46,18 @@ public class BrandManager implements BrandService {
 		checkIfNameNotDuplicated(createBrandRequest.getBrandName());
 
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
+		brand.setBrandId(0);
 
 		this.brandDao.save(brand);
 
-		return new SuccessResult("Brand added : " + brand.getBrandName());
+		return new SuccessResult(BusinessMessages.BRAND_ADD + brand.getBrandName());
 
 	}
 
 	private void checkIfNameNotDuplicated(String brandName) throws BusinessException {
 
 		if (this.brandDao.existsByBrandName(brandName)) {
-			throw new BusinessException("Names can't be the same");
+			throw new BusinessException(BusinessMessages.BRAND_NAME_NOT_DUPLICATED);
 		}
 
     }
@@ -69,7 +71,7 @@ public class BrandManager implements BrandService {
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<BrandListDto>>(response, "Success");
+		return new SuccessDataResult<List<BrandListDto>>(response, BusinessMessages.BRAND_GET_ALL);
 	}
 
 	@Override
@@ -82,7 +84,7 @@ public class BrandManager implements BrandService {
 		List<BrandListDto> response = result.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class)).collect(Collectors.toList());
 
-		return new SuccessDataResult<List<BrandListDto>>(response, "Brands Listed Successfully");
+		return new SuccessDataResult<List<BrandListDto>>(response, BusinessMessages.BRAND_GET_ALL_PAGED);
 	}
 
 	@Override
@@ -96,7 +98,7 @@ public class BrandManager implements BrandService {
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<BrandListDto>>(response);
+		return new SuccessDataResult<List<BrandListDto>>(response,BusinessMessages.BRAND_GET_ALL_SORTED);
 	}
 
 	@Override
@@ -105,12 +107,12 @@ public class BrandManager implements BrandService {
 		Brand result = this.brandDao.getByBrandId(brandId);
 
 		if (result == null) {
-			return new ErrorDataResult<BrandGetDto>("Brand not found");
+			return new ErrorDataResult<BrandGetDto>(BusinessMessages.BRAND_NOT_FOUND);
 		}
 
 		BrandGetDto response = this.modelMapperService.forDto().map(result, BrandGetDto.class);
 
-		return new SuccessDataResult<BrandGetDto>(response, "Success");
+		return new SuccessDataResult<BrandGetDto>(response, BusinessMessages.BRAND_GET_BY_ID);
 
 	}
 
@@ -118,7 +120,7 @@ public class BrandManager implements BrandService {
 	public boolean checkIfBrandExists(int brandId) throws BusinessException {
 
 		if (this.brandDao.getByBrandId(brandId) == null) {
-			throw new BusinessException("There is no data in the id sent");
+			throw new BusinessException(BusinessMessages.BRAND_NOT_FOUND);
 		}
 
 		return true;
@@ -139,7 +141,7 @@ public class BrandManager implements BrandService {
 
 		this.brandDao.save(brandUpdate);
 
-		return new SuccessResult(updateBrandRequest.getBrandName() + " updated..");
+		return new SuccessResult(updateBrandRequest.getBrandName() + BusinessMessages.BRAND_UPDATE);
 
 	}
 
@@ -156,7 +158,7 @@ public class BrandManager implements BrandService {
 
 		this.brandDao.deleteById(brand.getBrandId());
 
-		return new SuccessResult(deleteBrandRequest.getBrandId() + " deleted..");
+		return new SuccessResult(deleteBrandRequest.getBrandId() + BusinessMessages.BRAND_DELETE);
 
 	}
 

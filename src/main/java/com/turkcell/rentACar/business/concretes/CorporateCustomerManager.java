@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerListDto;
 import com.turkcell.rentACar.business.request.corporateCustomerRequests.CreateCorporateCustomerRequest;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// Exceptionları ayır yani her durumlara karşı özel handler ekle - ilerideki karşılaşabilecek durumları karşı;
 @Service
 public class CorporateCustomerManager implements CorporateCustomerService {
 
@@ -44,25 +44,24 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.save(corporateCustomer);
 
-        return new SuccessResult("CorporateCustomer added : " + createCorporateCustomerRequest.getTaxNumber());
+        return new SuccessResult(BusinessMessages.CORPORATE_CUSTOMER_ADD + createCorporateCustomerRequest.getTaxNumber());
     }
 
     private void checkIfTaxNumberRegex(String taxNumber) throws BusinessException {
 
-        String identityNumber = new String("nationalIdentity");
-        boolean matches = identityNumber.matches("/^[0-9]{10}$/");
+        String corporateTaxNumber = new String("taxNumber");
+        boolean matches = corporateTaxNumber.matches("/^[0-9]{10}$/");
 
-        if(!matches){
-            throw new BusinessException("Enter the correct ID number.");
+        if(matches){
+            throw new BusinessException(BusinessMessages.CORPORATE_CUSTOMER_TAX_NUMBER_REGEX);
         }
-
 
     }
 
     private void checkIfTaxNumberNotDuplicated(String taxNumber) throws BusinessException {
 
         if(this.corporateCustomerDao.existsByTaxNumber(taxNumber) == true){
-            throw new BusinessException("Tax number can't be the same");
+            throw new BusinessException(BusinessMessages.CORPORATE_CUSTOMER_TAX_NUMBER_NOT_DUPLICATED);
         }
     }
 
@@ -72,12 +71,12 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         CorporateCustomer result = this.corporateCustomerDao.getByCustomerId(corporateCustomerId);
 
         if (result == null) {
-            return new ErrorDataResult<CorporateCustomerGetDto>("CorporateCustomer not found");
+            return new ErrorDataResult<CorporateCustomerGetDto>(BusinessMessages.CORPORATE_CUSTOMER_NOT_FOUND);
         }
 
         CorporateCustomerGetDto response = this.modelMapperService.forDto().map(result, CorporateCustomerGetDto.class);
 
-        return new SuccessDataResult<CorporateCustomerGetDto>(response, "Success");
+        return new SuccessDataResult<CorporateCustomerGetDto>(response, BusinessMessages.CORPORATE_CUSTOMER_GET_BY_ID);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CorporateCustomerListDto>>(response, "Success");
+        return new SuccessDataResult<List<CorporateCustomerListDto>>(response, BusinessMessages.CORPORATE_CUSTOMER_GET_ALL);
     }
 
     @Override
@@ -102,7 +101,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         List<CorporateCustomerListDto> response = result.stream()
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CorporateCustomerListDto>>(response, "CorporateCustomers Listed Successfully");
+        return new SuccessDataResult<List<CorporateCustomerListDto>>(response, BusinessMessages.CORPORATE_CUSTOMER_GET_ALL_PAGED);
     }
 
     @Override
@@ -116,7 +115,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
                 .map(corporateCustomer -> this.modelMapperService.forDto().map(corporateCustomer, CorporateCustomerListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CorporateCustomerListDto>>(response);
+        return new SuccessDataResult<List<CorporateCustomerListDto>>(response,BusinessMessages.CORPORATE_CUSTOMER_GET_ALL_SORTED);
     }
 
     @Override
@@ -135,7 +134,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.save(corporateCustomerUpdate);
 
-        return new SuccessResult(updateCorporateCustomerRequest.getTaxNumber() + " updated..");
+        return new SuccessResult(updateCorporateCustomerRequest.getTaxNumber() + BusinessMessages.CORPORATE_CUSTOMER_UPDATE);
     }
 
     private void IdCorrector(CorporateCustomer corporateCustomer, CorporateCustomer corporateCustomerUpdate) {
@@ -151,12 +150,12 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.deleteById(corporateCustomer.getCustomerId());
 
-        return new SuccessResult(deleteCorporateCustomerRequest.getCorporateCustomerId() + " deleted..");
+        return new SuccessResult(deleteCorporateCustomerRequest.getCorporateCustomerId() + BusinessMessages.CORPORATE_CUSTOMER_DELETE);
     }
 
     private void checkIfCorporateCustomerExists(int corporateCustomerId) throws BusinessException {
         if(this.corporateCustomerDao.getByCustomerId(corporateCustomerId) == null){
-            throw new BusinessException("There is no data in the id sent");
+            throw new BusinessException(BusinessMessages.CORPORATE_CUSTOMER_NOT_FOUND);
         }
     }
 }

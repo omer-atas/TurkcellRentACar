@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.ColorService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.colorDtos.ColorGetDto;
 import com.turkcell.rentACar.business.dtos.colorDtos.ColorListDto;
 import com.turkcell.rentACar.business.request.colorRequests.CreateColorRequest;
@@ -41,13 +42,14 @@ public class ColorManager implements ColorService {
 	@Override
 	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
 
-		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
-
 		checkIfNameNotDuplicated(createColorRequest.getColorName());
+
+		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
+		color.setColorId(0);
 
 		this.colorDao.save(color);
 
-		return new SuccessResult("Color added : " + color.getColorName());
+		return new SuccessResult(BusinessMessages.COLOR_ADD + color.getColorName());
 
 	}
 
@@ -56,7 +58,7 @@ public class ColorManager implements ColorService {
 		var response = this.colorDao.existsByColorName(colorName);
 
 		if (response) {
-			throw new BusinessException("Names can't be the same");
+			throw new BusinessException(BusinessMessages.COLOR_NAME_NOT_DUPLICATED);
 		}
 
 	}
@@ -70,7 +72,7 @@ public class ColorManager implements ColorService {
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
+		return new SuccessDataResult<List<ColorListDto>>(response, BusinessMessages.COLOR_GET_ALL);
 	}
 
 	@Override
@@ -83,7 +85,7 @@ public class ColorManager implements ColorService {
 		List<ColorListDto> response = result.stream()
 				.map(car -> this.modelMapperService.forDto().map(car, ColorListDto.class)).collect(Collectors.toList());
 
-		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
+		return new SuccessDataResult<List<ColorListDto>>(response, BusinessMessages.COLOR_GET_ALL_PAGED);
 	}
 
 	@Override
@@ -97,7 +99,7 @@ public class ColorManager implements ColorService {
 				.map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<ColorListDto>>(response, "Colors Listed Successfully");
+		return new SuccessDataResult<List<ColorListDto>>(response, BusinessMessages.COLOR_GET_ALL_SORTED);
 	}
 
 	@Override
@@ -106,11 +108,11 @@ public class ColorManager implements ColorService {
 		Color result = this.colorDao.getByColorId(colorId);
 
 		if (result == null) {
-			return new ErrorDataResult<ColorGetDto>("There is no color in the id sent");
+			return new ErrorDataResult<ColorGetDto>(BusinessMessages.COLOR_NOT_FOUND);
 		}
 
 		ColorGetDto response = this.modelMapperService.forDto().map(result, ColorGetDto.class);
-		return new SuccessDataResult<ColorGetDto>(response, "Success");
+		return new SuccessDataResult<ColorGetDto>(response, BusinessMessages.COLOR_GET_BY_ID);
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class ColorManager implements ColorService {
 
 		this.colorDao.save(colorUpdate);
 
-		return new SuccessResult(updateColorRequest.getColorName() + " updated..");
+		return new SuccessResult(updateColorRequest.getColorName() + BusinessMessages.COLOR_UPDATE);
 
 	}
 
@@ -139,7 +141,7 @@ public class ColorManager implements ColorService {
 	public boolean checkIfColorExists(int colorId) throws BusinessException {
 
 		if (this.colorDao.getByColorId(colorId) == null) {
-			throw new BusinessException("There is no color in the id sent");
+			throw new BusinessException(BusinessMessages.COLOR_NOT_FOUND);
 		}
 
 		return true;
@@ -155,7 +157,7 @@ public class ColorManager implements ColorService {
 
 		this.colorDao.deleteById(color.getColorId());
 
-		return new SuccessResult(deleteColorRequest.getColorId() + " deleted..");
+		return new SuccessResult(deleteColorRequest.getColorId() + BusinessMessages.COLOR_DELETE);
 
 	}
 

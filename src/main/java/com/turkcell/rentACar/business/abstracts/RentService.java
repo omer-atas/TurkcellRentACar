@@ -2,11 +2,11 @@ package com.turkcell.rentACar.business.abstracts;
 
 import java.util.List;
 
+import com.turkcell.rentACar.api.modals.RentPostServiceModal;
 import org.springframework.data.domain.Sort;
 
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
-import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.DeleteRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.UpdateRentRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
@@ -15,9 +15,9 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 
 public interface RentService {
 
-	Result carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException;
+	Result carRentalForIndividualCustomer(RentPostServiceModal rentPostServiceModal) throws BusinessException;
 
-	Result carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException;
+	Result carRentalForCorporateCustomer(RentPostServiceModal rentPostServiceModal) throws BusinessException;
 
 	DataResult<RentGetDto> getByRentId(int rentId);
 

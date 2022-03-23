@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.turkcell.rentACar.business.abstracts.CityService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,10 +55,11 @@ public class CarManager implements CarService {
         checkIfColorExists(createCarRequest.getColorId());
 
         Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
+        car.setCarId(0);
 
         this.carDao.save(car);
 
-        return new SuccessResult("Car added : " + car.getCarId());
+        return new SuccessResult(BusinessMessages.CAR_ADD + car.getCarId());
     }
 
     public boolean checkIfBrandExists(int brandId) throws BusinessException {
@@ -65,7 +67,7 @@ public class CarManager implements CarService {
         if (this.brandService.getByBrandId(brandId).isSuccess()) {
             return true;
         }
-        throw new BusinessException("There is no brand corresponding to the sent id");
+        throw new BusinessException(BusinessMessages.BRAND_NOT_FOUND);
     }
 
     public boolean checkIfColorExists(int colorId) throws BusinessException {
@@ -73,7 +75,7 @@ public class CarManager implements CarService {
         if (this.colorService.getByColorId(colorId).isSuccess()) {
             return true;
         }
-        throw new BusinessException("There is no color corresponding to the sent id");
+        throw new BusinessException(BusinessMessages.COLOR_NOT_FOUND);
 
     }
 
@@ -83,12 +85,12 @@ public class CarManager implements CarService {
         Car result = this.carDao.getByCarId(carId);
 
         if (result == null) {
-            return new ErrorDataResult<CarGetDto>("Car with submitted id not found");
+            return new ErrorDataResult<CarGetDto>(BusinessMessages.CAR_NOT_FOUND);
         }
 
         CarGetDto response = this.modelMapperService.forDto().map(result, CarGetDto.class);
 
-        return new SuccessDataResult<CarGetDto>(response, "Success");
+        return new SuccessDataResult<CarGetDto>(response, BusinessMessages.CAR_GET_BY_ID);
 
     }
 
@@ -99,7 +101,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response, "Cars Listed Successfully");
+        return new SuccessDataResult<List<CarListDto>>(response, BusinessMessages.CAR_GET_ALL);
     }
 
     @Override
@@ -111,7 +113,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response);
+        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CAR_GET_ALL_PAGED);
     }
 
     @Override
@@ -123,7 +125,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response);
+        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CAR_GET_ALL_SORTED);
     }
 
     @Override
@@ -140,7 +142,7 @@ public class CarManager implements CarService {
 
         this.carDao.save(carUpdate);
 
-        return new SuccessResult(car.getCarId() + " updated..");
+        return new SuccessResult(car.getCarId() + BusinessMessages.CAR_UPDATE);
 
     }
 
@@ -179,7 +181,7 @@ public class CarManager implements CarService {
 
         this.carDao.deleteById(car.getCarId());
 
-        return new SuccessResult(deleteCarRequest.getCarId() + " deleted..");
+        return new SuccessResult(deleteCarRequest.getCarId() + BusinessMessages.CAR_DELETE);
 
     }
 
@@ -189,12 +191,12 @@ public class CarManager implements CarService {
         List<Car> result = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
 
         if (result.isEmpty()) {
-            return new ErrorDataResult<List<CarListDto>>("findByDailyPriceLessThanEqual not list");
+            return new ErrorDataResult<List<CarListDto>>(BusinessMessages.CAR_FIND_BY_DAILY_PRICE_LESS_THAN_EQUAL_NOT_FOUND);
         }
 
         List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response, "Listed");
+        return new SuccessDataResult<List<CarListDto>>(response, BusinessMessages.CAR_FIND_BY_DAILY_PRICE_LESS_THAN_EQUAL);
 
     }
 
@@ -202,7 +204,7 @@ public class CarManager implements CarService {
     public boolean checkIfCarExists(int carId) throws BusinessException {
 
         if (this.carDao.getByCarId(carId) == null) {
-            throw new BusinessException("Car not found ");
+            throw new BusinessException(BusinessMessages.CAR_CRASH_INFORMATION_NOT_FOUND);
         }
 
         return true;

@@ -18,12 +18,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/ carCrashInformations")
-public class CarCrashInformationController {
+public class CarCrashInformationsController {
 
     private CarCrashInformationService carCrashInformationService;
 
     @Autowired
-    public CarCrashInformationController(CarCrashInformationService carCrashInformationService) {
+    public CarCrashInformationsController(CarCrashInformationService carCrashInformationService) {
         this.carCrashInformationService = carCrashInformationService;
     }
 

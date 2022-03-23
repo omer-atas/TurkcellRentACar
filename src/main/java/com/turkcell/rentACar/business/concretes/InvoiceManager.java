@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.*;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceGetDto;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceListDto;
 import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceGetDto;
@@ -45,24 +46,27 @@ public class InvoiceManager implements InvoiceService{
     @Override
     public Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
 
-        checkIfRentAvaliable(createInvoiceRequest.getRentId());
         checkIfRentExists(createInvoiceRequest.getRentId());
         checkIfRentReturn(createInvoiceRequest.getRentId());
         checkIfInvoiceNoNotDuplicated(createInvoiceRequest.getInvoiceNo());
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
-
+        invoice.setInvoiceId(0);
         invoice.setTotalPayment(calculationTotalPayment(createInvoiceRequest.getRentId()));
         invoice.setCreationDate(LocalDate.now());
+        invoice.setStartingDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getStartingDate());
+        invoice.setEndDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getEndDate());
+        invoice.setTotalRentalDays(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getRentalPriceOfTheCar());
+        invoice.setRentDay(this.orderedAdditionalServiceService.findNoOfDaysBetween(invoice.getStartingDate(),invoice.getEndDate()));
 
         this.invoiceDao.save(invoice);
 
-        return new SuccessResult("Invoice added : " + invoice.getInvoiceId());
+        return new SuccessResult(BusinessMessages.INVOICE_ADD + invoice.getInvoiceId());
     }
 
     private void checkIfRentReturn(int rentId) throws BusinessException {
-        if(this.invoiceDao.getByRent_RentId(rentId).getRent().getEndDate() == null){
-            throw new BusinessException("The invoice could not be issued because the rental return information was not entered.");
+        if(this.rentService.getByRentId(rentId).getData().getEndDate() == null){
+            throw new BusinessException(BusinessMessages.INVOICE_RENT_RETURN);
         }
     }
 
@@ -104,58 +108,17 @@ public class InvoiceManager implements InvoiceService{
         return  totalpayment;
     }
 
-    @Override
-    public void calculatingDailyPriceToSubtractAfterAdditionalServiceUpdate(double dailyPrice,int rentId){
-
-        LocalDate startDate = this.rentService.getByRentId(rentId).getData().getStartingDate();
-        LocalDate endDate = this.rentService.getByRentId(rentId).getData().getEndDate();
-
-        double dailyPriceToSubtractAfterAdditionalServiceUpdate = dailyPrice * this.orderedAdditionalServiceService.findNoOfDaysBetween(startDate,endDate);
-        double totalPayment = this.invoiceDao.getByRent_RentId(rentId).getTotalPayment();
-
-        this.invoiceDao.getByRent_RentId(rentId).setTotalPayment(totalPayment-dailyPriceToSubtractAfterAdditionalServiceUpdate);
-    }
-
-    @Override
-    public void calculatingDailyPriceToAddingAfterAdditionalServiceUpdate(double dailyPrice,int rentId){
-
-        LocalDate startDate = this.rentService.getByRentId(rentId).getData().getStartingDate();
-        System.out.println(startDate);
-
-        LocalDate endDate = this.rentService.getByRentId(rentId).getData().getEndDate();
-        System.out.println(endDate);
-
-        double day = this.orderedAdditionalServiceService.findNoOfDaysBetween(startDate,endDate);
-        System.out.println(day);
-
-        double dailyPriceToSubtractAfterAdditionalServiceUpdate = dailyPrice * day;
-
-        double totalPayment = this.invoiceDao.getByRent_RentId(rentId).getTotalPayment();
-
-        this.invoiceDao.getByRent_RentId(rentId).setTotalPayment(totalPayment + dailyPriceToSubtractAfterAdditionalServiceUpdate);
-    }
-
-
-
-    private void checkIfRentAvaliable(int rentId) throws BusinessException {
-
-        if(this.invoiceDao.getByRent_RentId(rentId) != null){
-            throw new BusinessException("There is an invoice for the sent rent..");
-        }
-
-    }
-
     private void checkIfRentExists(int rentId) throws BusinessException {
 
         if(this.rentService.getByRentId(rentId) == null){
-            throw new BusinessException("There is no rent corresponding to the sent id");
+            throw new BusinessException(BusinessMessages.RENT_NOT_FOUND);
         }
 
     }
 
     private void checkIfInvoiceNoNotDuplicated(String invoiceNo) throws BusinessException {
         if(this.invoiceDao.existsByInvoiceNo(invoiceNo) ){
-            throw new BusinessException("Invoice no can't be the same");
+            throw new BusinessException(BusinessMessages.INVOICE_N0_NOT_DUPLICATED);
         }
     }
 
@@ -165,13 +128,13 @@ public class InvoiceManager implements InvoiceService{
         Invoice result = this.invoiceDao.getByInvoiceId(invoiceId);
 
         if (result == null) {
-            return new ErrorDataResult<InvoiceGetDto>("Invoice no not found");
+            return new ErrorDataResult<InvoiceGetDto>(BusinessMessages.INVOICE_NOT_FOUND);
         }
 
         InvoiceGetDto response = this.modelMapperService.forDto().map(result, InvoiceGetDto.class);
 
 
-        return new SuccessDataResult<InvoiceGetDto>(response, "Success");
+        return new SuccessDataResult<InvoiceGetDto>(response, BusinessMessages.INVOICE_GET_BY_ID);
     }
 
     @Override
@@ -180,13 +143,13 @@ public class InvoiceManager implements InvoiceService{
         Invoice result = this.invoiceDao.getByRent_RentId(rentId);
 
         if (result == null) {
-            return new ErrorDataResult<InvoiceGetDto>("Invoice no not found");
+            return new ErrorDataResult<InvoiceGetDto>(BusinessMessages.INVOICE_RENT_NOT_FOUND);
         }
 
         InvoiceGetDto response = this.modelMapperService.forDto().map(result, InvoiceGetDto.class);
 
 
-        return new SuccessDataResult<InvoiceGetDto>(response, "Success");
+        return new SuccessDataResult<InvoiceGetDto>(response, BusinessMessages.INVOICE_GET_BY_RENT_ID);
     }
 
     @Override
@@ -195,7 +158,7 @@ public class InvoiceManager implements InvoiceService{
         List<Invoice> result = this.invoiceDao.getByRent_Customer_CustomerId(customerId);
 
         if (result.isEmpty()) {
-            return new ErrorDataResult<List<InvoiceListDto>>("Gönderilen id'ye ait müşterinin fatura kaydı bulunmamaktadır");
+            return new ErrorDataResult<List<InvoiceListDto>>(BusinessMessages.INVOICE_CUSTOMER_NOT_FOUND);
         }
 
         List<InvoiceListDto> response = result.stream()
@@ -206,7 +169,7 @@ public class InvoiceManager implements InvoiceService{
             response.get(i).setCustomerId(result.get(i).getRent().getCustomer().getCustomerId());
         }
 
-        return new SuccessDataResult<List<InvoiceListDto>>(response, "Success");
+        return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_CUSTOMER);
     }
 
     @Override
@@ -215,7 +178,7 @@ public class InvoiceManager implements InvoiceService{
         List<Invoice> result = this.invoiceDao.getAllInvoicesInSpecificDateRange(fromDate,toDate);
 
         if (result.isEmpty()) {
-            return new ErrorDataResult<List<InvoiceListDto>>("Gönderilen aralıkta herhani bir fatura kaydı bulunmamaktadır");
+            return new ErrorDataResult<List<InvoiceListDto>>(BusinessMessages.INVOICE_IN_SPECIFIC_DATE_RANGE);
         }
 
         List<InvoiceListDto> response = result.stream()
@@ -224,7 +187,7 @@ public class InvoiceManager implements InvoiceService{
 
         response = manuelMappingForGetAll(result,response);
 
-        return new SuccessDataResult<List<InvoiceListDto>>(response, "Success");
+        return new SuccessDataResult<List<InvoiceListDto>>(response);
     }
 
     @Override
@@ -238,7 +201,7 @@ public class InvoiceManager implements InvoiceService{
 
         response = manuelMappingForGetAll(result,response);
 
-        return new SuccessDataResult<List<InvoiceListDto>>(response, "Success");
+        return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_GET_ALL);
     }
 
     @Override
@@ -253,7 +216,7 @@ public class InvoiceManager implements InvoiceService{
 
         response = manuelMappingForGetAll(result,response);
 
-        return new SuccessDataResult<List<InvoiceListDto>>(response, "Brands Listed Successfully");
+        return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_GET_ALL_PAGED);
     }
 
     private List<InvoiceListDto> manuelMappingForGetAll(List<Invoice> result,List<InvoiceListDto> response){
@@ -271,7 +234,7 @@ public class InvoiceManager implements InvoiceService{
         List<Invoice> result = this.invoiceDao.findAll(s);
 
         if (result.isEmpty()) {
-            return new ErrorDataResult<List<InvoiceListDto>>("Invoices not list - getAllSorted -");
+            return new ErrorDataResult<List<InvoiceListDto>>(BusinessMessages.INVOICE_GET_ALL_SORTED);
         }
 
         List<InvoiceListDto> response = result.stream()
@@ -304,7 +267,7 @@ public class InvoiceManager implements InvoiceService{
 
         this.invoiceDao.save(invoiceUpdate);
 
-        return new SuccessResult(invoiceUpdate.getInvoiceId() + " updated..");
+        return new SuccessResult(invoiceUpdate.getInvoiceId() + BusinessMessages.INVOICE_UPDATE);
     }
 
     @Override
@@ -316,46 +279,14 @@ public class InvoiceManager implements InvoiceService{
 
         this.invoiceDao.deleteById(invoice.getInvoiceId());
 
-        return new SuccessResult(deleteInvoiceRequest.getInvoiceId() + " deleted..");
+        return new SuccessResult(deleteInvoiceRequest.getInvoiceId() +  BusinessMessages.INVOICE_DELETE);
     }
 
     @Override
-    public void extractionOfAdditionalServicesPrice(int orderedAdditionalServiceId) throws BusinessException {
-
-        OrderedAdditionalServiceGetDto orderedAdditionalService = this.orderedAdditionalServiceService.getByOrderedAdditionalServiceId(orderedAdditionalServiceId).getData();
-
-        LocalDate startingDate = this.rentService.getByRentId(orderedAdditionalService.getRentId()).getData().getStartingDate();
-        LocalDate endDate = this.rentService.getByRentId(orderedAdditionalService.getRentId()).getData().getEndDate();
-
-        double day = this.orderedAdditionalServiceService.findNoOfDaysBetween(startingDate,endDate);
-
-        double dailyPrice = this.additionalServiceService.getByAdditionalServiceId(orderedAdditionalService.getAdditionalServiceId()).getData().getDailyPrice();
-
-        double totalPayment = this.invoiceDao.getByRent_RentId(orderedAdditionalService.getRentId()).getTotalPayment();
-
-        totalPayment -= (day * dailyPrice);
-
-        int rentId = this.rentService.getByRentId(this.orderedAdditionalServiceService.getByOrderedAdditionalServiceId(orderedAdditionalServiceId).getData().getRentId()).getData().getRentId();
-
-        UpdateInvoiceRequest updateInvoiceRequest = updatetotalPaymnetInInvoice(rentId,totalPayment);
-
-        this.update(this.invoiceDao.getByRent_RentId(orderedAdditionalServiceId).getInvoiceId(),updateInvoiceRequest);
-
-    }
-
-    private UpdateInvoiceRequest updatetotalPaymnetInInvoice(int rentId,double totalpayment){
-
-        Invoice invoice = this.invoiceDao.getByRent_RentId(rentId);
-        UpdateInvoiceRequest updateInvoiceRequest = this.modelMapperService.forDto().map(invoice,UpdateInvoiceRequest.class);
-        updateInvoiceRequest.setTotalPayment(totalpayment);
-
-        return updateInvoiceRequest;
-    }
-
-    private void checkIfInvoiceExists(int invoiceId) throws BusinessException {
+    public void checkIfInvoiceExists(int invoiceId) throws BusinessException {
 
         if(this.invoiceDao.getByInvoiceId(invoiceId) == null){
-            throw new BusinessException("There is no data in the id sent");
+            throw new BusinessException( BusinessMessages.INVOICE_NOT_FOUND);
         }
     }
 }

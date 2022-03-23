@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.turkcell.rentACar.api.modals.RentPostServiceModal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,13 +39,13 @@ public class RentsController {
 	}
 
 	@PostMapping("/carRentalForIndividualCustomer")
-	public Result carRentalForIndividualCustomer(@RequestBody @Valid CreateRentRequest createRentRequest) throws BusinessException{
-		return this.rentService.carRentalForIndividualCustomer(createRentRequest);
+	public Result carRentalForIndividualCustomer(@RequestBody @Valid RentPostServiceModal rentPostServiceModal) throws BusinessException{
+		return this.rentService.carRentalForIndividualCustomer(rentPostServiceModal);
 	}
 
 	@PostMapping("/carRentalForCorporateCustomer")
-	public Result carRentalForCorporateCustomer(@RequestBody @Valid CreateRentRequest createRentRequest) throws BusinessException {
-		return this.rentService.carRentalForCorporateCustomer(createRentRequest);
+	public Result carRentalForCorporateCustomer(@RequestBody @Valid RentPostServiceModal rentPostServiceModal) throws BusinessException {
+		return this.rentService.carRentalForCorporateCustomer(rentPostServiceModal);
 	}
 
 	@GetMapping("/getByRentId/{rentId}")

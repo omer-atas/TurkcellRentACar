@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.CarCrashInformationService;
 import com.turkcell.rentACar.business.abstracts.CarService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.carCrashInformationDtos.CarCrashInformationGetDto;
 import com.turkcell.rentACar.business.dtos.carCrashInformationDtos.CarCrashInformationListDto;
 import com.turkcell.rentACar.business.request.carCrashInformationRequests.CreateCarCrashInformationRequest;
@@ -45,7 +46,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
 
         this.carCrashInformationDao.save(carCrashInformation);
 
-        return new SuccessResult("CarCrashInformation added : " + carCrashInformation.getCarCrashInformationId());
+        return new SuccessResult(BusinessMessages.CAR_CRASH_INFORMATION_ADD + carCrashInformation.getCarCrashInformationId());
     }
 
     private void checkIfCarExists(int carId) throws BusinessException {
@@ -61,12 +62,12 @@ public class CarCrashInformationManager implements CarCrashInformationService {
         CarCrashInformation result = this.carCrashInformationDao.getByCarCrashInformationId(carCrashInformationId);
 
         if (result == null) {
-            return new ErrorDataResult<CarCrashInformationGetDto>("CarCrashInformation not found");
+            return new ErrorDataResult<CarCrashInformationGetDto>(BusinessMessages.CAR_CRASH_INFORMATION_NOT_FOUND);
         }
 
         CarCrashInformationGetDto response = this.modelMapperService.forDto().map(result, CarCrashInformationGetDto.class);
 
-        return new SuccessDataResult<CarCrashInformationGetDto>(response, "Success");
+        return new SuccessDataResult<CarCrashInformationGetDto>(response, BusinessMessages.CAR_CRASH_INFORMATION_GET_BY_ID);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
                 .map(carCrashInformation -> this.modelMapperService.forDto().map(carCrashInformation, CarCrashInformationListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarCrashInformationListDto>>(response, "Success");
+        return new SuccessDataResult<List<CarCrashInformationListDto>>(response, BusinessMessages.CAR_CRASH_INFORMATION_GET_ALL);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
         List<CarCrashInformationListDto> response = result.stream()
                 .map(carCrashInformation -> this.modelMapperService.forDto().map(carCrashInformation, CarCrashInformationListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarCrashInformationListDto>>(response, "Brands Listed Successfully");
+        return new SuccessDataResult<List<CarCrashInformationListDto>>(response, BusinessMessages.CAR_CRASH_INFORMATION_GET_ALL_PAGED);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
                 .map(carCrashInformation -> this.modelMapperService.forDto().map(carCrashInformation, CarCrashInformationListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarCrashInformationListDto>>(response);
+        return new SuccessDataResult<List<CarCrashInformationListDto>>(response,BusinessMessages.CAR_CRASH_INFORMATION_GET_ALL_SORTED);
     }
 
     @Override
@@ -121,12 +122,12 @@ public class CarCrashInformationManager implements CarCrashInformationService {
 
         this.carCrashInformationDao.save(carCrashInformationUpdate);
 
-        return new SuccessResult(carCrashInformationUpdate.getCarCrashInformationId() + " updated..");
+        return new SuccessResult(carCrashInformationUpdate.getCarCrashInformationId() + BusinessMessages.CAR_CRASH_INFORMATION_UPDATE);
     }
 
     private void checkIfCarCrashInformatioExists(int carCrashInformationId) throws BusinessException {
         if(this.carCrashInformationDao.getByCarCrashInformationId(carCrashInformationId) == null){
-            throw new BusinessException("There is no car carsh information with this id");
+            throw new BusinessException(BusinessMessages.CAR_CRASH_INFORMATION_NOT_FOUND);
         }
     }
 
@@ -145,6 +146,6 @@ public class CarCrashInformationManager implements CarCrashInformationService {
 
         this.carCrashInformationDao.deleteById(carCrashInformation.getCarCrashInformationId());
 
-        return new SuccessResult(carCrashInformation.getCarCrashInformationId() + " deleted..");
+        return new SuccessResult(carCrashInformation.getCarCrashInformationId() + BusinessMessages.CAR_CRASH_INFORMATION_DELETE);
     }
 }

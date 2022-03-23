@@ -29,7 +29,23 @@ public class Invoice {
     @Column(name = "total_payment")
     private double totalPayment;
 
-    @OneToOne()
+    @Column(name = "starting_date")
+    private LocalDate startingDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @Column(name = "rent_day")
+    private double rentDay;
+
+    @Column(name = "rental_price_of_the_car")
+    private int totalRentalDays;
+
+    @ManyToOne
     @JoinColumn(name = "rent_id")
     private Rent rent;
+
+    @OneToOne(mappedBy = "invoice")
+    private Payment payment;
+
 }

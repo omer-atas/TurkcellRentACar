@@ -18,12 +18,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/corporateCustomers")
-public class CorporateCustomerController {
+public class CorporateCustomersController {
 
     private CorporateCustomerService corporateCustomerService;
 
     @Autowired
-    public CorporateCustomerController(CorporateCustomerService corporateCustomerService) {
+    public CorporateCustomersController(CorporateCustomerService corporateCustomerService) {
         this.corporateCustomerService = corporateCustomerService;
     }
 

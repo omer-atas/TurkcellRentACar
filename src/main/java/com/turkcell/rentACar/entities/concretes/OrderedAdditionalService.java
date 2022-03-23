@@ -27,5 +27,4 @@ public class OrderedAdditionalService {
     @JoinColumn(name = "rent_id")
     private Rent rent;
 
-
 }

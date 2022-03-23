@@ -24,6 +24,8 @@ public class InvoiceListDto {
 
     private LocalDate endDate;
 
+    private double rentDay;
+
     private int totalRentalDays;
 
     private int customerId;

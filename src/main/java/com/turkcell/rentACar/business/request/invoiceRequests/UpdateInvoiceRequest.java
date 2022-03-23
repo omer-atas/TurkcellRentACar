@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Positive;
+import java.time.LocalDate;
 
 @Data
 
@@ -14,4 +15,13 @@ public class UpdateInvoiceRequest {
 
     @Positive
     private double totalPayment;
+
+    private LocalDate startingDate;
+
+    private LocalDate endDate;
+
+    private double rentDay;
+
+    @Positive
+    private int totalRentalDays;
 }
