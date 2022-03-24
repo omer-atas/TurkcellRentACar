@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface PaymentService {
 
-    Result addForIndividualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
+    Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
 
     DataResult<PaymentGetDto> getByPaymentId(int paymentId);
 

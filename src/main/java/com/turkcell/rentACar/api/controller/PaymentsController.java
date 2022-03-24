@@ -27,9 +27,9 @@ public class PaymentsController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/addForIndividualCustomer")
-    public Result addForIndividualCustomer(@RequestBody @Valid PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
-        return this.paymentService.addForIndividualCustomer(paymentPostServiceModal);
+    @PostMapping("/add")
+    public Result add(@RequestBody @Valid PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+        return this.paymentService.add(paymentPostServiceModal);
     }
 
     @GetMapping("/getall")

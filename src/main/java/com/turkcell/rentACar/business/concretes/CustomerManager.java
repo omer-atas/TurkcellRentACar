@@ -33,4 +33,12 @@ public class CustomerManager implements CustomerService {
 
         return response;
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        if(this.customerDao.existsByEmail(email)){
+            return true;
+        }
+        return false;
+    }
 }

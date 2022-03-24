@@ -52,7 +52,7 @@ public class CarCrashInformationManager implements CarCrashInformationService {
     private void checkIfCarExists(int carId) throws BusinessException {
 
         if(this.carService.getByCarId(carId).getData() == null){
-            throw new BusinessException("There is no carr with this id");
+            throw new BusinessException(BusinessMessages.CAR_NOT_FOUND);
         }
     }
 

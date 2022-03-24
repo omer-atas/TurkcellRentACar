@@ -365,7 +365,7 @@ public class RentManager implements RentService {
 
         checkIfTheUpdatedEndDateEarlierThanTheOldEndDate(rent.getEndDate(),updateRentRequest.getEndDate());
 
-        invoiceCreationControl(rent.getEndDate(),updateRentRequest.getEndDate(),rentId);
+        isInvoiceCreationControl(rent.getEndDate(),updateRentRequest.getEndDate(),rentId);
 
         Rent rentUpdate = this.modelMapperService.forRequest().map(updateRentRequest, Rent.class);
 
@@ -380,12 +380,11 @@ public class RentManager implements RentService {
         return new SuccessResult(rentUpdate.getRentId() + BusinessMessages.RENT_UPDATE);
     }
 
-    private void invoiceCreationControl(LocalDate endDate, LocalDate updateEndDate,int rentId) throws BusinessException {
+    private void isInvoiceCreationControl(LocalDate endDate, LocalDate updateEndDate,int rentId) throws BusinessException {
 
         if(updateEndDate.isAfter(endDate)){
 
             //add invoice
-
            CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
            createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size()+1));
            createInvoiceRequest.setRentId(rentId);

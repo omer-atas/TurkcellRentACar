@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
+import com.turkcell.rentACar.business.abstracts.CustomerService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerListDto;
@@ -26,16 +27,19 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
     private CorporateCustomerDao corporateCustomerDao;
     private ModelMapperService modelMapperService;
+    private CustomerService customerService;
 
     @Autowired
-    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService) {
+    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService,CustomerService customerService) {
         this.corporateCustomerDao = corporateCustomerDao;
         this.modelMapperService = modelMapperService;
+        this.customerService = customerService;
     }
 
     @Override
     public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException {
-        
+
+        checkIfEmailExists(createCorporateCustomerRequest.getEmail());
         checkIfTaxNumberNotDuplicated(createCorporateCustomerRequest.getTaxNumber());
         checkIfTaxNumberRegex(createCorporateCustomerRequest.getTaxNumber());
 
@@ -46,6 +50,13 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         return new SuccessResult(BusinessMessages.CORPORATE_CUSTOMER_ADD + createCorporateCustomerRequest.getTaxNumber());
     }
+
+    private void checkIfEmailExists(String email) throws BusinessException {
+        if(this.customerService.existsByEmail(email)){
+            throw new BusinessException(BusinessMessages.USER_EMAİL_EXİSTS);
+        }
+    }
+
 
     private void checkIfTaxNumberRegex(String taxNumber) throws BusinessException {
 

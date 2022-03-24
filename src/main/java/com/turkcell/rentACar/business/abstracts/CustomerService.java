@@ -4,5 +4,7 @@ import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
 
 public interface CustomerService {
 
-    CustomerGetDto  getByCustomerId(int customerId);;
+    CustomerGetDto  getByCustomerId(int customerId);
+
+    boolean existsByEmail(String email);
 }

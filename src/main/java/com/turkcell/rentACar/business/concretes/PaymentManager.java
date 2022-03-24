@@ -50,7 +50,7 @@ public class PaymentManager implements PaymentService {
     }
 
     @Override
-    public Result addForIndividualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+    public Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
 
         checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
 
@@ -81,9 +81,8 @@ public class PaymentManager implements PaymentService {
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
         createInvoiceRequest.setRentId(rentId);
-
+        createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size()+10));
         int invoiceId = this.invoiceService.add(createInvoiceRequest);
-        this.invoiceService.getByInvoiceId(invoiceId).getData().setInvoiceNo(String.valueOf(invoiceId));
 
         // add payment
 

@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.concretes;
 
+import com.turkcell.rentACar.business.abstracts.CustomerService;
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.individualCustomerDtos.IndividualCustomerGetDto;
@@ -26,11 +27,13 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
     private IndividualCustomerDao individualCustomerDao;
     private ModelMapperService modelMapperService;
+    private CustomerService customerService;
 
     @Autowired
-    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService) {
+    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService,CustomerService customerService) {
         this.individualCustomerDao = individualCustomerDao;
         this.modelMapperService = modelMapperService;
+        this.customerService = customerService;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         checkIfNationalIdentityNotDuplicated(createIndividualCustomerRequest.getNationalIdentity());
         checkIfNationalIdentityNumberRegex(createIndividualCustomerRequest.getNationalIdentity());
+        checkIfEmailExists(createIndividualCustomerRequest.getEmail());
 
         IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(createIndividualCustomerRequest, IndividualCustomer.class);
         individualCustomer.setCustomerId(0);
@@ -45,6 +49,12 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         this.individualCustomerDao.save(individualCustomer);
 
         return new SuccessResult(BusinessMessages.INDIVIDUAL_CUSTOMER_ADD + individualCustomer.getNationalIdentity());
+    }
+
+    private void checkIfEmailExists(String email) throws BusinessException {
+        if(this.customerService.existsByEmail(email)){
+            throw new BusinessException(BusinessMessages.USER_EMAİL_EXİSTS);
+        }
     }
 
     private void checkIfNationalIdentityNumberRegex(String nationalIdentity) throws BusinessException {

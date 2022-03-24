@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface CustomerDao extends JpaRepository<Customer,Integer> {
 
     Customer getByCustomerId(int customerId);
+
+    boolean existsByEmail(String email);
 }

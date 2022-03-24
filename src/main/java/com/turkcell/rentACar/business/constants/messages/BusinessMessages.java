@@ -103,7 +103,7 @@ public class BusinessMessages {
     public static final String INVOICE_ADD = "Invoice added : ";
     public static final String INVOICE_UPDATE = " updated..";
     public static final String INVOICE_RENT_RETURN = "The invoice could not be issued because the rental return information was not entered.";
-    public static final String INVOICE_N0_NOT_DUPLICATED = "Invoice no names can't be the same";
+    public static final String INVOICE_N0_NOT_DUPLICATED = "It has the invoice number. Give another name";
     public static final String INVOICE_DELETE = " deleted..";
     public static final String INVOICE_GET_BY_ID = "Success";
     public static final String INVOICE_GET_BY_RENT_ID = "Success";
@@ -128,7 +128,7 @@ public class BusinessMessages {
     public static final String ORDERED_ADDITIONAL_SERVICE_GET_ALL_SORTED = "OrderedAdditionalServices Listed Sorted Successfully";
 
     // Payment
-    public static final String PAYMENT_ADD = "Payment added : ";
+    public static final String PAYMENT_ADD = "Payment Added Successfully ";
     public static final String PAYMENT_UPDATE = " updated..";
     public static final String PAYMENT_DELETE = " deleted..";
     public static final String PAYMENT_GET_BY_ID = "Success";
@@ -163,4 +163,7 @@ public class BusinessMessages {
     public static final String CUSTOMER_CREDIT_CARD_INFORMATION_LISTED = "Customer credit cards listed";
     public static final String CREDIT_CARD_INFORMATION_DELETE = "Credit Cart Delted";
     public static final String RENT_UPDATE_END_DATE_CONTROL = "Return date cannot be earlier than old value when updating";
+
+    //User
+    public static final String USER_EMAİL_EXİSTS = "There is a user with this email";
 }
