@@ -32,11 +32,6 @@ public class OrderedAdditionalServicesController {
         this.orderedAdditionalServiceService = orderedAdditionalServiceService;
     }
 
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException {
-        return this.orderedAdditionalServiceService.add(createOrderedAdditionalServiceRequest);
-    }
-
     @GetMapping("/getall")
     public DataResult<List<OrderedAdditionalServiceListDto>> getAll() {
         return this.orderedAdditionalServiceService.getAll();

@@ -16,8 +16,6 @@ import java.util.List;
 
 public interface OrderedAdditionalServiceService {
 
-    Result add(CreateOrderedAdditionalServiceRequest createOrderedAdditionalServiceRequest) throws BusinessException;
-
     double findNoOfDaysBetween(LocalDate startingDate, LocalDate endDate);
 
     DataResult<List<OrderedAdditionalServiceListDto>> getAll();
@@ -33,4 +31,6 @@ public interface OrderedAdditionalServiceService {
     Result update(int orderedAdditionalServiceId, UpdateOrderedAdditionalServiceRequest updateOrderedAdditionalServiceRequest) throws BusinessException;
 
     Result delete(DeleteOrderedAdditionalServiceRequest deleteOrderedAdditionalServiceRequest) throws BusinessException;
+
+    void addOrderedAdditionalServiceForPayment(List<Integer> additionalServiceIds, int rentId) throws BusinessException;
 }

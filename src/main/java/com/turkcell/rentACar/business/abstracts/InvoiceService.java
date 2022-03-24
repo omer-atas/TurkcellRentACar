@@ -15,7 +15,7 @@ import java.util.List;
 
 public interface InvoiceService {
 
-    Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException;
+    int add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException;
 
     DataResult<InvoiceGetDto> getByInvoiceId(int invoiceId);
 
@@ -35,7 +35,7 @@ public interface InvoiceService {
 
     Result delete(DeleteInvoiceRequest deleteInvoiceRequest) throws BusinessException;
 
-    double calculationTotalPayment(int rentId);
+    double calculationTotalPayment(int rentId,LocalDate startDate,LocalDate endDate);
 
     void checkIfInvoiceExists(int invoiceId) throws BusinessException;
 }

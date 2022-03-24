@@ -1,5 +1,11 @@
 package com.turkcell.rentACar.business.constants.messages;
 
+import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
+import com.turkcell.rentACar.business.dtos.creditCardInformationDtos.CreditCardInformationGetDto;
+import com.turkcell.rentACar.business.dtos.creditCardInformationDtos.CreditCardInformationListDto;
+
+import java.util.List;
+
 public class BusinessMessages {
 
     //Additional Service
@@ -44,6 +50,7 @@ public class BusinessMessages {
     public static final String CAR_MAINTENANCE_GET_ALL = "CarMaintenances Listed Successfully";
     public static final String CAR_MAINTENANCE_GET_ALL_PAGED = "CarMaintenances Listed Page Successfully";
     public static final String CAR_MAINTENANCE_GET_ALL_SORTED = "CarMaintenances Listed Sorted Successfully";
+    public static final String CAR_MAINTENANCE_CAR_NOT_FOUND = "There is no Car Maintenance Car in the id sent";
 
     //Car
     public static final String CAR_ADD = "Car added : ";
@@ -126,7 +133,8 @@ public class BusinessMessages {
     public static final String PAYMENT_DELETE = " deleted..";
     public static final String PAYMENT_GET_BY_ID = "Success";
     public static final String PAYMENT_NOT_FOUND = "There is no payment in the id sent";
-    public static final String PAYMENT_GET_ALL = "PaymentS Listed Successfully";
+    public static final String PAYMENT_GET_ALL = "Payments Listed Successfully";
+    public static final String PAYMENT_CAN_NOT_MAKE_PAYMENT = "Failed to receive payment to perform the lease.";
 
     //Rent
     public static final String RENT_CORPORATE_CUSTOMER_NOT_FOUND = "There is no corporate customer with this id";
@@ -142,9 +150,17 @@ public class BusinessMessages {
     public static final String RENT_GET_ALL_SORTED = "Rents Listed Sorted Successfully";
     public static final String RENT_CAR_MAINTENANCE = "This car cannot be rented as it is under maintenance.";
     public static final String RENT_CAR_MAINTENANCE_NULL_DATE = "This car cannot be rented as it is under maintenance. / return date equals null";
-    public static final String RENT_CAN_NOT_MAKE_PAYMENT = "Rental cannot be made because payment cannot be made.";
-    public static final String RENT_CUSTOMER_NOT_FOUND ="The customer with this ID is not available";
+    public static final String CUSTOMER_NOT_FOUND ="The customer with this ID is not available";
     public static final String RENT_TO_CITY_NOT_FOUND ="The city with this ID is not available - toCity";
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
     public static final String PAYMENT_FOR_THE_INVOICE = "There is no payment for this invoice. Therefore, a second payment cannot be made.";
+
+    //Credit Card Information
+    public static final String CREDIT_CARD_INFORMATION_ADD = "Credit Card Added Successfully : ";
+    public static final String CREDIT_CARD_INFORMATION_NOT_FOUND = "Credit Card Not Found";
+    public static final String CREDIT_CARD_INFORMATION_GET_BY_ID = "Credit card information brought";
+    public static final String CUSTOMER_CREDIT_CARD_INFORMATION_NOT_FOUND = "Customer credit card not found";
+    public static final String CUSTOMER_CREDIT_CARD_INFORMATION_LISTED = "Customer credit cards listed";
+    public static final String CREDIT_CARD_INFORMATION_DELETE = "Credit Cart Delted";
+    public static final String RENT_UPDATE_END_DATE_CONTROL = "Return date cannot be earlier than old value when updating";
 }

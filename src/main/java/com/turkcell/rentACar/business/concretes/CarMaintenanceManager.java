@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -62,7 +63,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		this.carMaintenanceDao.save(carMaintenance);
 
-		return new SuccessResult("Added : " + carMaintenance.getMaintanenceId());
+		return new SuccessResult(BusinessMessages.CAR_MAINTENANCE_ADD + carMaintenance.getMaintanenceId());
 	}
 
 	private void checkIfCarExists(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
@@ -70,7 +71,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		DataResult<CarGetDto> result = this.carService.getByCarId(createCarMaintenanceRequest.getCarId());
 
 		if (!result.isSuccess()) {
-			throw new BusinessException("The car with this id does not exist..");
+			throw new BusinessException(BusinessMessages.CAR_NOT_FOUND);
 		}
 	}
 
@@ -89,14 +90,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getStartingDate()))
 					&& (createCarMaintenanceRequest.getReturnDate().isBefore(rent.getEndDate())
 							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getEndDate()))) {
-				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
+				throw new BusinessException(BusinessMessages.CAR_MAINTENANCE_CAR_RENTED);
 			}
 
 			if ((rent.getEndDate() == null)
 					&& (createCarMaintenanceRequest.getReturnDate().isAfter(rent.getStartingDate())
 							|| createCarMaintenanceRequest.getReturnDate().equals(rent.getStartingDate()))) {
 				throw new BusinessException(
-						"The car cannot be sent for maintenance because it is on rent. / null end date.");
+						BusinessMessages.CAR_MAINTENANCE_CAR_RENTED_NULL_DATE);
 			}
 
 		}
@@ -112,7 +113,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, BusinessMessages.CAR_MAINTENANCE_GET_ALL);
 
 	}
 
@@ -127,7 +128,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, BusinessMessages.CAR_MAINTENANCE_GET_ALL_PAGED);
 	}
 
 	@Override
@@ -141,14 +142,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenance listed successfully..");
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, BusinessMessages.CAR_MAINTENANCE_GET_ALL_SORTED);
 	}
 
 	@Override
 	public boolean checkIfCarMaintenanceExists(int carMaintenanceId) throws BusinessException {
 
 		if (this.carMaintenanceDao.getByMaintanenceId(carMaintenanceId) == null) {
-			throw new BusinessException("The car maintenance with this ID is not available..");
+			throw new BusinessException(BusinessMessages.CAR_MAINTENANCE_NOT_FOUND);
 		}
 
 		return true;
@@ -171,7 +172,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		this.carMaintenanceDao.save(carMaintenanceUpdate);
 
-		return new SuccessResult(carMaintenanceUpdate.getMaintanenceId() + " updated..");
+		return new SuccessResult(carMaintenanceUpdate.getMaintanenceId() + BusinessMessages.CAR_MAINTENANCE__UPDATE);
 	}
 
 	private UpdateCarMaintenanceRequest checkIfParameterIsNull(UpdateCarMaintenanceRequest updateCarMaintenanceRequest,
@@ -203,7 +204,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 		this.carMaintenanceDao.deleteById(carMaintenance.getMaintanenceId());
 
-		return new SuccessResult(carMaintenance.getMaintanenceId() + " deleted..");
+		return new SuccessResult(carMaintenance.getMaintanenceId() + BusinessMessages.CAR_MAINTENANCE_DELETE);
 
 	}
 
@@ -213,12 +214,12 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		CarMaintenance result = this.carMaintenanceDao.getByMaintanenceId(carMaintanenceId);
 
 		if (result == null) {
-			return new ErrorDataResult<CarMaintenanceGetDto>("Maintenances not listed");
+			return new ErrorDataResult<CarMaintenanceGetDto>(BusinessMessages.CAR_MAINTENANCE_NOT_FOUND);
 		}
 
 		CarMaintenanceGetDto response = this.modelMapperService.forDto().map(result, CarMaintenanceGetDto.class);
 
-		return new SuccessDataResult<CarMaintenanceGetDto>(response, "Success");
+		return new SuccessDataResult<CarMaintenanceGetDto>(response, BusinessMessages.CAR_MAINTENANCE_GET_BY_ID);
 	}
 
 	@Override
@@ -227,14 +228,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
 
 		if (result.isEmpty()) {
-			return new ErrorDataResult<List<CarMaintenanceListDto>>("Maintenances not listed");
+			return new ErrorDataResult<List<CarMaintenanceListDto>>(BusinessMessages.CAR_MAINTENANCE_CAR_NOT_FOUND);
 		}
 
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Success");
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response);
 	}
 
 	@Override

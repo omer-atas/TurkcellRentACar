@@ -1,13 +1,12 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
-import com.turkcell.rentACar.business.abstracts.InvoiceService;
-import com.turkcell.rentACar.business.abstracts.PaymentService;
-import com.turkcell.rentACar.business.abstracts.RentService;
+import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
 import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
+import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.DeletePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.UpdatePaymentRequest;
@@ -20,54 +19,93 @@ import com.turkcell.rentACar.entities.concretes.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PaymentManager implements PaymentService {
 
-    private PaymentDao paymentDao;
-    private ModelMapperService modelMapperService;
-    private InvoiceService invoiceService;
-    private PostService postService;
+    private final PaymentDao paymentDao;
+    private final ModelMapperService modelMapperService;
+    private final InvoiceService invoiceService;
+    private final PostService postService;
+    private RentService rentService;
+    private OrderedAdditionalServiceService orderedAdditionalServiceService;
+    private IndividualCustomerService individualCustomerService;
+    private CorporateCustomerService corporateCustomerService;
 
     @Autowired
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService,InvoiceService invoiceService,PostService postService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService,
+                          RentService rentService,OrderedAdditionalServiceService orderedAdditionalServiceService,
+                          IndividualCustomerService individualCustomerService,CorporateCustomerService corporateCustomerService) {
         this.paymentDao = paymentDao;
         this.modelMapperService = modelMapperService;
         this.invoiceService = invoiceService;
         this.postService = postService;
+        this.rentService = rentService;
+        this.orderedAdditionalServiceService = orderedAdditionalServiceService;
+        this.individualCustomerService = individualCustomerService;
+        this.corporateCustomerService = corporateCustomerService;
     }
 
     @Override
-    public Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+    public Result addForIndividualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
 
+        checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
 
-        this.invoiceService.checkIfInvoiceExists(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId());
-        checkIfPaymentForTheInvoice(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId());
-        checkIfRentPossible(paymentPostServiceModal.getCreateCreditCardRequest(),
-                this.invoiceService.getByInvoiceId(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId()).getData().getTotalPayment());
+        runPaymentSuccessor(paymentPostServiceModal);
 
-        Payment payment = this.modelMapperService.forRequest().map(paymentPostServiceModal.getCreateCreditCardRequest(), Payment.class);
+        return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Transactional
+    public void runPaymentSuccessor(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+
+        //add rent -Individual Customer or Corporate Customer
+
+        int rentId;
+
+        if(this.individualCustomerService.getByIndividualCustomerId( paymentPostServiceModal.getCreateRentRequest().getCustomerId()).getData() != null){
+            rentId = this.rentService.carRentalForIndividualCustomer(
+                    paymentPostServiceModal.getCreateRentRequest());
+        }else{
+            rentId = this.rentService.carRentalForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
+        }
+
+        //add ordered additonal service
+        this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal
+                .getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
+
+        //add invoice
+
+        CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
+        createInvoiceRequest.setRentId(rentId);
+
+        int invoiceId = this.invoiceService.add(createInvoiceRequest);
+        this.invoiceService.getByInvoiceId(invoiceId).getData().setInvoiceNo(String.valueOf(invoiceId));
+
+        // add payment
+
+        CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+        createPaymentRequest.setInvoiceId(invoiceId);
+
+        Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
         payment.setPaymentId(0);
-        payment.setAmount(this.invoiceService.getByInvoiceId(paymentPostServiceModal.getCreatePaymentRequest().getInvoiceId()).getData().getTotalPayment());
+        payment.setAmount(this.invoiceService.getByInvoiceId(invoiceId).getData().getTotalPayment());
 
         this.paymentDao.save(payment);
-
-        return new SuccessResult(BusinessMessages.PAYMENT_ADD + payment.getPaymentId());
     }
 
-    private void checkIfPaymentForTheInvoice(int invoiceId) throws BusinessException {
-        if(this.paymentDao.getByInvoice_InvoiceId(invoiceId) != null){
-            throw new BusinessException(BusinessMessages.PAYMENT_FOR_THE_INVOICE);
-        }
-    }
+    private void checkIfMakePayment(CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
 
-    private void checkIfRentPossible(CreateCreditCardRequest createCreditCardRequest,double totalPayment) throws BusinessException {
-
-        if (!this.postService.addPayment(createCreditCardRequest.getCardOwnerName(), createCreditCardRequest.getCardNumber(), createCreditCardRequest.getCardCVC(),
-                createCreditCardRequest.getCardEndMonth(), createCreditCardRequest.getCardEndYear(), totalPayment)) {
-            throw new BusinessException(BusinessMessages.RENT_CAN_NOT_MAKE_PAYMENT);
+        if (!this.postService.makePayment(createCreditCardRequest.getCardOwnerName(),
+                createCreditCardRequest.getCardNumber(),
+                createCreditCardRequest.getCardCVC(),
+                createCreditCardRequest.getCardEndMonth(),
+                createCreditCardRequest.getCardEndYear(),
+                createCreditCardRequest.getTotalPrice())) {
+            throw new BusinessException(BusinessMessages.PAYMENT_CAN_NOT_MAKE_PAYMENT);
         }
     }
 
@@ -90,9 +128,7 @@ public class PaymentManager implements PaymentService {
 
         List<Payment> result = this.paymentDao.findAll();
 
-        List<PaymentListDto> response = result.stream()
-                .map(payment -> this.modelMapperService.forDto().map(payment, PaymentListDto.class))
-                .collect(Collectors.toList());
+        List<PaymentListDto> response = result.stream().map(payment -> this.modelMapperService.forDto().map(payment, PaymentListDto.class)).collect(Collectors.toList());
 
         return new SuccessDataResult<List<PaymentListDto>>(response, BusinessMessages.PAYMENT_GET_ALL);
     }
@@ -114,7 +150,7 @@ public class PaymentManager implements PaymentService {
     }
 
     private void checkIfPaymentExists(int paymentId) throws BusinessException {
-        if(this.paymentDao.getByPaymentId(paymentId) == null){
+        if (this.paymentDao.getByPaymentId(paymentId) == null) {
             throw new BusinessException(BusinessMessages.PAYMENT_NOT_FOUND);
         }
     }

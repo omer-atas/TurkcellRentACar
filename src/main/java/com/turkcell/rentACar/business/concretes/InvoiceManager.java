@@ -4,7 +4,6 @@ import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceGetDto;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceListDto;
-import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceGetDto;
 import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.request.invoiceRequests.DeleteInvoiceRequest;
@@ -44,7 +43,7 @@ public class InvoiceManager implements InvoiceService{
     }
 
     @Override
-    public Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
+    public int add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
 
         checkIfRentExists(createInvoiceRequest.getRentId());
         checkIfRentReturn(createInvoiceRequest.getRentId());
@@ -52,7 +51,8 @@ public class InvoiceManager implements InvoiceService{
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
         invoice.setInvoiceId(0);
-        invoice.setTotalPayment(calculationTotalPayment(createInvoiceRequest.getRentId()));
+        invoice.setTotalPayment(calculationTotalPayment(createInvoiceRequest.getRentId(),this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getStartingDate(),
+                this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getEndDate()));
         invoice.setCreationDate(LocalDate.now());
         invoice.setStartingDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getStartingDate());
         invoice.setEndDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getEndDate());
@@ -61,7 +61,7 @@ public class InvoiceManager implements InvoiceService{
 
         this.invoiceDao.save(invoice);
 
-        return new SuccessResult(BusinessMessages.INVOICE_ADD + invoice.getInvoiceId());
+        return invoice.getInvoiceId();
     }
 
     private void checkIfRentReturn(int rentId) throws BusinessException {
@@ -86,12 +86,9 @@ public class InvoiceManager implements InvoiceService{
     }
 
     @Override
-    public double calculationTotalPayment(int rentId){
+    public double calculationTotalPayment(int rentId,LocalDate startDate,LocalDate endDate){
 
         double rentedCarTotalPrice = 0 , totalAdditionalServicesPrice = 0 ,totalpayment, citySwapPrice = 750.00;
-
-        LocalDate startDate = this.rentService.getByRentId(rentId).getData().getStartingDate();
-        LocalDate endDate = this.rentService.getByRentId(rentId).getData().getEndDate();
 
         totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(rentId) *
                                                     this.orderedAdditionalServiceService.findNoOfDaysBetween(startDate,endDate);

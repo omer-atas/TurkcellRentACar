@@ -8,6 +8,7 @@ import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
+import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.DeleteRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.UpdateRentRequest;
@@ -17,6 +18,7 @@ import com.turkcell.rentACar.core.utilities.results.*;
 import com.turkcell.rentACar.dataAccess.abstracts.RentDao;
 import com.turkcell.rentACar.entities.concretes.City;
 import com.turkcell.rentACar.entities.concretes.Customer;
+import com.turkcell.rentACar.entities.concretes.Invoice;
 import com.turkcell.rentACar.entities.concretes.Rent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -42,12 +44,14 @@ public class RentManager implements RentService {
     private final CustomerService customerService;
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
+    private InvoiceService invoiceService;
 
     @Lazy
     @Autowired
     public RentManager(RentDao rentDao, ModelMapperService modelMapperService, CarMaintenanceService carMaintenanceService, CarService carService,
                        CityService cityService, OrderedAdditionalServiceService orderedAdditionalServiceService, CustomerService customerService,
-                       IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService) {
+                       IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService,
+                       InvoiceService invoiceService) {
         this.rentDao = rentDao;
         this.modelMapperService = modelMapperService;
         this.carMaintenanceService = carMaintenanceService;
@@ -57,10 +61,11 @@ public class RentManager implements RentService {
         this.customerService = customerService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
+        this.invoiceService = invoiceService;
     }
 
     @Override
-    public Result carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+    public int carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
 
         checkIfEndDateBeforeStartDate(createRentRequest.getStartingDate(), createRentRequest.getEndDate());
         checkIfCustomerExists(createRentRequest.getCustomerId());
@@ -80,7 +85,7 @@ public class RentManager implements RentService {
 
         this.rentDao.save(rent);
 
-        return new SuccessResult(BusinessMessages.RENT_ADD + rent.getRentId());
+        return rent.getRentId();
     }
 
     private void checkIfEndDateBeforeStartDate(LocalDate startingDate, LocalDate endDate) throws BusinessException {
@@ -100,7 +105,7 @@ public class RentManager implements RentService {
     }
 
     @Override
-    public Result carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+    public int carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
 
         checkIfEndDateBeforeStartDate(createRentRequest.getStartingDate(), createRentRequest.getEndDate());
         checkIfCustomerExists(createRentRequest.getCustomerId());
@@ -120,7 +125,7 @@ public class RentManager implements RentService {
 
         this.rentDao.save(rent);
 
-        return new SuccessResult(BusinessMessages.RENT_ADD + rent.getRentId());
+        return rent.getRentId();
     }
 
     private void checkIfCorporateCustomerExists(int customerId) throws BusinessException {
@@ -147,7 +152,7 @@ public class RentManager implements RentService {
 
     private void checkIfCustomerExists(int customerId) throws BusinessException {
         if (this.customerService.getByCustomerId(customerId) == null) {
-            throw new BusinessException(BusinessMessages.RENT_CUSTOMER_NOT_FOUND);
+            throw new BusinessException(BusinessMessages.CUSTOMER_NOT_FOUND);
         }
     }
 
@@ -358,6 +363,10 @@ public class RentManager implements RentService {
 
         updateRentRequest = checkIfParameterIsNull(updateRentRequest, rent);
 
+        checkIfTheUpdatedEndDateEarlierThanTheOldEndDate(rent.getEndDate(),updateRentRequest.getEndDate());
+
+        invoiceCreationControl(rent.getEndDate(),updateRentRequest.getEndDate(),rentId);
+
         Rent rentUpdate = this.modelMapperService.forRequest().map(updateRentRequest, Rent.class);
 
         rentUpdate = manuelMappingToRentUpdate(rentId, rentUpdate);
@@ -369,6 +378,27 @@ public class RentManager implements RentService {
         this.rentDao.save(rentUpdate);
 
         return new SuccessResult(rentUpdate.getRentId() + BusinessMessages.RENT_UPDATE);
+    }
+
+    private void invoiceCreationControl(LocalDate endDate, LocalDate updateEndDate,int rentId) throws BusinessException {
+
+        if(updateEndDate.isAfter(endDate)){
+
+            //add invoice
+
+           CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
+           createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size()+1));
+           createInvoiceRequest.setRentId(rentId);
+           this.invoiceService.add(createInvoiceRequest);
+
+        }
+    }
+
+    private void checkIfTheUpdatedEndDateEarlierThanTheOldEndDate(LocalDate endDate, LocalDate updateEndDate) throws BusinessException {
+
+        if(updateEndDate.isBefore(endDate) || updateEndDate.equals(endDate)){
+            throw new BusinessException(BusinessMessages.RENT_UPDATE_END_DATE_CONTROL);
+        }
     }
 
     private Rent manuelMappingToRentUpdate(int rentId, Rent rentUpdate) {

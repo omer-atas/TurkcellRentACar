@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.business.request.creditCartRequests;
+package com.turkcell.rentACar.business.request.creditCardInformationRequests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,16 +10,21 @@ import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCreditCardRequest {
+public class CreateCreditCardInformationRequest {
 
     @NotNull
+    @NotBlank
+    @NotEmpty
     @Size(min = 1)
     private String cardNumber;
 
     @NotNull
+    @NotBlank
+    @NotEmpty
     @Size(min = 1)
     private String cardOwnerName;
 
+    @Positive
     @Min(1)
     @Max(12)
     private int cardEndMonth;
@@ -27,9 +32,10 @@ public class CreateCreditCardRequest {
     @Positive
     private int cardEndYear;
 
-    @Positive
+    @Min(100)
+    @Max(999)
     private int cardCVC;
 
     @Positive
-    private double totalPrice;
+    private int customerId;
 }

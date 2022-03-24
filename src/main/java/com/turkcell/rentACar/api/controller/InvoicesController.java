@@ -3,7 +3,6 @@ package com.turkcell.rentACar.api.controller;
 import com.turkcell.rentACar.business.abstracts.InvoiceService;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceGetDto;
 import com.turkcell.rentACar.business.dtos.invoiceDtos.InvoiceListDto;
-import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.request.invoiceRequests.DeleteInvoiceRequest;
 import com.turkcell.rentACar.business.request.invoiceRequests.UpdateInvoiceRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
@@ -22,16 +21,11 @@ import java.util.List;
 @RequestMapping("/api/invoices")
 public class InvoicesController {
 
-    private InvoiceService invoiceService;
+    private final InvoiceService invoiceService;
 
     @Autowired
     public InvoicesController(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
-    }
-
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
-        return this.invoiceService.add(createInvoiceRequest);
     }
 
     @GetMapping("/getall")
@@ -45,8 +39,7 @@ public class InvoicesController {
     }
 
     @GetMapping("/getAllPaged")
-    public DataResult<List<InvoiceListDto>> getAllPaged(@RequestParam("pageNo") int pageNo,
-                                                      @RequestParam("pageSize") int pageSize) {
+    public DataResult<List<InvoiceListDto>> getAllPaged(@RequestParam("pageNo") int pageNo, @RequestParam("pageSize") int pageSize) {
         return this.invoiceService.getAllPaged(pageNo, pageSize);
     }
 
@@ -61,13 +54,12 @@ public class InvoicesController {
     }
 
     @GetMapping("/getAllInvoicesInSpecificDateRange")
-    public DataResult<List<InvoiceListDto>> getAllInvoicesInSpecificDateRange(@RequestParam("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate fromDate, @RequestParam("toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate) {
-        return this.invoiceService.getAllInvoicesInSpecificDateRange(fromDate,toDate);
+    public DataResult<List<InvoiceListDto>> getAllInvoicesInSpecificDateRange(@RequestParam("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate, @RequestParam("toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate) {
+        return this.invoiceService.getAllInvoicesInSpecificDateRange(fromDate, toDate);
     }
 
     @PutMapping("/update")
-    public Result update(@RequestParam("invoiceId") int invoiceId,
-                         @RequestBody @Valid UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
+    public Result update(@RequestParam("invoiceId") int invoiceId, @RequestBody @Valid UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
         return this.invoiceService.update(invoiceId, updateInvoiceRequest);
     }
 
