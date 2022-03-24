@@ -307,6 +307,8 @@ public class RentManager implements RentService {
             response.get(i).setFromCityId(result.get(i).getFromCity().getCityPlate());
             response.get(i).setToCityId(result.get(i).getToCity().getCityPlate());
             response.get(i).setCustomerId(result.get(i).getCustomer().getCustomerId());
+            response.get(i).setStartingKilometer(result.get(i).getStartingKilometer());
+            response.get(i).setReturnKilometer(result.get(i).getReturnKilometer());
         }
 
         return response;
@@ -383,13 +385,11 @@ public class RentManager implements RentService {
     private void isInvoiceCreationControl(LocalDate endDate, LocalDate updateEndDate,int rentId) throws BusinessException {
 
         if(updateEndDate.isAfter(endDate)){
-
             //add invoice
            CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
            createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size()+1));
            createInvoiceRequest.setRentId(rentId);
            this.invoiceService.add(createInvoiceRequest);
-
         }
     }
 

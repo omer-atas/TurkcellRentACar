@@ -86,6 +86,7 @@ public class PaymentManager implements PaymentService {
 
         // add payment
 
+        checkIfPaymentForInvoice(invoiceId);
         CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
         createPaymentRequest.setInvoiceId(invoiceId);
 
@@ -94,6 +95,13 @@ public class PaymentManager implements PaymentService {
         payment.setAmount(this.invoiceService.getByInvoiceId(invoiceId).getData().getTotalPayment());
 
         this.paymentDao.save(payment);
+    }
+
+    private void checkIfPaymentForInvoice(int invoiceId) throws BusinessException {
+
+        if(this.paymentDao.existsByInvoice_InvoiceId(invoiceId)){
+            throw new BusinessException(BusinessMessages.PAYMENT_EXİSTS_BY_INVOICE);
+        }
     }
 
     private void checkIfMakePayment(CreateCreditCardRequest createCreditCardRequest) throws BusinessException {

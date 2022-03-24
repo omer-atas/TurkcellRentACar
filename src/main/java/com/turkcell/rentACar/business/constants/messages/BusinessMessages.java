@@ -1,10 +1,5 @@
 package com.turkcell.rentACar.business.constants.messages;
 
-import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
-import com.turkcell.rentACar.business.dtos.creditCardInformationDtos.CreditCardInformationGetDto;
-import com.turkcell.rentACar.business.dtos.creditCardInformationDtos.CreditCardInformationListDto;
-
-import java.util.List;
 
 public class BusinessMessages {
 
@@ -100,7 +95,6 @@ public class BusinessMessages {
     public static final String INDIVIDUAL_CUSTOMER_GET_ALL_SORTED = "IndividuaLCustomers Listed Sorted Successfully";
 
     // Invoice
-    public static final String INVOICE_ADD = "Invoice added : ";
     public static final String INVOICE_UPDATE = " updated..";
     public static final String INVOICE_RENT_RETURN = "The invoice could not be issued because the rental return information was not entered.";
     public static final String INVOICE_N0_NOT_DUPLICATED = "It has the invoice number. Give another name";
@@ -117,7 +111,6 @@ public class BusinessMessages {
     public static final String INVOICE_IN_SPECIFIC_DATE_RANGE = "There is no invoice record in the sent range.";
 
     //OrderedAdditionalService
-    public static final String ORDERED_ADDITIONAL_SERVICE_ADD = "OrderedAdditionalService added : ";
     public static final String ORDERED_ADDITIONAL_SERVICE_UPDATE = " updated..";
     public static final String ORDERED_ADDITIONAL_SERVICE_DELETE = " deleted..";
     public static final String ORDERED_ADDITIONAL_SERVICE_GET_BY_ID = "Success";
@@ -135,11 +128,9 @@ public class BusinessMessages {
     public static final String PAYMENT_NOT_FOUND = "There is no payment in the id sent";
     public static final String PAYMENT_GET_ALL = "Payments Listed Successfully";
     public static final String PAYMENT_CAN_NOT_MAKE_PAYMENT = "Failed to receive payment to perform the lease.";
+    public static final String PAYMENT_EXİSTS_BY_INVOICE = "This invoice has a payment";
 
     //Rent
-    public static final String RENT_CORPORATE_CUSTOMER_NOT_FOUND = "There is no corporate customer with this id";
-    public static final String RENT_INDIVIDUAL_CUSTOMER_NOT_FOUND = "There is no individual customer with this id";
-    public static final String RENT_ADD = "Added : ";
     public static final String RENT_END_DATE_BEFORE_STARTING_DATE = "End date cannot be earlier than start date";
     public static final String RENT_UPDATE = " updated..";
     public static final String RENT_DELETE = " deleted..";
@@ -153,7 +144,6 @@ public class BusinessMessages {
     public static final String CUSTOMER_NOT_FOUND ="The customer with this ID is not available";
     public static final String RENT_TO_CITY_NOT_FOUND ="The city with this ID is not available - toCity";
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
-    public static final String PAYMENT_FOR_THE_INVOICE = "There is no payment for this invoice. Therefore, a second payment cannot be made.";
 
     //Credit Card Information
     public static final String CREDIT_CARD_INFORMATION_ADD = "Credit Card Added Successfully : ";
@@ -166,4 +156,5 @@ public class BusinessMessages {
 
     //User
     public static final String USER_EMAİL_EXİSTS = "There is a user with this email";
+
 }
