@@ -1,13 +1,18 @@
 package com.turkcell.rentACar.business.concretes;
 
+import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
+import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
+import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
+import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
+import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.CreateOrderedAdditionalServiceListRequest;
 import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.DeleteRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.UpdateRentRequest;
@@ -25,6 +30,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -126,7 +132,7 @@ public class RentManager implements RentService {
 
 
     @Override
-    public  void checkIfCorporateCustomerExists(int customerId) throws BusinessException {
+    public void checkIfCorporateCustomerExists(int customerId) throws BusinessException {
 
         if (this.corporateCustomerService.getByCorporateCustomerId(customerId).getData() == null) {
             throw new BusinessException(BusinessMessages.CORPORATE_CUSTOMER_NOT_FOUND);
@@ -147,6 +153,7 @@ public class RentManager implements RentService {
 
         return rent;
     }
+
     @Override
     public void checkIfCustomerExists(int customerId) throws BusinessException {
         if (this.customerService.getByCustomerId(customerId) == null) {
@@ -361,9 +368,6 @@ public class RentManager implements RentService {
 
         Rent rent = this.rentDao.getByRentId(rentId);
 
-        updateRentRequest = checkIfParameterIsNull(updateRentRequest, rent);
-
-
         Rent rentUpdate = this.modelMapperService.forRequest().map(updateRentRequest, Rent.class);
 
         rentUpdate = manuelMappingToRentUpdate(rentId, rentUpdate);
@@ -377,6 +381,121 @@ public class RentManager implements RentService {
         return new SuccessResult(rentUpdate.getRentId() + BusinessMessages.RENT_UPDATE);
     }
 
+    @Override
+    public Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
+
+        System.out.println(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
+        checkIfIndividualCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
+
+        Rent rent = this.rentDao.getByRentId(rentId);
+
+        checkIfEndDateForRentDelay(rent.getEndDate(), rentEndDateDelayPostServiceModal.getUpdateEndDate());
+
+        this.carService.updateKilometerInformation(this.rentDao.getByRentId(rentId).getCar().getCarId(), rentEndDateDelayPostServiceModal.getReturnKilometer());
+
+        CreateRentRequest createRentRequest = this.createRentForEndDateDelay(rent, rentEndDateDelayPostServiceModal.getUpdateEndDate());
+        CreateCreditCardRequest createCreditCardRequest = this.createCreditCardForEndDateDelay(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
+        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = this.createOrderedAdditionalServicesForEndDateDelay(rentId);
+
+        this.createPaymentRentDelayEndDateForIndividualCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
+
+        return new SuccessResult("Bireysel müşteri geç teslimi için gerekli yapılar oluşturuldu..");
+    }
+
+    private void createPaymentRentDelayEndDateForIndividualCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
+
+        PaymentPostServiceModal paymentPostServiceModal = new PaymentPostServiceModal();
+        paymentPostServiceModal.setCreateRentRequest(createRentRequest);
+        paymentPostServiceModal.setCreateOrderedAdditionalServiceListRequests(createOrderedAdditionalServiceListRequest);
+        paymentPostServiceModal.setCreateCreditCardRequest(createCreditCardRequest);
+
+        this.paymentService.addForIndıvıdualCustomer(paymentPostServiceModal);
+    }
+
+    @Override
+    public Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
+
+        checkIfCorporateCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
+
+        Rent rent = this.rentDao.getByRentId(rentId);
+
+        checkIfEndDateForRentDelay(rent.getEndDate(), rentEndDateDelayPostServiceModal.getUpdateEndDate());
+
+        this.carService.updateKilometerInformation(this.rentDao.getByRentId(rentId).getCar().getCarId(), rentEndDateDelayPostServiceModal.getReturnKilometer());
+
+        CreateRentRequest createRentRequest = this.createRentForEndDateDelay(rent, rentEndDateDelayPostServiceModal.getUpdateEndDate());
+        CreateCreditCardRequest createCreditCardRequest = this.createCreditCardForEndDateDelay(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
+        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = this.createOrderedAdditionalServicesForEndDateDelay(rentId);
+
+        this.createPaymentRentDelayEndDateForCorporateCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
+
+        return new SuccessResult("Ticari müşteri geç teslimi için gerekli yapılar oluşturuldu..");
+    }
+
+    private void createPaymentRentDelayEndDateForCorporateCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
+
+        PaymentPostServiceModal paymentPostServiceModal = new PaymentPostServiceModal();
+        paymentPostServiceModal.setCreateRentRequest(createRentRequest);
+        paymentPostServiceModal.setCreateOrderedAdditionalServiceListRequests(createOrderedAdditionalServiceListRequest);
+        paymentPostServiceModal.setCreateCreditCardRequest(createCreditCardRequest);
+
+        this.paymentService.addForCorporateCustomer(paymentPostServiceModal);
+    }
+
+    private void checkIfEndDateForRentDelay(LocalDate endDate, LocalDate updateEndDate) throws BusinessException {
+
+        if (updateEndDate.isBefore(endDate) || updateEndDate.isBefore(endDate)) {
+            throw new BusinessException("dönüş tarihi sistemle aynı");
+        }
+    }
+
+    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId) throws BusinessException {
+
+        if (this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData() == null) {
+            throw new BusinessException("ek servis almamış");
+        }
+
+        var orderedAdditinalServices = this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData();
+        List<Integer> additionalServiceIds = new ArrayList<Integer>();
+        for (int i = 0; i < orderedAdditinalServices.size(); i++) {
+            int id = orderedAdditinalServices.get(i).getAdditionalServiceId();
+            additionalServiceIds.add(id);
+        }
+
+        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = new CreateOrderedAdditionalServiceListRequest();
+        createOrderedAdditionalServiceListRequest.setAdditionalServiceIds(additionalServiceIds);
+
+        return createOrderedAdditionalServiceListRequest;
+    }
+
+    private CreateCreditCardRequest createCreditCardForEndDateDelay(CreateCreditCardRequest createCreditCard) {
+
+        CreateCreditCardRequest createCreditCardRequest = new CreateCreditCardRequest();
+
+        createCreditCardRequest.setCardOwnerName(createCreditCard.getCardOwnerName());
+        createCreditCardRequest.setCardNumber(createCreditCard.getCardNumber());
+        createCreditCardRequest.setCardEndMonth(createCreditCard.getCardEndMonth());
+        createCreditCardRequest.setCardCVC(createCreditCard.getCardCVC());
+        createCreditCardRequest.setTotalPrice(createCreditCard.getTotalPrice());
+
+        return createCreditCardRequest;
+    }
+
+
+    private CreateRentRequest createRentForEndDateDelay(Rent rent, LocalDate updateEndDate) {
+
+        CreateRentRequest createRentRequest = new CreateRentRequest();
+
+        createRentRequest.setCarId(rent.getCar().getCarId());
+        createRentRequest.setStartingDate(rent.getEndDate());
+        createRentRequest.setEndDate(updateEndDate);
+        createRentRequest.setToCityId(rent.getToCity().getCityPlate());
+        createRentRequest.setFromCityId(rent.getFromCity().getCityPlate());
+        createRentRequest.setCustomerId(rent.getCustomer().getCustomerId());
+        return createRentRequest;
+
+    }
+
     private Rent manuelMappingToRentUpdate(int rentId, Rent rentUpdate) {
         rentUpdate.setToCity(this.rentDao.getByRentId(rentId).getToCity());
         rentUpdate.setFromCity(this.rentDao.getByRentId(rentId).getFromCity());
@@ -384,15 +503,6 @@ public class RentManager implements RentService {
         rentUpdate.setStartingKilometer(this.rentDao.getByRentId(rentId).getStartingKilometer());
 
         return rentUpdate;
-    }
-
-    private UpdateRentRequest checkIfParameterIsNull(UpdateRentRequest updateRentRequest, Rent rentalCar) {
-
-        if (updateRentRequest.getStartingDate() == null) {
-            updateRentRequest.setStartingDate(rentalCar.getStartingDate());
-        }
-
-        return updateRentRequest;
     }
 
     private void IdCorrector(Rent rent, Rent rentUpdate) {

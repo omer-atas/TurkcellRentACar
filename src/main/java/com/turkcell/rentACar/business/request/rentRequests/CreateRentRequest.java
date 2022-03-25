@@ -1,7 +1,6 @@
 package com.turkcell.rentACar.business.request.rentRequests;
 
 import java.time.LocalDate;
-
 import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;

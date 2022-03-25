@@ -74,6 +74,16 @@ public class RentsController {
         return this.rentService.update(rentId, updateRentRequest);
     }
 
+    @PutMapping("/updateRentDelayEndDateForIndividualCustomer")
+    public Result updateRentDelayEndDateForIndividualCustomer(@RequestParam("rentId") int rentId, @RequestBody @Valid RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException{
+        return  this.rentService.updateRentDelayEndDateForIndividualCustomer(rentId,rentEndDateDelayPostServiceModal);
+    }
+
+    @PutMapping("/updateRentDelayEndDateForCorporateCustomer")
+    public Result updateRentDelayEndDateForCorporateCustomer(@RequestParam("rentId") int rentId, @RequestBody @Valid RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException{
+        return this.rentService.updateRentDelayEndDateForCorporateCustomer(rentId,rentEndDateDelayPostServiceModal);
+    }
+
     @DeleteMapping("/delete")
     public Result delete(@RequestBody @Valid DeleteRentRequest deleteRentRequest) throws BusinessException {
         return this.rentService.delete(deleteRentRequest);

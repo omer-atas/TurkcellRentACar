@@ -76,7 +76,7 @@ public class InvoiceManager implements InvoiceService {
 
         if (orderedAdditionalServices != null) {
             for (OrderedAdditionalServiceListDto o : orderedAdditionalServices) {
-                totalAdditionalServicesPrice += this.additionalServiceService.getByAdditionalServiceId(o.getOrderedAdditionalServiceId()).getData().getDailyPrice();
+                totalAdditionalServicesPrice += this.additionalServiceService.getByAdditionalServiceId(o.getAdditionalServiceId()).getData().getDailyPrice();
             }
         }
 

@@ -41,6 +41,10 @@ public interface RentService {
 
 	void checkIfCorporateCustomerExists(int customerId) throws BusinessException;
 
+	Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
+
+	Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
+
 	List<RentListDto> getByCar_CarId(int carId);
 
 	Result update(int rentId, UpdateRentRequest updateRentRequest) throws BusinessException;

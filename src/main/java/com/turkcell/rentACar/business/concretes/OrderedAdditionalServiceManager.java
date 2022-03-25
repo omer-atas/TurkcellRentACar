@@ -56,7 +56,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
             orderedAdditionalServiceRequest.setRentId(rentId);
 
             OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forDto().map(orderedAdditionalServiceRequest,OrderedAdditionalService.class);
-
+            orderedAdditionalService.setOrderedAdditionalServiceId(0);
             this.orderedAdditionalServiceDao.save(orderedAdditionalService);
         }
     }

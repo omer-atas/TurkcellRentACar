@@ -1,10 +1,8 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
-import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
-import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
 import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
@@ -12,6 +10,7 @@ import com.turkcell.rentACar.business.request.invoiceRequests.CreateInvoiceReque
 import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.DeletePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.UpdatePaymentRequest;
+import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import com.turkcell.rentACar.core.bankServices.PostService;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
@@ -59,9 +58,16 @@ public class PaymentManager implements PaymentService {
 
         checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
 
-        runPaymentSuccessorForIndıvıdualCustomer(paymentPostServiceModal);
+        int rentId = createRentForIndıvıdualCustomer(paymentPostServiceModal.getCreateRentRequest());
+        runPaymentSuccessor(paymentPostServiceModal, rentId);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    private int createRentForIndıvıdualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+        // add - rent - IndıvıdualCustomer
+        int rentId = this.rentService.carRentalForIndividualCustomer(createRentRequest);
+        return rentId;
     }
 
     @Override
@@ -70,28 +76,18 @@ public class PaymentManager implements PaymentService {
         this.rentService.checkIfCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
         this.rentService.checkIfCorporateCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
 
-        runPaymentSuccessorForCorporateCustomer(paymentPostServiceModal);
+        checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
+
+        int rentId = createRentForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
+        runPaymentSuccessor(paymentPostServiceModal, rentId);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
     }
 
-    @Transactional
-    public void runPaymentSuccessorForCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
-
-        //add rent - Corporate Customer
-        int rentId = this.rentService.carRentalForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
-
-        this.runPaymentSuccessor(paymentPostServiceModal, rentId);
-    }
-
-    @Transactional
-    public void runPaymentSuccessorForIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
-
-        //add rent - Individual Customer
-
-        int rentId = this.rentService.carRentalForIndividualCustomer(paymentPostServiceModal.getCreateRentRequest());
-
-        this.runPaymentSuccessor(paymentPostServiceModal, rentId);
+    private int createRentForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+        // add - rent - CorporateCustomer
+        int rentId = this.rentService.carRentalForCorporateCustomer(createRentRequest);
+        return rentId;
     }
 
     @Transactional
@@ -105,6 +101,7 @@ public class PaymentManager implements PaymentService {
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
         createInvoiceRequest.setRentId(rentId);
         createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size() + 10));
+
         int invoiceId = this.invoiceService.add(createInvoiceRequest);
 
         // add payment
