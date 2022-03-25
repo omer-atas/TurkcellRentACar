@@ -1,9 +1,11 @@
 package com.turkcell.rentACar.api.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,8 +70,8 @@ public class RentsController {
     }
 
     @PutMapping("/update")
-    public Result update(@RequestParam("rentalId") int rentalId, @RequestBody @Valid UpdateRentRequest updateRentRequest) throws BusinessException {
-        return this.rentService.update(rentalId, updateRentRequest);
+    public Result update(@RequestParam("rentId") int rentId, @RequestBody @Valid UpdateRentRequest updateRentRequest) throws BusinessException {
+        return this.rentService.update(rentId, updateRentRequest);
     }
 
     @DeleteMapping("/delete")

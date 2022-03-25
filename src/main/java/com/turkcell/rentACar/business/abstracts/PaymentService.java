@@ -13,7 +13,9 @@ import java.util.List;
 
 public interface PaymentService {
 
-    Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
+    Result addForIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
+
+    Result addForCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException;
 
     DataResult<PaymentGetDto> getByPaymentId(int paymentId);
 

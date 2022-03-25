@@ -1,8 +1,10 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
+import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
+import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
 import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
@@ -30,15 +32,14 @@ public class PaymentManager implements PaymentService {
     private final ModelMapperService modelMapperService;
     private final InvoiceService invoiceService;
     private final PostService postService;
-    private RentService rentService;
-    private OrderedAdditionalServiceService orderedAdditionalServiceService;
-    private IndividualCustomerService individualCustomerService;
-    private CorporateCustomerService corporateCustomerService;
+    private final RentService rentService;
+    private final OrderedAdditionalServiceService orderedAdditionalServiceService;
+    private final IndividualCustomerService individualCustomerService;
+    private final CorporateCustomerService corporateCustomerService;
+    private final CustomerService customerService;
 
     @Autowired
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService,
-                          RentService rentService,OrderedAdditionalServiceService orderedAdditionalServiceService,
-                          IndividualCustomerService individualCustomerService,CorporateCustomerService corporateCustomerService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService, CustomerService customerService) {
         this.paymentDao = paymentDao;
         this.modelMapperService = modelMapperService;
         this.invoiceService = invoiceService;
@@ -47,41 +48,63 @@ public class PaymentManager implements PaymentService {
         this.orderedAdditionalServiceService = orderedAdditionalServiceService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
+        this.customerService = customerService;
     }
 
     @Override
-    public Result add(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+    public Result addForIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+
+        this.rentService.checkIfCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
+        this.rentService.checkIfIndividualCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
 
         checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
 
-        runPaymentSuccessor(paymentPostServiceModal);
+        runPaymentSuccessorForIndıvıdualCustomer(paymentPostServiceModal);
+
+        return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Override
+    public Result addForCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+
+        this.rentService.checkIfCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
+        this.rentService.checkIfCorporateCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
+
+        runPaymentSuccessorForCorporateCustomer(paymentPostServiceModal);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
     }
 
     @Transactional
-    public void runPaymentSuccessor(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+    public void runPaymentSuccessorForCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
 
-        //add rent -Individual Customer or Corporate Customer
+        //add rent - Corporate Customer
+        int rentId = this.rentService.carRentalForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
 
-        int rentId;
+        this.runPaymentSuccessor(paymentPostServiceModal, rentId);
+    }
 
-        if(this.individualCustomerService.getByIndividualCustomerId( paymentPostServiceModal.getCreateRentRequest().getCustomerId()).getData() != null){
-            rentId = this.rentService.carRentalForIndividualCustomer(
-                    paymentPostServiceModal.getCreateRentRequest());
-        }else{
-            rentId = this.rentService.carRentalForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
-        }
+    @Transactional
+    public void runPaymentSuccessorForIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+
+        //add rent - Individual Customer
+
+        int rentId = this.rentService.carRentalForIndividualCustomer(paymentPostServiceModal.getCreateRentRequest());
+
+        this.runPaymentSuccessor(paymentPostServiceModal, rentId);
+    }
+
+    @Transactional
+    public void runPaymentSuccessor(PaymentPostServiceModal paymentPostServiceModal, int rentId) throws BusinessException {
 
         //add ordered additonal service
-        this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal
-                .getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
+        this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
 
         //add invoice
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
         createInvoiceRequest.setRentId(rentId);
-        createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size()+10));
+        createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size() + 10));
         int invoiceId = this.invoiceService.add(createInvoiceRequest);
 
         // add payment
@@ -99,19 +122,14 @@ public class PaymentManager implements PaymentService {
 
     private void checkIfPaymentForInvoice(int invoiceId) throws BusinessException {
 
-        if(this.paymentDao.existsByInvoice_InvoiceId(invoiceId)){
+        if (this.paymentDao.existsByInvoice_InvoiceId(invoiceId)) {
             throw new BusinessException(BusinessMessages.PAYMENT_EXİSTS_BY_INVOICE);
         }
     }
 
     private void checkIfMakePayment(CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
 
-        if (!this.postService.makePayment(createCreditCardRequest.getCardOwnerName(),
-                createCreditCardRequest.getCardNumber(),
-                createCreditCardRequest.getCardCVC(),
-                createCreditCardRequest.getCardEndMonth(),
-                createCreditCardRequest.getCardEndYear(),
-                createCreditCardRequest.getTotalPrice())) {
+        if (!this.postService.makePayment(createCreditCardRequest.getCardOwnerName(), createCreditCardRequest.getCardNumber(), createCreditCardRequest.getCardCVC(), createCreditCardRequest.getCardEndMonth(), createCreditCardRequest.getCardEndYear(), createCreditCardRequest.getTotalPrice())) {
             throw new BusinessException(BusinessMessages.PAYMENT_CAN_NOT_MAKE_PAYMENT);
         }
     }

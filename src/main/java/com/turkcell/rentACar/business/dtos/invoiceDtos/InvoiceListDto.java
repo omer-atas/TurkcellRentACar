@@ -26,7 +26,7 @@ public class InvoiceListDto {
 
     private double rentDay;
 
-    private int totalRentalDays;
+    private int totalRentCarPrice;
 
     private int customerId;
 }

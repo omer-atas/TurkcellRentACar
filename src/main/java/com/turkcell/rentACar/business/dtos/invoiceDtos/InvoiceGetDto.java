@@ -26,7 +26,7 @@ public class InvoiceGetDto {
 
     private double rentDay;
 
-    private int totalRentalDays;
+    private int totalRentCarPrice;
 
     private int customerId;
 }

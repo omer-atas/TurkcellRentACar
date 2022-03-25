@@ -1,7 +1,9 @@
 package com.turkcell.rentACar.business.abstracts;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import org.springframework.data.domain.Sort;
 
@@ -32,6 +34,12 @@ public interface RentService {
 	DataResult<List<RentListDto>> getAllSorted(Sort.Direction direction);
 
 	boolean checkIfRentExists(int rentalId) throws BusinessException;
+
+	void checkIfIndividualCustomerExists(int customerId) throws BusinessException;
+
+	void checkIfCustomerExists(int customerId) throws BusinessException;
+
+	void checkIfCorporateCustomerExists(int customerId) throws BusinessException;
 
 	List<RentListDto> getByCar_CarId(int carId);
 
