@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -33,11 +34,13 @@ public class BrandManager implements BrandService {
 
 	private BrandDao brandDao;
 	private ModelMapperService modelMapperService;
+	private CarService carService;
 
 	@Autowired
-	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService) {
+	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService,CarService carService) {
 		this.brandDao = brandDao;
 		this.modelMapperService = modelMapperService;
+		this.carService = carService;
 	}
 
 	@Override
@@ -153,6 +156,7 @@ public class BrandManager implements BrandService {
 	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException {
 
 		checkIfBrandExists(deleteBrandRequest.getBrandId());
+		checkIfThereIsACarWithThisBrand(deleteBrandRequest.getBrandId());
 
 		Brand brand = this.modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 
@@ -160,6 +164,13 @@ public class BrandManager implements BrandService {
 
 		return new SuccessResult(deleteBrandRequest.getBrandId() + BusinessMessages.BRAND_DELETE);
 
+	}
+
+	private void checkIfThereIsACarWithThisBrand(int brandId) throws BusinessException {
+
+		if(!this.carService.getByBrand_BrandId(brandId).getData().isEmpty()){
+			throw new BusinessException(BusinessMessages.IS_THERE_A_BRAND_OF_CAR_AVAILABLE);
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.concretes;
 
+import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.abstracts.ColorService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.colorDtos.ColorGetDto;
@@ -32,11 +33,13 @@ public class ColorManager implements ColorService {
 
 	private ColorDao colorDao;
 	private ModelMapperService modelMapperService;
+	private CarService carService;
 
 	@Autowired
-	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService) {
+	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService,CarService carService) {
 		this.colorDao = colorDao;
 		this.modelMapperService = modelMapperService;
+		this.carService = carService;
 	}
 
 	@Override
@@ -152,6 +155,7 @@ public class ColorManager implements ColorService {
 	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
 
 		checkIfColorExists(deleteColorRequest.getColorId());
+		checkIfThereIsACarWithThisColor(deleteColorRequest.getColorId());
 
 		Color color = this.modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 
@@ -159,6 +163,13 @@ public class ColorManager implements ColorService {
 
 		return new SuccessResult(deleteColorRequest.getColorId() + BusinessMessages.COLOR_DELETE);
 
+	}
+
+	private void checkIfThereIsACarWithThisColor(int colorId) throws BusinessException {
+
+		if(!this.carService.getByColor_ColorId(colorId).getData().isEmpty()){
+			throw new BusinessException(BusinessMessages.IS_THERE_A_COLOR_OF_CAR_AVAILABLE);
+		}
 	}
 
 }

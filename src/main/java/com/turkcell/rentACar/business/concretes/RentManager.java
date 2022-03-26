@@ -212,7 +212,7 @@ public class RentManager implements RentService {
 
     private void checkIfCarMaintenance(int carId, LocalDate startingDate, LocalDate endDate) throws BusinessException {
 
-        List<CarMaintenanceListDto> result = this.carMaintenanceService.getByCar_CarId(carId);
+        List<CarMaintenanceListDto> result = this.carMaintenanceService.getByCar_CarId(carId).getData();
 
         if (result == null) {
             return;
@@ -384,7 +384,6 @@ public class RentManager implements RentService {
     @Override
     public Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
-        System.out.println(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
         checkIfIndividualCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
 
         Rent rent = this.rentDao.getByRentId(rentId);
@@ -399,7 +398,7 @@ public class RentManager implements RentService {
 
         this.createPaymentRentDelayEndDateForIndividualCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
 
-        return new SuccessResult("Bireysel müşteri geç teslimi için gerekli yapılar oluşturuldu..");
+        return new SuccessResult(BusinessMessages.RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER);
     }
 
     private void createPaymentRentDelayEndDateForIndividualCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
@@ -429,7 +428,7 @@ public class RentManager implements RentService {
 
         this.createPaymentRentDelayEndDateForCorporateCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
 
-        return new SuccessResult("Ticari müşteri geç teslimi için gerekli yapılar oluşturuldu..");
+        return new SuccessResult(BusinessMessages.RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER);
     }
 
     private void createPaymentRentDelayEndDateForCorporateCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
@@ -444,23 +443,30 @@ public class RentManager implements RentService {
 
     private void checkIfEndDateForRentDelay(LocalDate endDate, LocalDate updateEndDate) throws BusinessException {
 
-        if (updateEndDate.isBefore(endDate) || updateEndDate.isBefore(endDate)) {
-            throw new BusinessException("dönüş tarihi sistemle aynı");
+        System.out.println(endDate);
+        System.out.println(updateEndDate);
+
+        if (updateEndDate.isBefore(endDate) || updateEndDate.equals(endDate)) {
+            throw new BusinessException(BusinessMessages.RENT_DELAY_END_DATE_CHECK);
         }
     }
 
-    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId) throws BusinessException {
+    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId){
 
-        if (this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData() == null) {
-            throw new BusinessException("ek servis almamış");
-        }
-
-        var orderedAdditinalServices = this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData();
         List<Integer> additionalServiceIds = new ArrayList<Integer>();
-        for (int i = 0; i < orderedAdditinalServices.size(); i++) {
-            int id = orderedAdditinalServices.get(i).getAdditionalServiceId();
-            additionalServiceIds.add(id);
+
+        System.out.println(additionalServiceIds);
+
+        if (this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData() != null) {
+            var orderedAdditinalServices = this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData();
+
+            for (int i = 0; i < orderedAdditinalServices.size(); i++) {
+                int id = orderedAdditinalServices.get(i).getAdditionalServiceId();
+                additionalServiceIds.add(id);
+            }
         }
+
+
 
         CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = new CreateOrderedAdditionalServiceListRequest();
         createOrderedAdditionalServiceListRequest.setAdditionalServiceIds(additionalServiceIds);
@@ -517,12 +523,27 @@ public class RentManager implements RentService {
     public Result delete(DeleteRentRequest deleteRentalCarRequest) throws BusinessException {
 
         checkIfRentExists(deleteRentalCarRequest.getRentId());
+        checkIfThereIsOrderedAdditionalServiceWithThisRent(deleteRentalCarRequest.getRentId());
+        checkIfThereIsInvoiceWithThisRent(deleteRentalCarRequest.getRentId());
 
         Rent rentalCar = this.modelMapperService.forRequest().map(deleteRentalCarRequest, Rent.class);
 
         this.rentDao.deleteById(rentalCar.getRentId());
 
         return new SuccessResult(deleteRentalCarRequest.getRentId() + BusinessMessages.RENT_DELETE);
+    }
+
+    private void checkIfThereIsInvoiceWithThisRent(int rentId) throws BusinessException {
+        if(!this.invoiceService.getByRent_RentId(rentId).getData().isEmpty()){
+            throw new BusinessException("Bu kiraya karşılık gelen fatura mevcuttur. Bu yüzden kiralama silinemiyor");
+        }
+    }
+
+    private void checkIfThereIsOrderedAdditionalServiceWithThisRent(int rentId) throws BusinessException {
+
+        if(!this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData().isEmpty()){
+            throw new BusinessException("Bu kiraya karşılık gelen sipariş edilen ek hizmetler mevcuttur. Bu yüzden kiralama silinemiyor");
+        }
     }
 
     @Override

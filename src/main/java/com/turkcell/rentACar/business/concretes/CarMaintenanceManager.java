@@ -156,6 +156,18 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	}
 
 	@Override
+	public DataResult<List<CarMaintenanceListDto>> getByCar_CarId(int carId) {
+
+		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
+
+		List<CarMaintenanceListDto> response = result.stream().map(
+						carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response);
+	}
+
+	@Override
 	public Result update(int carMaintenanceId, UpdateCarMaintenanceRequest updateCarMaintenanceRequest)
 			throws BusinessException {
 
@@ -236,37 +248,6 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<CarMaintenanceListDto>>(response);
-	}
-
-	@Override
-	public List<CarMaintenanceListDto> getAllCarMaintenanceByCarId(int carId) {
-
-		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
-
-		if (result.isEmpty()) {
-			return null;
-		}
-		List<CarMaintenanceListDto> response = result.stream().map(
-				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
-				.collect(Collectors.toList());
-
-		return response;
-	}
-
-	@Override
-	public List<CarMaintenanceListDto> getByCar_CarId(int carId) {
-
-		List<CarMaintenance> result = this.carMaintenanceDao.getByCar_CarId(carId);
-
-		if (result.isEmpty()) {
-			return null;
-		}
-
-		List<CarMaintenanceListDto> response = result.stream()
-				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, CarMaintenanceListDto.class))
-				.collect(Collectors.toList());
-
-		return response;
 	}
 
 }

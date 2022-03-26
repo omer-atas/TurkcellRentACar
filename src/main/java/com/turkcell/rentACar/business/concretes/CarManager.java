@@ -4,17 +4,15 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-import com.turkcell.rentACar.business.abstracts.CityService;
+import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.turkcell.rentACar.business.abstracts.BrandService;
-import com.turkcell.rentACar.business.abstracts.CarService;
-import com.turkcell.rentACar.business.abstracts.ColorService;
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carDtos.CarListDto;
 import com.turkcell.rentACar.business.request.carRequests.CreateCarRequest;
@@ -33,19 +31,27 @@ import com.turkcell.rentACar.entities.concretes.Car;
 @Service
 public class CarManager implements CarService {
 
-    private CarDao carDao;
-    private ModelMapperService modelMapperService;
-    private BrandService brandService;
-    private ColorService colorService;
-    private CityService cityService;
+    private final CarDao carDao;
+    private final ModelMapperService modelMapperService;
+    private final BrandService brandService;
+    private final ColorService colorService;
+    private final CityService cityService;
+    private CarCrashInformationService carCrashInformationService;
+    private RentService rentService;
+    private CarMaintenanceService carMaintenanceService;
 
+    @Lazy
     @Autowired
-    public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandService brandService, ColorService colorService, CityService cityService) {
+    public CarManager(CarDao carDao, ModelMapperService modelMapperService, BrandService brandService, ColorService colorService, CityService cityService,
+                      CarCrashInformationService carCrashInformationService,RentService rentService,CarMaintenanceService carMaintenanceService) {
         this.carDao = carDao;
         this.modelMapperService = modelMapperService;
         this.brandService = brandService;
         this.colorService = colorService;
         this.cityService = cityService;
+        this.carMaintenanceService = carMaintenanceService;
+        this.carCrashInformationService = carCrashInformationService;
+        this.rentService = rentService;
     }
 
     @Override
@@ -113,7 +119,27 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CAR_GET_ALL_PAGED);
+        return new SuccessDataResult<List<CarListDto>>(response, BusinessMessages.CAR_GET_ALL_PAGED);
+    }
+
+    @Override
+    public DataResult<List<CarListDto>> getByBrand_BrandId(int brandId) {
+
+        List<Car> result = this.carDao.getByBrand_BrandId(brandId);
+
+        List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
+
+        return new SuccessDataResult<List<CarListDto>>(response, "Belirli markaya sahip arabalar listelendi...");
+    }
+
+    @Override
+    public DataResult<List<CarListDto>> getByColor_ColorId(int colorId) {
+
+        List<Car> result = this.carDao.getByColor_ColorId(colorId);
+
+        List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
+
+        return new SuccessDataResult<List<CarListDto>>(response, "Belirli renge sahip arabalar listelendi...");
     }
 
     @Override
@@ -125,7 +151,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CAR_GET_ALL_SORTED);
+        return new SuccessDataResult<List<CarListDto>>(response, BusinessMessages.CAR_GET_ALL_SORTED);
     }
 
     @Override
@@ -176,6 +202,9 @@ public class CarManager implements CarService {
     public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
 
         checkIfCarExists(deleteCarRequest.getCarId());
+        checkIfThereIsACarMaintenanceWithThisCar(deleteCarRequest.getCarId());
+        checkIfThereIsACarCrashInformationWithThisCar(deleteCarRequest.getCarId());
+        checkIfThereIsARentWithThisCar(deleteCarRequest.getCarId());
 
         Car car = this.modelMapperService.forRequest().map(deleteCarRequest, Car.class);
 
@@ -183,6 +212,25 @@ public class CarManager implements CarService {
 
         return new SuccessResult(deleteCarRequest.getCarId() + BusinessMessages.CAR_DELETE);
 
+    }
+
+    private void checkIfThereIsACarCrashInformationWithThisCar(int carId) throws BusinessException {
+
+        if(!this.carCrashInformationService.getByCar_CarId(carId).getData().isEmpty()){
+            throw new BusinessException(BusinessMessages.IS_THERE_A_CAR_OF_CAR_CRASH_INFORMATION_AVAILABLE);
+        }
+    }
+
+    private void checkIfThereIsARentWithThisCar(int carId) throws BusinessException {
+        if(!this.rentService.getByCar_CarId(carId).isEmpty()){
+            throw new BusinessException(BusinessMessages.IS_THERE_A_CAR_OF_RENT_AVAILABLE);
+        }
+    }
+
+    private void checkIfThereIsACarMaintenanceWithThisCar(int carId) throws BusinessException {
+        if(!this.carMaintenanceService.getByCar_CarId(carId).getData().isEmpty()){
+            throw new BusinessException(BusinessMessages.IS_THERE_A_CAR_OF_CAR_MAINTENANCE_AVAILABLE);
+        }
     }
 
     @Override

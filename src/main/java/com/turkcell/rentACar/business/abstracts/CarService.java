@@ -2,6 +2,7 @@ package com.turkcell.rentACar.business.abstracts;
 
 import java.util.List;
 
+import com.turkcell.rentACar.entities.concretes.Car;
 import org.springframework.data.domain.Sort;
 
 import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
@@ -22,6 +23,10 @@ public interface CarService {
 	DataResult<List<CarListDto>> getAll();
 
 	DataResult<List<CarListDto>> getAllPaged(int pageNo, int pageSize);
+
+	DataResult<List<CarListDto>> getByBrand_BrandId(int brandId);
+
+	DataResult<List<CarListDto>> getByColor_ColorId(int colorId);
 
 	DataResult<List<CarListDto>> getAllSorted(Sort.Direction direction);
 

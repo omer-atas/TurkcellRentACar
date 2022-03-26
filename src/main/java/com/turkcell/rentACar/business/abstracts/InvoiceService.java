@@ -19,7 +19,7 @@ public interface InvoiceService {
 
     DataResult<InvoiceGetDto> getByInvoiceId(int invoiceId);
 
-    DataResult<InvoiceGetDto> getByRent_RentId(int rentId);
+    DataResult<List<InvoiceListDto>> getByRent_RentId(int rentId);
 
     DataResult<List<InvoiceListDto>> getByRent_Customer_CustomerId(int customerId);
 

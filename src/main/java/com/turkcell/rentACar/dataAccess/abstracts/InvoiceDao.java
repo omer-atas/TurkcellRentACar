@@ -15,7 +15,7 @@ public interface InvoiceDao extends JpaRepository<Invoice,Integer> {
 
     boolean existsByInvoiceNo(String invoiceNo);
 
-    Invoice getByRent_RentId(int rentId);
+    List<Invoice> getByRent_RentId(int rentId);
 
     List<Invoice> getByRent_Customer_CustomerId(int customerId);
 

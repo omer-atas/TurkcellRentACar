@@ -71,6 +71,18 @@ public class CarCrashInformationManager implements CarCrashInformationService {
     }
 
     @Override
+    public DataResult<List<CarCrashInformationListDto>> getByCar_CarId(int carId) {
+
+        List<CarCrashInformation> result = this.carCrashInformationDao.getByCar_CarId(carId);
+
+        List<CarCrashInformationListDto> response = result.stream()
+                .map(carCrashInformation -> this.modelMapperService.forDto().map(carCrashInformation, CarCrashInformationListDto.class))
+                .collect(Collectors.toList());
+
+        return new SuccessDataResult<List<CarCrashInformationListDto>>(response);
+    }
+
+    @Override
     public DataResult<List<CarCrashInformationListDto>> getAll() {
 
         List<CarCrashInformation> result = this.carCrashInformationDao.findAll();

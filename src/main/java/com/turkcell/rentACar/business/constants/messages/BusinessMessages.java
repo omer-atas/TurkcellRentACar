@@ -12,6 +12,7 @@ public class BusinessMessages {
     public static final String ADDITIONAL_SERVİCE_GET_ALL = "AdditionalServices Listed Successfully";
     public static final String ADDITIONAL_SERVİCE_GET_ALL_PAGED = "AdditionalServices Listed Page Successfully";
     public static final String ADDITIONAL_SERVİCE_GET_ALL_SORTED = "AdditionalServices Listed Sorted Successfully";
+    public static final String IS_THERE_A_ADDITIONAL_SERVİCE_OF_ORDERED_ADDITIONAL_SERVICES_AVALIABLE="There are rentals ordered that have this additional service. So the additional service cannot be deleted";
 
     //Brand
     public static final String BRAND_ADD = "Brand added : ";
@@ -23,6 +24,7 @@ public class BusinessMessages {
     public static final String BRAND_GET_ALL = "Brands Listed Successfully";
     public static final String BRAND_GET_ALL_PAGED = "Brands Listed Page Successfully";
     public static final String BRAND_GET_ALL_SORTED = "Brands Listed Sorted Successfully";
+    public static final String IS_THERE_A_BRAND_OF_CAR_AVAILABLE = "There is a car brand corresponding to this brand. Therefore, the deletion cannot be performed...";
 
     //Car Crash Information
     public static final String CAR_CRASH_INFORMATION_ADD = "Car Crash Information added : ";
@@ -58,6 +60,9 @@ public class BusinessMessages {
     public static final String CAR_GET_ALL_SORTED = "Cars Listed Sorted Successfully";
     public static final String CAR_FIND_BY_DAILY_PRICE_LESS_THAN_EQUAL_NOT_FOUND = "findByDailyPriceLessThanEqual not list";
     public static final String CAR_FIND_BY_DAILY_PRICE_LESS_THAN_EQUAL = "findByDailyPriceLessThanEqual Listed Sorted Successfully";
+    public static final String IS_THERE_A_CAR_OF_CAR_CRASH_INFORMATION_AVAILABLE = "There is damage information of this car. Therefore, it cannot be deleted. (Damage records of the car must be deleted first.)";
+    public static final String IS_THERE_A_CAR_OF_RENT_AVAILABLE ="There is a rental for this car. Therefore it cannot be deleted. (Leases belonging to the car must be deleted first)";
+    public static final String IS_THERE_A_CAR_OF_CAR_MAINTENANCE_AVAILABLE ="There are maintenances for this car. Therefore, it cannot be deleted. (Car maintenance must be deleted first)";
 
     //Color
     public static final String COLOR_ADD = "Color added : ";
@@ -69,6 +74,7 @@ public class BusinessMessages {
     public static final String COLOR_GET_ALL = "Colors Listed Successfully";
     public static final String COLOR_GET_ALL_PAGED = "Colors Listed Page Successfully";
     public static final String COLOR_GET_ALL_SORTED = "Colors Listed Sorted Successfully";
+    public static final String IS_THERE_A_COLOR_OF_CAR_AVAILABLE = "There are cars with this color. Therefore, the deletion cannot be performed...";
 
     // CorporateCustomer
     public static final String CORPORATE_CUSTOMER_ADD = "CorporateCustomer added : ";
@@ -144,6 +150,9 @@ public class BusinessMessages {
     public static final String CUSTOMER_NOT_FOUND ="The customer with this ID is not available";
     public static final String RENT_TO_CITY_NOT_FOUND ="The city with this ID is not available - toCity";
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
+    public static final String RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER= "Necessary structures have been created for individual customer late delivery.";
+    public static final String RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER="Necessary structures have been created for commercial customer late delivery.";
+    public static final String RENT_DELAY_END_DATE_CHECK = "The return date is the same as the system";
 
     //Credit Card Information
     public static final String CREDIT_CARD_INFORMATION_ADD = "Credit Card Added Successfully : ";

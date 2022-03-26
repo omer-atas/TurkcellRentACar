@@ -9,6 +9,7 @@ import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.U
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
+import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
@@ -27,6 +28,8 @@ public interface OrderedAdditionalServiceService {
     DataResult<OrderedAdditionalServiceGetDto> getByOrderedAdditionalServiceId(int orderedAdditionalServiceId);
 
     DataResult<List<OrderedAdditionalServiceListDto>> getByRent_RentId(int rentId);
+
+    DataResult<List<OrderedAdditionalServiceListDto>>getByAdditionalService_AdditionalServiceId(int additionalServiceId);
 
     Result update(int orderedAdditionalServiceId, UpdateOrderedAdditionalServiceRequest updateOrderedAdditionalServiceRequest) throws BusinessException;
 

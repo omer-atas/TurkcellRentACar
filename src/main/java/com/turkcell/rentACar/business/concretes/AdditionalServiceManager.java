@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
+import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceGetDto;
 import com.turkcell.rentACar.business.dtos.additionalServiceDtos.AdditionalServiceListDto;
@@ -26,11 +27,13 @@ public class AdditionalServiceManager implements AdditionalServiceService {
 
     private AdditionalServiceDao additionalServiceDao;
     private ModelMapperService modelMapperService;
+    private OrderedAdditionalServiceService orderedAdditionalServiceService;
 
     @Autowired
-    public AdditionalServiceManager(AdditionalServiceDao additionalServiceDao, ModelMapperService modelMapperService) {
+    public AdditionalServiceManager(AdditionalServiceDao additionalServiceDao, ModelMapperService modelMapperService,OrderedAdditionalServiceService orderedAdditionalServiceService) {
         this.additionalServiceDao = additionalServiceDao;
         this.modelMapperService = modelMapperService;
+        this.orderedAdditionalServiceService = orderedAdditionalServiceService;
     }
 
     @Override
@@ -122,12 +125,20 @@ public class AdditionalServiceManager implements AdditionalServiceService {
     public Result delete(DeleteAdditionalServiceRequest deleteAdditionalServiceRequest) throws BusinessException {
 
         checkIfAdditionalServiceExists(deleteAdditionalServiceRequest.getAdditionalServiceId());
-        
+        checkIfThereIsOrderedAdditionalServiceWithThisAdditionalService(deleteAdditionalServiceRequest.getAdditionalServiceId());
+
         AdditionalService additionalService = this.modelMapperService.forRequest().map(deleteAdditionalServiceRequest, AdditionalService.class);
 
         this.additionalServiceDao.deleteById(additionalService.getAdditionalServiceId());
 
         return new SuccessResult(deleteAdditionalServiceRequest.getAdditionalServiceId() + BusinessMessages.ADDITIONAL_SERVICE_DELETE);
+    }
+
+    private void checkIfThereIsOrderedAdditionalServiceWithThisAdditionalService(int additionalServiceId) throws BusinessException {
+
+        if(!this.orderedAdditionalServiceService.getByAdditionalService_AdditionalServiceId(additionalServiceId).getData().isEmpty()){
+            throw new BusinessException(BusinessMessages.IS_THERE_A_ADDITIONAL_SERVİCE_OF_ORDERED_ADDITIONAL_SERVICES_AVALIABLE);
+        }
     }
 
     private void checkIfAdditionalServiceExists(int additionalServiceId) throws BusinessException {

@@ -80,7 +80,7 @@ public class InvoiceManager implements InvoiceService {
             }
         }
 
-        return totalAdditionalServicesPrice;
+        return  totalAdditionalServicesPrice;
     }
 
     @Override
@@ -89,7 +89,6 @@ public class InvoiceManager implements InvoiceService {
         double rentedCarTotalPrice = 0, totalAdditionalServicesPrice = 0, totalpayment, citySwapPrice = 750.00;
 
         totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(rentId) * this.orderedAdditionalServiceService.findNoOfDaysBetween(startDate, endDate);
-        System.out.println(totalAdditionalServicesPrice);
         rentedCarTotalPrice += this.rentService.getByRentId(rentId).getData().getRentalPriceOfTheCar();
 
         if (this.rentService.getByRentId(rentId).getData().getToCityId() != this.rentService.getByRentId(rentId).getData().getFromCityId()) {
@@ -131,18 +130,15 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<InvoiceGetDto> getByRent_RentId(int rentId) {
+    public  DataResult<List<InvoiceListDto>> getByRent_RentId(int rentId) {
 
-        Invoice result = this.invoiceDao.getByRent_RentId(rentId);
+        List<Invoice> result = this.invoiceDao.getByRent_RentId(rentId);
 
-        if (result == null) {
-            return new ErrorDataResult<InvoiceGetDto>(BusinessMessages.INVOICE_RENT_NOT_FOUND);
-        }
+        List<InvoiceListDto> response = result.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
 
-        InvoiceGetDto response = this.modelMapperService.forDto().map(result, InvoiceGetDto.class);
+        response = manuelMappingForGetAll(result, response);
 
-
-        return new SuccessDataResult<InvoiceGetDto>(response, BusinessMessages.INVOICE_GET_BY_RENT_ID);
+        return new SuccessDataResult<List<InvoiceListDto>>(response);
     }
 
     @Override

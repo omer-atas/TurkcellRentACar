@@ -25,7 +25,7 @@ public class Brand {
 	@Column(name = "brand_name", unique = true)
 	private String brandName;
 	
-	@OneToMany(mappedBy = "brand",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "brand")
 	private List<Car> cars;
 
 }

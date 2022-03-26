@@ -34,8 +34,6 @@ public interface CarMaintenanceService {
 
 	boolean checkIfCarMaintenanceExists(int carMaintenanceId) throws BusinessException;
 
-	List<CarMaintenanceListDto> getAllCarMaintenanceByCarId(int carId);
-
-	List<CarMaintenanceListDto> getByCar_CarId(int carId);
+	DataResult<List<CarMaintenanceListDto>> getByCar_CarId(int carId);
 
 }

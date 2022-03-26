@@ -8,6 +8,7 @@ import com.turkcell.rentACar.business.request.carCrashInformationRequests.Update
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
+import com.turkcell.rentACar.entities.concretes.CarCrashInformation;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface CarCrashInformationService {
     Result add(CreateCarCrashInformationRequest createCarCrashInformationRequest) throws BusinessException;
 
     DataResult<CarCrashInformationGetDto> getByCarCrashInformationId(int carCrashInformationId);
+
+    DataResult<List<CarCrashInformationListDto>> getByCar_CarId(int carId);
 
     DataResult<List<CarCrashInformationListDto>> getAll();
 

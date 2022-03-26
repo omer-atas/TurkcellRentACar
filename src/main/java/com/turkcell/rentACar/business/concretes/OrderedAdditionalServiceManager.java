@@ -49,16 +49,19 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
         checkIfAdditionalServiceExists(additionalServiceIds);
         checkIfRentExists(rentId);
 
-        for (int additionalServiceId:additionalServiceIds){
+        if (!additionalServiceIds.isEmpty()) {
+            for (int additionalServiceId : additionalServiceIds) {
 
-            CreateOrderedAdditionalServiceRequest orderedAdditionalServiceRequest = new CreateOrderedAdditionalServiceRequest();
-            orderedAdditionalServiceRequest.setAdditionalServiceId(additionalServiceId);
-            orderedAdditionalServiceRequest.setRentId(rentId);
+                CreateOrderedAdditionalServiceRequest orderedAdditionalServiceRequest = new CreateOrderedAdditionalServiceRequest();
+                orderedAdditionalServiceRequest.setAdditionalServiceId(additionalServiceId);
+                orderedAdditionalServiceRequest.setRentId(rentId);
 
-            OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forDto().map(orderedAdditionalServiceRequest,OrderedAdditionalService.class);
-            orderedAdditionalService.setOrderedAdditionalServiceId(0);
-            this.orderedAdditionalServiceDao.save(orderedAdditionalService);
+                OrderedAdditionalService orderedAdditionalService = this.modelMapperService.forDto().map(orderedAdditionalServiceRequest, OrderedAdditionalService.class);
+                orderedAdditionalService.setOrderedAdditionalServiceId(0);
+                this.orderedAdditionalServiceDao.save(orderedAdditionalService);
+            }
         }
+
     }
 
     @Override
@@ -71,7 +74,7 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
 
 
     private void checkIfAdditionalServiceExists(List<Integer> additionalServiceIds) throws BusinessException {
-        for(int additionalServiceId:additionalServiceIds){
+        for (int additionalServiceId : additionalServiceIds) {
             if (this.additionalServiceService.getByAdditionalServiceId(additionalServiceId).getData() == null) {
                 throw new BusinessException(BusinessMessages.ADDITIONAL_SERVICE_NOT_FOUND);
             }
@@ -140,6 +143,21 @@ public class OrderedAdditionalServiceManager implements OrderedAdditionalService
     public DataResult<List<OrderedAdditionalServiceListDto>> getByRent_RentId(int rentId) {
 
         List<OrderedAdditionalService> result = this.orderedAdditionalServiceDao.getByRent_RentId(rentId);
+
+        if (result.isEmpty()) {
+            return new ErrorDataResult<List<OrderedAdditionalServiceListDto>>(BusinessMessages.ORDERED_ADDITIONAL_SERVICE_RENT_NOT_FOUND);
+        }
+
+        List<OrderedAdditionalServiceListDto> response = result.stream().map(orderedAdditionalService -> this.modelMapperService.forDto().map(orderedAdditionalService, OrderedAdditionalServiceListDto.class)).collect(Collectors.toList());
+
+
+        return new SuccessDataResult<List<OrderedAdditionalServiceListDto>>(response);
+    }
+
+    @Override
+    public DataResult<List<OrderedAdditionalServiceListDto>> getByAdditionalService_AdditionalServiceId(int additionalServiceId) {
+
+        List<OrderedAdditionalService> result = this.orderedAdditionalServiceDao.getByAdditionalService_AdditionalServiceId(additionalServiceId);
 
         if (result.isEmpty()) {
             return new ErrorDataResult<List<OrderedAdditionalServiceListDto>>(BusinessMessages.ORDERED_ADDITIONAL_SERVICE_RENT_NOT_FOUND);

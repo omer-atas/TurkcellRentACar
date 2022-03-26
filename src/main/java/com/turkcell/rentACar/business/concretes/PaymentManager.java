@@ -93,13 +93,21 @@ public class PaymentManager implements PaymentService {
     @Transactional
     public void runPaymentSuccessor(PaymentPostServiceModal paymentPostServiceModal, int rentId) throws BusinessException {
 
+        System.out.println(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds());
+
         //add ordered additonal service
-        this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
+
+        if (!paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().isEmpty() ||
+                paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds() != null ||
+                paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().get(0) != 0) {
+            this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
+        }
 
         //add invoice
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
         createInvoiceRequest.setRentId(rentId);
+        // create unique invoice no
         createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size() + 10));
 
         int invoiceId = this.invoiceService.add(createInvoiceRequest);
