@@ -4,7 +4,6 @@ import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.PaymentService;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentListDto;
-import com.turkcell.rentACar.business.request.paymentRequests.CreatePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.DeletePaymentRequest;
 import com.turkcell.rentACar.business.request.paymentRequests.UpdatePaymentRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;

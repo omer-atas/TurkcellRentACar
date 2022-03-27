@@ -129,7 +129,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response, "Belirli markaya sahip arabalar listelendi...");
+        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CARS_WITH_CAR_BRAND_SENT_ID);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class CarManager implements CarService {
 
         List<CarListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CarListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CarListDto>>(response, "Belirli renge sahip arabalar listelendi...");
+        return new SuccessDataResult<List<CarListDto>>(response,BusinessMessages.CARS_WITH_CAR_COLOR_SENT_ID);
     }
 
     @Override

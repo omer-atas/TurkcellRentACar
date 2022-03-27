@@ -63,6 +63,8 @@ public class BusinessMessages {
     public static final String IS_THERE_A_CAR_OF_CAR_CRASH_INFORMATION_AVAILABLE = "There is damage information of this car. Therefore, it cannot be deleted. (Damage records of the car must be deleted first.)";
     public static final String IS_THERE_A_CAR_OF_RENT_AVAILABLE ="There is a rental for this car. Therefore it cannot be deleted. (Leases belonging to the car must be deleted first)";
     public static final String IS_THERE_A_CAR_OF_CAR_MAINTENANCE_AVAILABLE ="There are maintenances for this car. Therefore, it cannot be deleted. (Car maintenance must be deleted first)";
+    public static final String CARS_WITH_CAR_COLOR_SENT_ID ="Cars with specific color are listed";
+    public static final String CARS_WITH_CAR_BRAND_SENT_ID  ="Cars with car brand sent id are listed";
 
     //Color
     public static final String COLOR_ADD = "Color added : ";
@@ -152,6 +154,8 @@ public class BusinessMessages {
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
     public static final String RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER= "Necessary structures have been created for individual customer late delivery.";
     public static final String RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER="Necessary structures have been created for commercial customer late delivery.";
+    public static final String IS_THE_INVOICE_AVAILABLE_FOR_THIS_RENTAL = "There is an invoice corresponding to this rental. Therefore, the lease cannot be deleted";
+    public static final String IS_THE_ORDERED_ADDITIONAL_SERVICE_AVAILABLE_FOR_THIS_RENTAL = "There are additional services ordered corresponding to this lease. Therefore, the lease cannot be deleted";
     public static final String RENT_DELAY_END_DATE_CHECK = "The return date is the same as the system";
 
     //Credit Card Information

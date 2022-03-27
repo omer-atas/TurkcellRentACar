@@ -8,7 +8,6 @@ import com.turkcell.rentACar.business.dtos.carDtos.CarGetDto;
 import com.turkcell.rentACar.business.dtos.carMaintenanceDtos.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
-import com.turkcell.rentACar.business.dtos.orderedAdditionalServiceDtos.OrderedAdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
 import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
@@ -451,7 +450,7 @@ public class RentManager implements RentService {
         }
     }
 
-    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId){
+    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId) {
 
         List<Integer> additionalServiceIds = new ArrayList<Integer>();
 
@@ -465,7 +464,6 @@ public class RentManager implements RentService {
                 additionalServiceIds.add(id);
             }
         }
-
 
 
         CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = new CreateOrderedAdditionalServiceListRequest();
@@ -534,15 +532,15 @@ public class RentManager implements RentService {
     }
 
     private void checkIfThereIsInvoiceWithThisRent(int rentId) throws BusinessException {
-        if(!this.invoiceService.getByRent_RentId(rentId).getData().isEmpty()){
-            throw new BusinessException("Bu kiraya karşılık gelen fatura mevcuttur. Bu yüzden kiralama silinemiyor");
+        if (!this.invoiceService.getByRent_RentId(rentId).getData().isEmpty()) {
+            throw new BusinessException(BusinessMessages.IS_THE_INVOICE_AVAILABLE_FOR_THIS_RENTAL);
         }
     }
 
     private void checkIfThereIsOrderedAdditionalServiceWithThisRent(int rentId) throws BusinessException {
 
-        if(!this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData().isEmpty()){
-            throw new BusinessException("Bu kiraya karşılık gelen sipariş edilen ek hizmetler mevcuttur. Bu yüzden kiralama silinemiyor");
+        if (!this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData().isEmpty()) {
+            throw new BusinessException(BusinessMessages.IS_THE_ORDERED_ADDITIONAL_SERVICE_AVAILABLE_FOR_THIS_RENTAL);
         }
     }
 

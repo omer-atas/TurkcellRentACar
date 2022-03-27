@@ -57,11 +57,15 @@ public class PaymentManager implements PaymentService {
         this.rentService.checkIfIndividualCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
 
         checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
-
-        int rentId = createRentForIndıvıdualCustomer(paymentPostServiceModal.getCreateRentRequest());
-        runPaymentSuccessor(paymentPostServiceModal, rentId);
+        runPaymentSuccessorIndıvıdualCustomer(paymentPostServiceModal);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Transactional
+    public void runPaymentSuccessorIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+        int rentId = createRentForIndıvıdualCustomer(paymentPostServiceModal.getCreateRentRequest());
+        runPaymentSuccessor(paymentPostServiceModal, rentId);
     }
 
     private int createRentForIndıvıdualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
@@ -77,11 +81,15 @@ public class PaymentManager implements PaymentService {
         this.rentService.checkIfCorporateCustomerExists(paymentPostServiceModal.getCreateRentRequest().getCustomerId());
 
         checkIfMakePayment(paymentPostServiceModal.getCreateCreditCardRequest());
-
-        int rentId = createRentForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
-        runPaymentSuccessor(paymentPostServiceModal, rentId);
+        runPaymentSuccessorCorporateCustomer(paymentPostServiceModal);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Transactional
+    public void runPaymentSuccessorCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
+        int rentId = createRentForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
+        runPaymentSuccessor(paymentPostServiceModal, rentId);
     }
 
     private int createRentForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
@@ -95,11 +103,8 @@ public class PaymentManager implements PaymentService {
 
         System.out.println(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds());
 
-        //add ordered additonal service
-
-        if (!paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().isEmpty() ||
-                paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds() != null ||
-                paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().get(0) != 0) {
+        //add ordered additonal services
+        if (!paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().isEmpty() || paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds() != null || paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().get(0) != 0) {
             this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
         }
 
