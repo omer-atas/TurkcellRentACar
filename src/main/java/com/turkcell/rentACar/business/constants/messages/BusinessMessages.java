@@ -161,11 +161,11 @@ public class BusinessMessages {
     //Credit Card Information
     public static final String CREDIT_CARD_INFORMATION_ADD = "Credit Card Added Successfully : ";
     public static final String CREDIT_CARD_INFORMATION_NOT_FOUND = "Credit Card Not Found";
+    public static final String CREDIT_CARD_GET_ALL = "Credit card Listed Successfully";
     public static final String CREDIT_CARD_INFORMATION_GET_BY_ID = "Credit card information brought";
     public static final String CUSTOMER_CREDIT_CARD_INFORMATION_NOT_FOUND = "Customer credit card not found";
     public static final String CUSTOMER_CREDIT_CARD_INFORMATION_LISTED = "Customer credit cards listed";
     public static final String CREDIT_CARD_INFORMATION_DELETE = "Credit Cart Delted";
-    public static final String RENT_UPDATE_END_DATE_CONTROL = "Return date cannot be earlier than old value when updating";
 
     //User
     public static final String USER_EMAİL_EXİSTS = "There is a user with this email";

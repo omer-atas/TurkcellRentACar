@@ -72,7 +72,7 @@ public class CreditCardInformationManager implements CreditCardInformationServic
 
         List<CreditCardInformationListDto> response = result.stream().map(color -> this.modelMapperService.forDto().map(color, CreditCardInformationListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<List<CreditCardInformationListDto>>(response, BusinessMessages.CAR_GET_ALL);
+        return new SuccessDataResult<List<CreditCardInformationListDto>>(response, BusinessMessages.CREDIT_CARD_GET_ALL);
     }
 
     @Override
