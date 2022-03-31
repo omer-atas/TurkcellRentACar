@@ -104,7 +104,7 @@ public class PaymentManager implements PaymentService {
         System.out.println(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds());
 
         //add ordered additonal services
-        if (!paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().isEmpty() || paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds() != null || paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().get(0) != 0) {
+        if (!paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds().isEmpty() || paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds() != null) {
             this.orderedAdditionalServiceService.addOrderedAdditionalServiceForPayment(paymentPostServiceModal.getCreateOrderedAdditionalServiceListRequests().getAdditionalServiceIds(), rentId);
         }
 

@@ -383,6 +383,7 @@ public class RentManager implements RentService {
     @Override
     public Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
+        checkIfRentExists(rentId);
         checkIfIndividualCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
 
         Rent rent = this.rentDao.getByRentId(rentId);
@@ -413,6 +414,7 @@ public class RentManager implements RentService {
     @Override
     public Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
+        checkIfRentExists(rentId);
         checkIfCorporateCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
 
         Rent rent = this.rentDao.getByRentId(rentId);

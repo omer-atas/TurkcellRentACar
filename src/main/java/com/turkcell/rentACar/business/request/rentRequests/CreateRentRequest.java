@@ -17,8 +17,10 @@ public class CreateRentRequest {
 
 	private LocalDate endDate;
 
+	@Positive
 	private int fromCityId;
 
+	@Positive
 	private int toCityId;
 
 	@Positive
