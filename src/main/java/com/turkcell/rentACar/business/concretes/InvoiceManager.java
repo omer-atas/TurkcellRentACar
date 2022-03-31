@@ -31,14 +31,17 @@ public class InvoiceManager implements InvoiceService {
     private final RentService rentService;
     private final OrderedAdditionalServiceService orderedAdditionalServiceService;
     private final AdditionalServiceService additionalServiceService;
+    private CarService carService;
 
     @Autowired
-    public InvoiceManager(InvoiceDao invoiceDao, ModelMapperService modelMapperService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, AdditionalServiceService additionalServiceService) {
+    public InvoiceManager(InvoiceDao invoiceDao, ModelMapperService modelMapperService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, AdditionalServiceService additionalServiceService,
+                          CarService carService) {
         this.invoiceDao = invoiceDao;
         this.modelMapperService = modelMapperService;
         this.rentService = rentService;
         this.orderedAdditionalServiceService = orderedAdditionalServiceService;
         this.additionalServiceService = additionalServiceService;
+        this.carService = carService;
     }
 
     @Override
@@ -50,12 +53,9 @@ public class InvoiceManager implements InvoiceService {
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
         invoice.setInvoiceId(0);
-        invoice.setTotalPayment(calculationTotalPayment(createInvoiceRequest.getRentId(), this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getStartingDate(), this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getEndDate()));
+        invoice.setTotalPayment(calculationTotalPayment(createInvoiceRequest.getRentId(), createInvoiceRequest.getStartingDate(),createInvoiceRequest.getEndDate()));
         invoice.setCreationDate(LocalDate.now());
-        invoice.setStartingDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getStartingDate());
-        invoice.setEndDate(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getEndDate());
-        invoice.setTotalRentCarPrice(this.rentService.getByRentId(createInvoiceRequest.getRentId()).getData().getRentalPriceOfTheCar());
-        invoice.setRentDay(this.orderedAdditionalServiceService.findNoOfDaysBetween(invoice.getStartingDate(), invoice.getEndDate()));
+        invoice.setRentDay(this.orderedAdditionalServiceService.findNoOfDaysBetween(createInvoiceRequest.getStartingDate(), createInvoiceRequest.getEndDate()));
 
         this.invoiceDao.save(invoice);
 
@@ -86,10 +86,18 @@ public class InvoiceManager implements InvoiceService {
     @Override
     public double calculationTotalPayment(int rentId, LocalDate startDate, LocalDate endDate) {
 
-        double rentedCarTotalPrice = 0, totalAdditionalServicesPrice = 0, totalpayment, citySwapPrice = 750.00;
+        System.out.println(startDate);
+        System.out.println(endDate);
+
+        double rentedCarTotalPrice=0, totalAdditionalServicesPrice = 0, totalpayment = 0, citySwapPrice = 750.00;
 
         totalAdditionalServicesPrice += sumOfAdditionalServicesPrice(rentId) * this.orderedAdditionalServiceService.findNoOfDaysBetween(startDate, endDate);
-        rentedCarTotalPrice += this.rentService.getByRentId(rentId).getData().getRentalPriceOfTheCar();
+
+        rentedCarTotalPrice += this.rentService.calculatorRentalPriceOfTheCar(
+                this.rentService.getByRentId(rentId).getData().getCarId(),
+                startDate,
+                endDate
+        );
 
         if (this.rentService.getByRentId(rentId).getData().getToCityId() != this.rentService.getByRentId(rentId).getData().getFromCityId()) {
             totalpayment = totalAdditionalServicesPrice + rentedCarTotalPrice + citySwapPrice;

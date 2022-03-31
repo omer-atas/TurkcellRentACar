@@ -23,5 +23,5 @@ public class UpdateInvoiceRequest {
     private double rentDay;
 
     @Positive
-    private int totalRentCarPrice;
+    private double totalRentCarPrice;
 }

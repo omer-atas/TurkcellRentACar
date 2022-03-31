@@ -1,6 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
 import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
+import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.paymentDtos.PaymentGetDto;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +38,10 @@ public class PaymentManager implements PaymentService {
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
     private final CustomerService customerService;
+    private CarService carService;
 
     @Autowired
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService, CustomerService customerService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService, CustomerService customerService,CarService carService) {
         this.paymentDao = paymentDao;
         this.modelMapperService = modelMapperService;
         this.invoiceService = invoiceService;
@@ -48,6 +51,7 @@ public class PaymentManager implements PaymentService {
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
         this.customerService = customerService;
+        this.carService = carService;
     }
 
     @Override
@@ -60,6 +64,84 @@ public class PaymentManager implements PaymentService {
         runPaymentSuccessorIndıvıdualCustomer(paymentPostServiceModal);
 
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Transactional
+    @Override
+    public Result gettingPaidForIndividualCustomerDelayEndDate(RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal,int rentId,double totalRentalPriceForTheDelayEndDateOfTheCar ) throws BusinessException {
+
+        this.rentService.checkIfCustomerExists(this.rentService.getByRentId(rentId).getData().getCustomerId());
+        this.rentService.checkIfIndividualCustomerExists(this.rentService.getByRentId(rentId).getData().getCustomerId());
+
+        checkIfMakePayment(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
+
+        //add invoice
+
+        LocalDate startingDate = this.rentService.getByRentId(rentId).getData().getEndDate();
+        LocalDate endDate = rentEndDateDelayPostServiceModal.getUpdateEndDate();
+        int invoiceId = this.createAnInvoice(rentId,startingDate,endDate,totalRentalPriceForTheDelayEndDateOfTheCar);
+
+        // add payment
+
+        checkIfPaymentForInvoice(invoiceId);
+
+        this.createPayment(invoiceId);
+
+        return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+    @Transactional
+    @Override
+    public Result gettingPaidForCorporateCustomerDelayEndDate(RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal, int rentId, double totalRentalPriceForTheDelayEndDateOfTheCar) throws BusinessException {
+
+        this.rentService.checkIfCustomerExists(this.rentService.getByRentId(rentId).getData().getCustomerId());
+        this.rentService.checkIfCorporateCustomerExists(this.rentService.getByRentId(rentId).getData().getCustomerId());
+
+        checkIfMakePayment(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
+
+        //add invoice
+
+        LocalDate startingDate = this.rentService.getByRentId(rentId).getData().getEndDate();
+        LocalDate endDate = rentEndDateDelayPostServiceModal.getUpdateEndDate();
+        int invoiceId = this.createAnInvoice(rentId,startingDate,endDate,totalRentalPriceForTheDelayEndDateOfTheCar);
+
+        // add payment
+
+        checkIfPaymentForInvoice(invoiceId);
+
+        this.createPayment(invoiceId);
+
+        return new SuccessResult(BusinessMessages.PAYMENT_ADD);
+    }
+
+
+    private void createPayment(int invoiceId){
+
+        CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+
+        createPaymentRequest.setInvoiceId(invoiceId);
+
+        Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
+        payment.setPaymentId(0);
+        payment.setAmount(this.invoiceService.getByInvoiceId(invoiceId).getData().getTotalPayment());
+
+        this.paymentDao.save(payment);
+    }
+
+    private int createAnInvoice(int rentId,LocalDate startingDate ,LocalDate endDate,double totalRentalPriceForTheDelayEndDateOfTheCar ) throws BusinessException {
+
+        CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
+        createInvoiceRequest.setRentId(rentId);
+        // create unique invoice no
+        createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size() + 10));
+        createInvoiceRequest.setStartingDate(startingDate);
+        createInvoiceRequest.setEndDate(endDate);
+
+        createInvoiceRequest.setTotalRentCarPrice(totalRentalPriceForTheDelayEndDateOfTheCar);
+
+        int invoiceId = this.invoiceService.add(createInvoiceRequest);
+
+        return  invoiceId;
     }
 
     @Transactional
@@ -114,20 +196,15 @@ public class PaymentManager implements PaymentService {
         createInvoiceRequest.setRentId(rentId);
         // create unique invoice no
         createInvoiceRequest.setInvoiceNo(String.valueOf(this.invoiceService.getAll().getData().size() + 10));
+        createInvoiceRequest.setStartingDate(this.rentService.getByRentId(rentId).getData().getStartingDate());
+        createInvoiceRequest.setEndDate(this.rentService.getByRentId(rentId).getData().getEndDate());
+
+        createInvoiceRequest.setTotalRentCarPrice(this.rentService.getByRentId(rentId).getData().getRentalPriceOfTheCar());
 
         int invoiceId = this.invoiceService.add(createInvoiceRequest);
 
         // add payment
-
-        checkIfPaymentForInvoice(invoiceId);
-        CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
-        createPaymentRequest.setInvoiceId(invoiceId);
-
-        Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
-        payment.setPaymentId(0);
-        payment.setAmount(this.invoiceService.getByInvoiceId(invoiceId).getData().getTotalPayment());
-
-        this.paymentDao.save(payment);
+        this.createPayment(invoiceId);
     }
 
     private void checkIfPaymentForInvoice(int invoiceId) throws BusinessException {

@@ -41,6 +41,8 @@ public interface RentService {
 
 	void checkIfCorporateCustomerExists(int customerId) throws BusinessException;
 
+	double calculatorRentalPriceOfTheCar(int carId, LocalDate startingDate, LocalDate endDate);
+
 	Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
 
 	Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;

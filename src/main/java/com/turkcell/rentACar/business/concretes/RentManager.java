@@ -1,6 +1,5 @@
 package com.turkcell.rentACar.business.concretes;
 
-import com.turkcell.rentACar.api.modals.PaymentPostServiceModal;
 import com.turkcell.rentACar.api.modals.RentEndDateDelayPostServiceModal;
 import com.turkcell.rentACar.business.abstracts.*;
 import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
@@ -10,8 +9,6 @@ import com.turkcell.rentACar.business.dtos.cityDtos.CityGetDto;
 import com.turkcell.rentACar.business.dtos.customerDtos.CustomerGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentGetDto;
 import com.turkcell.rentACar.business.dtos.rentDtos.RentListDto;
-import com.turkcell.rentACar.business.request.creditCartRequests.CreateCreditCardRequest;
-import com.turkcell.rentACar.business.request.orderedAdditionalServiceRequests.CreateOrderedAdditionalServiceListRequest;
 import com.turkcell.rentACar.business.request.rentRequests.CreateRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.DeleteRentRequest;
 import com.turkcell.rentACar.business.request.rentRequests.UpdateRentRequest;
@@ -28,8 +25,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,7 +91,8 @@ public class RentManager implements RentService {
         }
     }
 
-    private double calculatorRentalPriceOfTheCar(int carId, LocalDate startingDate, LocalDate endDate) {
+    @Override
+    public double calculatorRentalPriceOfTheCar(int carId, LocalDate startingDate, LocalDate endDate) {
         return this.carService.getByCarId(carId).getData().getDailyPrice() * this.orderedAdditionalServiceService.findNoOfDaysBetween(startingDate, endDate);
     }
 
@@ -380,6 +378,7 @@ public class RentManager implements RentService {
         return new SuccessResult(rentUpdate.getRentId() + BusinessMessages.RENT_UPDATE);
     }
 
+    @Transactional
     @Override
     public Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
@@ -392,29 +391,24 @@ public class RentManager implements RentService {
 
         this.carService.updateKilometerInformation(this.rentDao.getByRentId(rentId).getCar().getCarId(), rentEndDateDelayPostServiceModal.getReturnKilometer());
 
-        CreateRentRequest createRentRequest = this.createRentForEndDateDelay(rent, rentEndDateDelayPostServiceModal.getUpdateEndDate());
-        CreateCreditCardRequest createCreditCardRequest = this.createCreditCardForEndDateDelay(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
-        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = this.createOrderedAdditionalServicesForEndDateDelay(rentId);
+        double totalRentalPriceForTheDelayEndDateOfTheCar = calculatorRentalPriceOfTheCar(rent.getCar().getCarId(), rent.getEndDate(), rentEndDateDelayPostServiceModal.getUpdateEndDate());
 
-        this.createPaymentRentDelayEndDateForIndividualCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
+        double carRentalPrice = rent.getRentalPriceOfTheCar() + totalRentalPriceForTheDelayEndDateOfTheCar;
+
+
+        this.paymentService.gettingPaidForIndividualCustomerDelayEndDate(rentEndDateDelayPostServiceModal, rentId, totalRentalPriceForTheDelayEndDateOfTheCar);
+
+        rent.setRentalPriceOfTheCar(carRentalPrice);
+        rent.setEndDate(rentEndDateDelayPostServiceModal.getUpdateEndDate());
 
         return new SuccessResult(BusinessMessages.RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER);
     }
 
-    private void createPaymentRentDelayEndDateForIndividualCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
-
-        PaymentPostServiceModal paymentPostServiceModal = new PaymentPostServiceModal();
-        paymentPostServiceModal.setCreateRentRequest(createRentRequest);
-        paymentPostServiceModal.setCreateOrderedAdditionalServiceListRequests(createOrderedAdditionalServiceListRequest);
-        paymentPostServiceModal.setCreateCreditCardRequest(createCreditCardRequest);
-
-        this.paymentService.addForIndıvıdualCustomer(paymentPostServiceModal);
-    }
-
+    @Transactional
     @Override
     public Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
-        checkIfRentExists(rentId);
+        checkIfCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
         checkIfCorporateCustomerExists(this.rentDao.getByRentId(rentId).getCustomer().getCustomerId());
 
         Rent rent = this.rentDao.getByRentId(rentId);
@@ -423,23 +417,16 @@ public class RentManager implements RentService {
 
         this.carService.updateKilometerInformation(this.rentDao.getByRentId(rentId).getCar().getCarId(), rentEndDateDelayPostServiceModal.getReturnKilometer());
 
-        CreateRentRequest createRentRequest = this.createRentForEndDateDelay(rent, rentEndDateDelayPostServiceModal.getUpdateEndDate());
-        CreateCreditCardRequest createCreditCardRequest = this.createCreditCardForEndDateDelay(rentEndDateDelayPostServiceModal.getCreateCreditCardRequest());
-        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = this.createOrderedAdditionalServicesForEndDateDelay(rentId);
+        double totalRentalPriceForTheDelayEndDateOfTheCar = calculatorRentalPriceOfTheCar(rent.getCar().getCarId(), rent.getEndDate(), rentEndDateDelayPostServiceModal.getUpdateEndDate());
 
-        this.createPaymentRentDelayEndDateForCorporateCustomer(createRentRequest, createOrderedAdditionalServiceListRequest, createCreditCardRequest);
+        double carRentalPrice = rent.getRentalPriceOfTheCar() + totalRentalPriceForTheDelayEndDateOfTheCar;
+
+        this.paymentService.gettingPaidForCorporateCustomerDelayEndDate(rentEndDateDelayPostServiceModal, rentId, totalRentalPriceForTheDelayEndDateOfTheCar);
+
+        rent.setRentalPriceOfTheCar(carRentalPrice);
+        rent.setEndDate(rentEndDateDelayPostServiceModal.getUpdateEndDate());
 
         return new SuccessResult(BusinessMessages.RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER);
-    }
-
-    private void createPaymentRentDelayEndDateForCorporateCustomer(CreateRentRequest createRentRequest, CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest, CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
-
-        PaymentPostServiceModal paymentPostServiceModal = new PaymentPostServiceModal();
-        paymentPostServiceModal.setCreateRentRequest(createRentRequest);
-        paymentPostServiceModal.setCreateOrderedAdditionalServiceListRequests(createOrderedAdditionalServiceListRequest);
-        paymentPostServiceModal.setCreateCreditCardRequest(createCreditCardRequest);
-
-        this.paymentService.addForCorporateCustomer(paymentPostServiceModal);
     }
 
     private void checkIfEndDateForRentDelay(LocalDate endDate, LocalDate updateEndDate) throws BusinessException {
@@ -452,55 +439,6 @@ public class RentManager implements RentService {
         }
     }
 
-    private CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServicesForEndDateDelay(int rentId) {
-
-        List<Integer> additionalServiceIds = new ArrayList<Integer>();
-
-        System.out.println(additionalServiceIds);
-
-        if (this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData() != null) {
-            var orderedAdditinalServices = this.orderedAdditionalServiceService.getByRent_RentId(rentId).getData();
-
-            for (int i = 0; i < orderedAdditinalServices.size(); i++) {
-                int id = orderedAdditinalServices.get(i).getAdditionalServiceId();
-                additionalServiceIds.add(id);
-            }
-        }
-
-
-        CreateOrderedAdditionalServiceListRequest createOrderedAdditionalServiceListRequest = new CreateOrderedAdditionalServiceListRequest();
-        createOrderedAdditionalServiceListRequest.setAdditionalServiceIds(additionalServiceIds);
-
-        return createOrderedAdditionalServiceListRequest;
-    }
-
-    private CreateCreditCardRequest createCreditCardForEndDateDelay(CreateCreditCardRequest createCreditCard) {
-
-        CreateCreditCardRequest createCreditCardRequest = new CreateCreditCardRequest();
-
-        createCreditCardRequest.setCardOwnerName(createCreditCard.getCardOwnerName());
-        createCreditCardRequest.setCardNumber(createCreditCard.getCardNumber());
-        createCreditCardRequest.setCardEndMonth(createCreditCard.getCardEndMonth());
-        createCreditCardRequest.setCardCVC(createCreditCard.getCardCVC());
-        createCreditCardRequest.setTotalPrice(createCreditCard.getTotalPrice());
-
-        return createCreditCardRequest;
-    }
-
-
-    private CreateRentRequest createRentForEndDateDelay(Rent rent, LocalDate updateEndDate) {
-
-        CreateRentRequest createRentRequest = new CreateRentRequest();
-
-        createRentRequest.setCarId(rent.getCar().getCarId());
-        createRentRequest.setStartingDate(rent.getEndDate());
-        createRentRequest.setEndDate(updateEndDate);
-        createRentRequest.setToCityId(rent.getToCity().getCityPlate());
-        createRentRequest.setFromCityId(rent.getFromCity().getCityPlate());
-        createRentRequest.setCustomerId(rent.getCustomer().getCustomerId());
-        return createRentRequest;
-
-    }
 
     private Rent manuelMappingToRentUpdate(int rentId, Rent rentUpdate) {
         rentUpdate.setToCity(this.rentDao.getByRentId(rentId).getToCity());

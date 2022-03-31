@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 @Data
 
@@ -17,6 +18,15 @@ public class CreateInvoiceRequest {
     @NotEmpty
     @Size(min = 1)
     private String invoiceNo;
+
+    private LocalDate startingDate;
+
+    private LocalDate endDate;
+
+    private double rentDay;
+
+    @Positive
+    private double totalRentCarPrice;
 
     @Positive
     private int rentId;

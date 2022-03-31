@@ -153,7 +153,7 @@ public class BusinessMessages {
     public static final String RENT_TO_CITY_NOT_FOUND ="The city with this ID is not available - toCity";
     public static final String RENT_FROM_CITY_NOT_FOUND ="The city with this ID is not available - fromCity";
     public static final String RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER= "Necessary structures have been created for individual customer late delivery.";
-    public static final String RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER="Necessary structures have been created for commercial customer late delivery.";
+    public static final String RENT_DELAY_END_DATE_FOR_CORPORATE_CUSTOMER="Necessary structures have been created for corporate customer late delivery.";
     public static final String IS_THE_INVOICE_AVAILABLE_FOR_THIS_RENTAL = "There is an invoice corresponding to this rental. Therefore, the lease cannot be deleted";
     public static final String IS_THE_ORDERED_ADDITIONAL_SERVICE_AVAILABLE_FOR_THIS_RENTAL = "There are additional services ordered corresponding to this lease. Therefore, the lease cannot be deleted";
     public static final String RENT_DELAY_END_DATE_CHECK = "The return date is the same as the system";

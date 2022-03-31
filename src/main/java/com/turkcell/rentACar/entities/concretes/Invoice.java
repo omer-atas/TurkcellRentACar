@@ -39,7 +39,7 @@ public class Invoice {
     private double rentDay;
 
     @Column(name = "rental_price_of_the_car")
-    private int totalRentCarPrice;
+    private double totalRentCarPrice;
 
     @ManyToOne
     @JoinColumn(name = "rent_id")
