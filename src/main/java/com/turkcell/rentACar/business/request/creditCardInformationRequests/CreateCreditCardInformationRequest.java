@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.request.creditCardInformationRequests;
 
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,14 @@ public class CreateCreditCardInformationRequest {
     @NotBlank
     @NotEmpty
     @Size(min = 1)
+    @Pattern(regexp = "^[0-9]{16}", message = BusinessMessages.CARD_NO_REGEX_MESSAGE)
     private String cardNumber;
 
     @NotNull
     @NotBlank
     @NotEmpty
     @Size(min = 1)
+    @Pattern(regexp = "^[abcçdefgğhıijklmnoöprsştuüvwqyzABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVWQYZ ]{5,50}", message = BusinessMessages.CARD_HOLDER_REGEX_MESSAGE)
     private String cardOwnerName;
 
     @Positive

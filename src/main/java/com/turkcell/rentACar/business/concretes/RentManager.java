@@ -24,8 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -378,7 +379,7 @@ public class RentManager implements RentService {
         return new SuccessResult(rentUpdate.getRentId() + BusinessMessages.RENT_UPDATE);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
     @Override
     public Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 
@@ -404,7 +405,7 @@ public class RentManager implements RentService {
         return new SuccessResult(BusinessMessages.RENT_DELAY_END_DATE_FOR_INDIVIDUAL_CUSTOMER);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
     @Override
     public Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException {
 

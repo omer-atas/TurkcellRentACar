@@ -166,8 +166,12 @@ public class BusinessMessages {
     public static final String CUSTOMER_CREDIT_CARD_INFORMATION_NOT_FOUND = "Customer credit card not found";
     public static final String CUSTOMER_CREDIT_CARD_INFORMATION_LISTED = "Customer credit cards listed";
     public static final String CREDIT_CARD_INFORMATION_DELETE = "Credit Cart Delted";
+    public static final String CARD_NO_REGEX_MESSAGE = "Not in credit card number format";
+    public static final String CARD_HOLDER_REGEX_MESSAGE = "Enter the correct credit card holder.";
 
     //User
     public static final String USER_EMAİL_EXİSTS = "There is a user with this email";
+
+
 
 }
