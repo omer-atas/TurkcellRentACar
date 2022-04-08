@@ -38,8 +38,7 @@ public class PaymentManager implements PaymentService {
     private final OrderedAdditionalServiceService orderedAdditionalServiceService;
 
     @Autowired
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService,
-                          RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService) {
         this.paymentDao = paymentDao;
         this.modelMapperService = modelMapperService;
         this.invoiceService = invoiceService;
@@ -60,7 +59,7 @@ public class PaymentManager implements PaymentService {
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
     @Override
     public Result gettingPaidForIndividualCustomerDelayEndDate(RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal, int rentId, double totalRentalPriceForTheDelayEndDateOfTheCar) throws BusinessException {
 
@@ -85,7 +84,7 @@ public class PaymentManager implements PaymentService {
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
     @Override
     public Result gettingPaidForCorporateCustomerDelayEndDate(RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal, int rentId, double totalRentalPriceForTheDelayEndDateOfTheCar) throws BusinessException {
 
@@ -140,13 +139,14 @@ public class PaymentManager implements PaymentService {
         return invoiceId;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
     public void runPaymentSuccessorIndıvıdualCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
         int rentId = createRentForIndıvıdualCustomer(paymentPostServiceModal.getCreateRentRequest());
         runPaymentSuccessor(paymentPostServiceModal, rentId);
     }
 
-    private int createRentForIndıvıdualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
+    public int createRentForIndıvıdualCustomer(CreateRentRequest createRentRequest) throws BusinessException {
         // add - rent - IndıvıdualCustomer
         int rentId = this.rentService.carRentalForIndividualCustomer(createRentRequest);
         return rentId;
@@ -164,19 +164,20 @@ public class PaymentManager implements PaymentService {
         return new SuccessResult(BusinessMessages.PAYMENT_ADD);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
     public void runPaymentSuccessorCorporateCustomer(PaymentPostServiceModal paymentPostServiceModal) throws BusinessException {
         int rentId = createRentForCorporateCustomer(paymentPostServiceModal.getCreateRentRequest());
         runPaymentSuccessor(paymentPostServiceModal, rentId);
     }
 
-    private int createRentForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
+    public int createRentForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException {
         // add - rent - CorporateCustomer
         int rentId = this.rentService.carRentalForCorporateCustomer(createRentRequest);
         return rentId;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = BusinessException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BusinessException.class)
     public void runPaymentSuccessor(PaymentPostServiceModal paymentPostServiceModal, int rentId) throws BusinessException {
 
         //add ordered additonal services
