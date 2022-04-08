@@ -20,6 +20,7 @@ public class UpdateInvoiceRequest {
 
     private LocalDate endDate;
 
+    @Positive
     private double rentDay;
 
     @Positive

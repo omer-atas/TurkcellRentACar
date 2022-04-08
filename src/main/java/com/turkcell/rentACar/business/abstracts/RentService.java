@@ -17,40 +17,40 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 
 public interface RentService {
 
-	int carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException;
+    int carRentalForIndividualCustomer(CreateRentRequest createRentRequest) throws BusinessException;
 
-	int carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException;
+    int carRentalForCorporateCustomer(CreateRentRequest createRentRequest) throws BusinessException;
 
-	DataResult<RentGetDto> getByRentId(int rentId);
+    DataResult<RentGetDto> getByRentId(int rentId);
 
-	DataResult<List<RentListDto>> getAll();
+    DataResult<List<RentListDto>> getAll();
 
-	DataResult<List<RentListDto>> getAllForCorporateCustomer();
+    DataResult<List<RentListDto>> getAllForCorporateCustomer();
 
-	DataResult<List<RentListDto>> getAllForIndividualCustomer();
+    DataResult<List<RentListDto>> getAllForIndividualCustomer();
 
-	DataResult<List<RentListDto>> getAllPaged(int pageNo, int pageSize);
+    DataResult<List<RentListDto>> getAllPaged(int pageNo, int pageSize);
 
-	DataResult<List<RentListDto>> getAllSorted(Sort.Direction direction);
+    DataResult<List<RentListDto>> getAllSorted(Sort.Direction direction);
 
-	boolean checkIfRentExists(int rentalId) throws BusinessException;
+    boolean checkIfRentExists(int rentalId) throws BusinessException;
 
-	void checkIfIndividualCustomerExists(int customerId) throws BusinessException;
+    void checkIfIndividualCustomerExists(int customerId) throws BusinessException;
 
-	void checkIfCustomerExists(int customerId) throws BusinessException;
+    void checkIfCustomerExists(int customerId) throws BusinessException;
 
-	void checkIfCorporateCustomerExists(int customerId) throws BusinessException;
+    void checkIfCorporateCustomerExists(int customerId) throws BusinessException;
 
-	double calculatorRentalPriceOfTheCar(int carId, LocalDate startingDate, LocalDate endDate);
+    double calculatorRentalPriceOfTheCar(int carId, LocalDate startingDate, LocalDate endDate);
 
-	Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
+    Result updateRentDelayEndDateForIndividualCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
 
-	Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
+    Result updateRentDelayEndDateForCorporateCustomer(int rentId, RentEndDateDelayPostServiceModal rentEndDateDelayPostServiceModal) throws BusinessException;
 
-	List<RentListDto> getByCar_CarId(int carId);
+    List<RentListDto> getByCar_CarId(int carId);
 
-	Result update(int rentId, UpdateRentRequest updateRentRequest) throws BusinessException;
+    Result update(int rentId, UpdateRentRequest updateRentRequest) throws BusinessException;
 
-	Result delete(DeleteRentRequest deleteRentalCarRequest) throws BusinessException;
+    Result delete(DeleteRentRequest deleteRentalCarRequest) throws BusinessException;
 
 }

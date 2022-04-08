@@ -36,21 +36,22 @@ public class Rent {
     @Column(name = "return_kilometer")
     private double returnKilometer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_city_id")
     private City fromCity;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_city_id")
     private City toCity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id")
     private Car car;
 
     @OneToMany(mappedBy = "rent")
     private List<OrderedAdditionalService> orderedAdditionalService;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 

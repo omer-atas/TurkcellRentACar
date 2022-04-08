@@ -41,7 +41,7 @@ public class Invoice {
     @Column(name = "rental_price_of_the_car")
     private double totalRentCarPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rent_id")
     private Rent rent;
 

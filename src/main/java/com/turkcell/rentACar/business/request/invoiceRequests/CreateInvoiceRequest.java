@@ -23,6 +23,7 @@ public class CreateInvoiceRequest {
 
     private LocalDate endDate;
 
+    @Positive
     private double rentDay;
 
     @Positive

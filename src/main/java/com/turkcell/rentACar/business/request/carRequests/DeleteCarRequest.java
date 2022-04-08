@@ -1,6 +1,5 @@
 package com.turkcell.rentACar.business.request.carRequests;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
@@ -11,8 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteCarRequest {
-	
-	@NotNull
+
 	@Positive
 	private int carId;
 

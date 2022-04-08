@@ -49,7 +49,7 @@ public class InvoicesController {
     }
 
     @GetMapping("/getByRent_Customer_CustomerId/{customerId}")
-    public DataResult<List<InvoiceListDto>> getByRent_Customer_CustomerId(@RequestParam("invoiceId") int customerId) {
+    public DataResult<List<InvoiceListDto>> getByRent_Customer_CustomerId(@RequestParam("customerId") int customerId) {
         return this.invoiceService.getByRent_Customer_CustomerId(customerId);
     }
 

@@ -12,11 +12,15 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CreateCreditCardRequest {
 
+    @NotBlank
     @NotNull
+    @NotEmpty
     @Size(min = 1)
     private String cardNumber;
 
+    @NotBlank
     @NotNull
+    @NotEmpty
     @Size(min = 1)
     private String cardOwnerName;
 

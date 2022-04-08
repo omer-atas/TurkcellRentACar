@@ -1,10 +1,11 @@
 package com.turkcell.rentACar.business.request.rentRequests;
 
-import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.Positive;
 
 @Data
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateRentRequest {
 
+    @Positive
     private double returnKilometer;
 
 }

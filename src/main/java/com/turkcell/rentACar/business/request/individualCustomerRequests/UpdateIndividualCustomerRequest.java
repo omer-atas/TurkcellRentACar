@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.*;
+
 @Data
 
 @AllArgsConstructor
@@ -14,8 +16,13 @@ public class UpdateIndividualCustomerRequest {
 
     private String lastName;
 
+    @NotBlank
+    @NotNull
+    @NotEmpty
+    @Size(min = 11,max = 11)
     private String nationalIdentity;
 
+    @Email
     private String email;
 
     private String password;

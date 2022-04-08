@@ -29,4 +29,5 @@ public class InvoiceGetDto {
     private int totalRentCarPrice;
 
     private int customerId;
+
 }

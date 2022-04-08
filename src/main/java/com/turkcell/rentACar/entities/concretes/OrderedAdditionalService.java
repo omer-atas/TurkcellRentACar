@@ -19,11 +19,11 @@ public class OrderedAdditionalService {
     @Column(name = "ordered_additional_service_id")
     private int orderedAdditionalServiceId;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "additional_service_id")
     private AdditionalService additionalService;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rent_id")
     private Rent rent;
 

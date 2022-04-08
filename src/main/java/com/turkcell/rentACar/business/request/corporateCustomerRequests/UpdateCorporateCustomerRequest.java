@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
+import javax.validation.constraints.*;
 
 @Data
 
@@ -14,6 +14,10 @@ public class UpdateCorporateCustomerRequest {
 
     private String companyName;
 
+    @NotBlank
+    @NotNull
+    @NotEmpty
+    @Size(min = 10,max = 10)
     private String taxNumber;
 
     @Email

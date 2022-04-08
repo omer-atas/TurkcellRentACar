@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
 
-// make payment ekle oraya rent - paymnet - additionalService
-
 @SpringBootApplication
 @RestControllerAdvice
 public class RentACarApplication {

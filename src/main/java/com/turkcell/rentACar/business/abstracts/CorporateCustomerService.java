@@ -2,14 +2,9 @@ package com.turkcell.rentACar.business.abstracts;
 
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerGetDto;
 import com.turkcell.rentACar.business.dtos.corporateCustomerDtos.CorporateCustomerListDto;
-import com.turkcell.rentACar.business.dtos.userDtos.UserGetDto;
-import com.turkcell.rentACar.business.dtos.userDtos.UserListDto;
 import com.turkcell.rentACar.business.request.corporateCustomerRequests.CreateCorporateCustomerRequest;
 import com.turkcell.rentACar.business.request.corporateCustomerRequests.DeleteCorporateCustomerRequest;
 import com.turkcell.rentACar.business.request.corporateCustomerRequests.UpdateCorporateCustomerRequest;
-import com.turkcell.rentACar.business.request.userRequests.CreateUserRequest;
-import com.turkcell.rentACar.business.request.userRequests.DeleteUserRequest;
-import com.turkcell.rentACar.business.request.userRequests.UpdateUserRequest;
 import com.turkcell.rentACar.core.exception.BusinessException;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;

@@ -34,7 +34,7 @@ public class CreditCardInformation {
     @Column(name = "card_cvc")
     private int cardCVC;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 }

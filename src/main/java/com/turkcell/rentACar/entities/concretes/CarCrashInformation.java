@@ -22,7 +22,7 @@ public class CarCrashInformation {
     @Column(name = "crash_detail")
     private String crashDetail;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="car_id")
     private Car car;
 }

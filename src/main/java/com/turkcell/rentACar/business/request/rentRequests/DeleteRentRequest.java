@@ -1,6 +1,5 @@
 package com.turkcell.rentACar.business.request.rentRequests;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeleteRentRequest {
 
-	@NotNull
 	@Positive
 	private int rentId;
 

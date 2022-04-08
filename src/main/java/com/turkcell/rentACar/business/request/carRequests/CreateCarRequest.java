@@ -28,7 +28,6 @@ public class CreateCarRequest {
 	@Size(min = 1)
 	private String description;
 
-	@NotNull
 	@Positive
 	private double kilometerInformation;
 
