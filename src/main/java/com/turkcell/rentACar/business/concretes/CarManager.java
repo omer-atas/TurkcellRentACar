@@ -31,11 +31,11 @@ import com.turkcell.rentACar.entities.concretes.Car;
 @Service
 public class CarManager implements CarService {
 
-    private final CarDao carDao;
-    private final ModelMapperService modelMapperService;
-    private final BrandService brandService;
-    private final ColorService colorService;
-    private final CityService cityService;
+    private CarDao carDao;
+    private ModelMapperService modelMapperService;
+    private BrandService brandService;
+    private ColorService colorService;
+    private CityService cityService;
     private CarCrashInformationService carCrashInformationService;
     private RentService rentService;
     private CarMaintenanceService carMaintenanceService;

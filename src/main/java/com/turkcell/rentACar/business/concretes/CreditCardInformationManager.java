@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 @Service
 public class CreditCardInformationManager implements CreditCardInformationService {
 
-    private final CreditCardInformationDao creditCardInformationDao;
-    private final ModelMapperService modelMapperService;
-    private final CustomerService customerService;
+    private CreditCardInformationDao creditCardInformationDao;
+    private ModelMapperService modelMapperService;
+    private CustomerService customerService;
 
     @Autowired
     public CreditCardInformationManager(CreditCardInformationDao creditCardInformationDao, ModelMapperService modelMapperService, CustomerService customerService) {

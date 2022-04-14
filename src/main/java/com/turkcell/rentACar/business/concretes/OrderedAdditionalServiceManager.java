@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 @Service
 public class OrderedAdditionalServiceManager implements OrderedAdditionalServiceService {
 
-    private final OrderedAdditionalServiceDao orderedAdditionalServiceDao;
-    private final ModelMapperService modelMapperService;
-    private final AdditionalServiceService additionalServiceService;
-    private final RentService rentService;
+    private OrderedAdditionalServiceDao orderedAdditionalServiceDao;
+    private ModelMapperService modelMapperService;
+    private AdditionalServiceService additionalServiceService;
+    private RentService rentService;
 
     @Lazy
     @Autowired

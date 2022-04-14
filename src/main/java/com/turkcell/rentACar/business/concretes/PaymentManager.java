@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentManager implements PaymentService {
 
-    private final PaymentDao paymentDao;
-    private final ModelMapperService modelMapperService;
-    private final InvoiceService invoiceService;
-    private final PostService postService;
-    private final RentService rentService;
-    private final OrderedAdditionalServiceService orderedAdditionalServiceService;
+    private PaymentDao paymentDao;
+    private ModelMapperService modelMapperService;
+    private InvoiceService invoiceService;
+    private PostService postService;
+    private RentService rentService;
+    private OrderedAdditionalServiceService orderedAdditionalServiceService;
 
     @Autowired
     public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, InvoiceService invoiceService, PostService postService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService) {

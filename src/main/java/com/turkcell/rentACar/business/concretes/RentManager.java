@@ -34,17 +34,17 @@ import java.util.stream.Collectors;
 @Service
 public class RentManager implements RentService {
 
-    private final RentDao rentDao;
-    private final ModelMapperService modelMapperService;
-    private final CarMaintenanceService carMaintenanceService;
-    private final CarService carService;
-    private final CityService cityService;
-    private final OrderedAdditionalServiceService orderedAdditionalServiceService;
-    private final CustomerService customerService;
-    private final IndividualCustomerService individualCustomerService;
-    private final CorporateCustomerService corporateCustomerService;
-    private final InvoiceService invoiceService;
-    private final PaymentService paymentService;
+    private RentDao rentDao;
+    private ModelMapperService modelMapperService;
+    private CarMaintenanceService carMaintenanceService;
+    private CarService carService;
+    private CityService cityService;
+    private OrderedAdditionalServiceService orderedAdditionalServiceService;
+    private CustomerService customerService;
+    private IndividualCustomerService individualCustomerService;
+    private CorporateCustomerService corporateCustomerService;
+    private InvoiceService invoiceService;
+    private PaymentService paymentService;
 
     @Lazy
     @Autowired

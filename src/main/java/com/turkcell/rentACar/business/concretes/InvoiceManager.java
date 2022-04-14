@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceManager implements InvoiceService {
 
-    private final InvoiceDao invoiceDao;
-    private final ModelMapperService modelMapperService;
-    private final RentService rentService;
-    private final OrderedAdditionalServiceService orderedAdditionalServiceService;
-    private final AdditionalServiceService additionalServiceService;
-    private final CarService carService;
+    private InvoiceDao invoiceDao;
+    private ModelMapperService modelMapperService;
+    private RentService rentService;
+    private OrderedAdditionalServiceService orderedAdditionalServiceService;
+    private AdditionalServiceService additionalServiceService;
+    private CarService carService;
 
     @Autowired
     public InvoiceManager(InvoiceDao invoiceDao, ModelMapperService modelMapperService, RentService rentService, OrderedAdditionalServiceService orderedAdditionalServiceService, AdditionalServiceService additionalServiceService, CarService carService) {
