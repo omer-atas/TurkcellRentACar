@@ -58,7 +58,7 @@ public class ColorManager implements ColorService {
 
 	public void checkIfNameNotDuplicated(String colorName) throws BusinessException {
 
-		var response = this.colorDao.existsByColorName(colorName);
+		boolean response = this.colorDao.existsByColorName(colorName);
 
 		if (response) {
 			throw new BusinessException(BusinessMessages.COLOR_NAME_NOT_DUPLICATED);
